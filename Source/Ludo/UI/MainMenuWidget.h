@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "MainMenuInterface.h"
 #include "MainMenuWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LUDO_API UMainMenuWidget : public UUserWidget
+class LUDO_API UMainMenuWidget : public UUserWidget, public IMainMenuInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +19,10 @@ public:
 	UMainMenuWidget(const FObjectInitializer& ObjectInitializer);
 
 	void SetMainContent(UWidget* Content);
+
+	// Menu interface
+	virtual void NavigateMenu(EMainMenu ToMenu) override;
+	virtual void ReturnToParentMenu() override;
 
 protected:
 	void NativeOnInitialized() override;
@@ -38,8 +43,12 @@ private:
 	class UButton* ButtonExitGame;
 
 	UPROPERTY(EditAnywhere, Category="Content")
-	TSubclassOf<UUserWidget> DefaultMainContent_Class;
-	UUserWidget* RootMenu;
+	TSubclassOf<class UMainMenuSubWidget> DefaultMainContent_Class;
+	
+	TArray<EMainMenu> MenuStack;
+
+	UPROPERTY()
+	UMainMenuSubWidget* RootMenu;
 
 public:
 	UFUNCTION(BlueprintPure)
