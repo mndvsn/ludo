@@ -3,12 +3,18 @@
 
 #include "MainMenuWidget.h"
 
+#include "Components/NamedSlot.h"
 #include "Components/Button.h"
 
 
 UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
 {
 	Super::NativeOnInitialized();
+}
+
+void UMainMenuWidget::SetMainContent(UWidget* Content)
+{
+	SlotMain->SetContent(Content);
 }
 
 void UMainMenuWidget::NativeOnInitialized()
@@ -19,6 +25,12 @@ void UMainMenuWidget::NativeOnInitialized()
 	{
 		ButtonExitGame->OnReleased.AddDynamic(this, &UMainMenuWidget::ButtonExitGameReleased);
 	}
+
+	// Create root main menu content
+	if (DefaultMainContent_Class == nullptr) return;
+	RootMenu = CreateWidget(this, DefaultMainContent_Class);
+	
+	SetMainContent(RootMenu);
 }
 
 void UMainMenuWidget::ButtonExitGameReleased()

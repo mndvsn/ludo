@@ -17,6 +17,8 @@ class LUDO_API UMainMenuWidget : public UUserWidget
 public:
 	UMainMenuWidget(const FObjectInitializer& ObjectInitializer);
 
+	void SetMainContent(UWidget* Content);
+
 protected:
 	void NativeOnInitialized() override;
 
@@ -27,19 +29,23 @@ private:
 	UPROPERTY(meta = (BindWidget), BlueprintGetter="GetMain")
 	UUserWidget* WidgetMain;
 
-	UPROPERTY(meta = (BindWidget), BlueprintGetter="GetContents")
-	UUserWidget* WidgetMainContents;
+	UPROPERTY(meta = (BindWidget), BlueprintGetter="GetSlotMain")
+	class UNamedSlot* SlotMain;
 
 	UPROPERTY(meta = (BindWidget), BlueprintGetter="GetFooter")
 	UUserWidget* WidgetFooter;
 
 	class UButton* ButtonExitGame;
 
+	UPROPERTY(EditAnywhere, Category="Content")
+	TSubclassOf<UUserWidget> DefaultMainContent_Class;
+	UUserWidget* RootMenu;
+
 public:
 	UFUNCTION(BlueprintPure)
 	UUserWidget* GetMain() { return WidgetMain; };
 	UFUNCTION(BlueprintPure)
-	UUserWidget* GetContents() { return WidgetMainContents; };
+	UNamedSlot* GetSlotMain() { return SlotMain; };
 	UFUNCTION(BlueprintPure)
 	UUserWidget* GetFooter() { return WidgetFooter; };
 };
