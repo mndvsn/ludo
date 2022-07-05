@@ -34,4 +34,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonBack;
+
+	UPROPERTY(meta = (BindWidget))
+	class USlider* SliderPlayersCPU;
 };

@@ -5,6 +5,7 @@
 #include "Game/LudoGameInstance.h"
 
 #include "Components/Button.h"
+#include "Components/Slider.h"
 
 
 UCreateGameWidget::UCreateGameWidget(const FObjectInitializer& ObjectInitializer) : UMainMenuSubWidget(ObjectInitializer)
@@ -22,12 +23,13 @@ void UCreateGameWidget::NativeOnInitialized()
 
 void UCreateGameWidget::ButtonCreateGameReleased()
 {
-	if (GetMenuInterface() == nullptr) return;
+	if (SliderPlayersCPU == nullptr) return;
+	uint32 NumPlayersCPU = (uint32)SliderPlayersCPU->GetValue();
 
 	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
 	if (GameInstance == nullptr) return;
 
-	GameInstance->CreateGame();
+	GameInstance->CreateGameCPU(NumPlayersCPU);
 }
 
 void UCreateGameWidget::ButtonBackReleased()

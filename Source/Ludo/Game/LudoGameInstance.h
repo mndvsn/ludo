@@ -19,6 +19,8 @@ class LUDO_API ULudoGameInstance : public UGameInstance
 public:
 	void Init() override;
 
+	void CreateGameCPU(uint32 NumCPUPlayers = 3);
+
 	void CreateGame();
 
 	void EndGame();

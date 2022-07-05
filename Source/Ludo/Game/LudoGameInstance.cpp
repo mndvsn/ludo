@@ -19,6 +19,14 @@ void ULudoGameInstance::Init()
 	Engine->OnTravelFailure().AddUObject(this, &ULudoGameInstance::HandleTravelFailure);
 }
 
+void ULudoGameInstance::CreateGameCPU(uint32 NumCPUPlayers)
+{
+	if (GetEngine() == nullptr) return;
+	GetEngine()->AddOnScreenDebugMessage(0, 4, FColor::Red, FString::Printf(TEXT("Creating game with CPU: %d"), NumCPUPlayers));
+
+	CreateGame();
+}
+
 void ULudoGameInstance::CreateGame()
 {
 	UWorld* World = GetWorld();
