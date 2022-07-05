@@ -1,12 +1,14 @@
 // Copyright Martin Furuberg. All Rights Reserved.
 
 #include "LudoGameModeBase.h"
-#include "GamerState.h"
-#include "../LudoPlayerController.h"
-#include "../Actors/Gamer.h"
+
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/PlayerStart.h"
 #include "EngineUtils.h"
+
+#include "LudoPlayerController.h"
+#include "GamerState.h"
+#include "Actors/Gamer.h"
+#include "Actors/LudoPlayerStart.h"
 
 
 ALudoGameModeBase::ALudoGameModeBase()
@@ -69,12 +71,12 @@ void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController
 AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Give player start -> %s"), *Player->GetName());
-	APlayerStart* StartSpot = nullptr;
+	ALudoPlayerStart* StartSpot = nullptr;
 
-	if (AvailableStartPoints.Num() > 0)
+	if (AvailablePlayerStarts.Num() > 0)
 	{
-		StartSpot = AvailableStartPoints[0];
-		AvailableStartPoints.RemoveAt(0);
+		StartSpot = AvailablePlayerStarts[0];
+		AvailablePlayerStarts.RemoveAt(0);
 	}
 
 	return StartSpot;
@@ -95,18 +97,7 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 	
 	int NumberOfPlayers = MaxNumberOfPlayers;
 
-	// Find all PlayerStarts
-	for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
-	{
-		AvailableStartPoints.Add(*It);
-	}
-	AvailableStartPoints.Sort([](const APlayerStart& A, const APlayerStart& B)
-	{
-		int StartIndexA = FCString::Atoi(*A.PlayerStartTag.ToString());
-		int StartIndexB = FCString::Atoi(*B.PlayerStartTag.ToString());
-		return StartIndexA < StartIndexB;
-	});
-	UE_LOG(LogTemp, Warning, TEXT("StartPoints: %d"), AvailableStartPoints.Num());
+	CreatePlayerStarts(NumberOfPlayers);
 
 	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), AvailableStartPoints);
 /*
@@ -127,4 +118,20 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 
 	APlayerController *PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->Possess(Players[0]);*/
+}
+
+void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr) return;
+
+	for (uint8 i=0; i < PlayerCount; i++)
+	{
+		FRotator StartRotation;
+		StartRotation.Yaw = i * (360.0f / PlayerCount);
+
+		ALudoPlayerStart* PlayerStart = World->SpawnActor<ALudoPlayerStart>(FVector::ZeroVector, StartRotation);
+		PlayerStart->SetPlayerIndex(i);
+		AvailablePlayerStarts.Add(PlayerStart);
+	}
 }

@@ -39,9 +39,9 @@ protected:
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	//virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
-	
-	// start positions
-	TArray<class APlayerStart*> AvailableStartPoints;
+
+	TArray<class ALudoPlayerStart*> AvailablePlayerStarts;
 private:
 
+	void CreatePlayerStarts(uint8 PlayerCount);
 };
