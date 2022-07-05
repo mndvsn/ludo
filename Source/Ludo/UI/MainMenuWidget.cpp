@@ -3,11 +3,13 @@
 
 #include "MainMenuWidget.h"
 
+#include "Kismet/KismetSystemLibrary.h"
 #include "Components/NamedSlot.h"
 #include "Components/Button.h"
 
 #include "MainMenuSubWidget.h"
 #include "ModeSelectWidget.h"
+#include "CreateGameWidget.h"
 
 
 UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
@@ -43,16 +45,31 @@ void UMainMenuWidget::NavigateMenu(EMainMenu ToMenu)
 		return;
 	}
 
-	// Add menu to navigation history
-	MenuStack.Add(ToMenu);
-
 	switch (ToMenu)
 	{
-	default:
-	case EMainMenu::MM_ModeSelect:		
+	case EMainMenu::MM_ModeSelect:
+	{
+		RootMenu->SetVisibility(ESlateVisibility::Visible);
+		RootMenu->SetIsEnabled(true);
 		SetMainContent(RootMenu);
 		break;
 	}
+	case EMainMenu::MM_CreateGame:
+	{
+		if (CreateGameWidget_Class == nullptr) return;
+		UCreateGameWidget* CreateGameWidget = CreateWidget<UCreateGameWidget>(this, CreateGameWidget_Class);
+		CreateGameWidget->SetMenuInterface(this);
+
+		SetMainContent(CreateGameWidget);
+		break;
+	}
+	case EMainMenu::MM_None:
+	default:
+		break;
+	}
+
+	// Add menu to navigation history
+	MenuStack.Add(ToMenu);
 }
 
 void UMainMenuWidget::ReturnToParentMenu()
@@ -71,10 +88,26 @@ void UMainMenuWidget::ReturnToParentMenu()
 
 void UMainMenuWidget::SetMainContent(UWidget* Content)
 {
+	if (Content == nullptr) return;
+
+	UWidget* CurrentContent = SlotMain->GetContent();
+	if (CurrentContent != nullptr)
+	{
+		if (CurrentContent == RootMenu)
+		{
+			CurrentContent->SetVisibility(ESlateVisibility::Collapsed);
+			CurrentContent->SetIsEnabled(false);
+		}
+		else
+		{
+			CurrentContent->RemoveFromParent();
+		}
+	}
+
 	SlotMain->SetContent(Content);
 }
 
 void UMainMenuWidget::ButtonExitGameReleased()
 {
-	GetOwningPlayer()->ConsoleCommand("quit");
+	UKismetSystemLibrary::QuitGame(GetWorld(), 0, EQuitPreference::Quit, false);
 }

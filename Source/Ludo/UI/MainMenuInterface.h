@@ -11,6 +11,7 @@ UENUM(BlueprintType)
 enum class EMainMenu : uint8 {
 	MM_None  UMETA(DisplayName = "None"),
 	MM_ModeSelect  UMETA(DisplayName = "ModeSelect"),
+	MM_CreateGame  UMETA(DisplayName = "CreateGame"),
 };
 
 // This class does not need to be modified.

@@ -44,11 +44,14 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Content")
 	TSubclassOf<class UMainMenuSubWidget> DefaultMainContent_Class;
-	
-	TArray<EMainMenu> MenuStack;
 
 	UPROPERTY()
 	UMainMenuSubWidget* RootMenu;
+
+	UPROPERTY(EditAnywhere, Category = "Content")
+	TSubclassOf<class UMainMenuSubWidget> CreateGameWidget_Class;
+
+	TArray<EMainMenu> MenuStack;
 
 public:
 	UFUNCTION(BlueprintPure)

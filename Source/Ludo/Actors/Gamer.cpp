@@ -2,15 +2,17 @@
 
 
 #include "Gamer.h"
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "../UI/DefaultHUD.h"
-#include "../LudoPlayerController.h"
-#include "Components/TextRenderComponent.h"
-#include "../Game/GamerState.h"
+
+#include "Game/LudoGameInstance.h"
+#include "Game/GamerState.h"
+#include "UI/DefaultHUD.h"
+#include "LudoPlayerController.h"
 
 // Sets default values
 AGamer::AGamer()
@@ -72,7 +74,7 @@ void AGamer::BeginPlay()
 	{
 		DefaultHUD = Cast<UDefaultHUD>(CreateWidget(GetWorld(), DefaultHUD_Class));
 		DefaultHUD->AddToViewport();
-		DefaultHUD->OnShowMenu.AddDynamic(this, &AGamer::ExitGame);
+		DefaultHUD->OnShowMenu.AddDynamic(this, &AGamer::ShowInGameMenu);
 	}
 }
 
@@ -100,7 +102,7 @@ void AGamer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
 	// System
-	PlayerInputComponent->BindAction("Menu", IE_Pressed, this, &AGamer::ExitGame);
+	PlayerInputComponent->BindAction("Menu", IE_Pressed, this, &AGamer::ShowInGameMenu);
 
 	// Camera
 	PlayerInputComponent->BindAxis("CameraUp", this, &AGamer::PushCameraUp);
@@ -200,8 +202,9 @@ void AGamer::UpdatePlayerLabel()
 	}
 }
 
-void AGamer::ExitGame()
+void AGamer::ShowInGameMenu()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Meny trigger"));
-	UKismetSystemLibrary::QuitGame(GetWorld(), 0, EQuitPreference::Quit, false);
+	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
+	if (GameInstance == nullptr) return;
+	GameInstance->EndGame();
 }

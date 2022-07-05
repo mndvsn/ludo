@@ -19,5 +19,5 @@ void UModeSelectWidget::ButtonGameCPUReleased()
 {
 	if (GetMenuInterface() == nullptr) return;
 
-	GetMenuInterface()->NavigateMenu(EMainMenu::MM_ModeSelect);
+	GetMenuInterface()->NavigateMenu(EMainMenu::MM_CreateGame);
 }

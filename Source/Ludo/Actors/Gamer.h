@@ -67,5 +67,5 @@ public:
 	void UpdatePlayerLabel();
 
 	UFUNCTION()
-	void ExitGame();
+	void ShowInGameMenu();
 };
