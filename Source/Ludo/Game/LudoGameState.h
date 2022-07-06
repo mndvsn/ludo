@@ -20,6 +20,8 @@ class LUDO_API ALudoGameState : public AGameStateBase
 public:
 	const class AGamerState* GetGamerStateForIndex(int8 PlayerIndex) const;
 
+	const class AGamerState* GetGamerStateInTurn() const;
+
 	bool IsPlayerTurn(APlayerController* Player);
 
 	void AdvanceTurn();

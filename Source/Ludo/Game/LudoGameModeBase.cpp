@@ -55,8 +55,32 @@ bool ALudoGameModeBase::CheckGameReady()
 
 void ALudoGameModeBase::StartGame()
 {
+	ALudoGameState* State = GetGameState<ALudoGameState>();
+	
 	// Go to first turn
-	GetGameState<ALudoGameState>()->AdvanceTurn();
+	State->AdvanceTurn();
+
+	// Set controller in turn
+	PlayerControllerInTurn = CastChecked<ALudoPlayerController>(State->GetGamerStateInTurn()->GetPlayerController());
+	
+	// Tell player controller in turn
+	PlayerControllerInTurn->Client_StartTurn();
+}
+
+void ALudoGameModeBase::NextTurn()
+{
+	ALudoGameState* State = GetGameState<ALudoGameState>();
+
+	// Tell player turn has ended
+	PlayerControllerInTurn->Client_EndTurn();
+
+	State->AdvanceTurn();
+
+	// Update controller in turn
+	PlayerControllerInTurn = CastChecked<ALudoPlayerController>(State->GetGamerStateInTurn()->GetPlayerController());
+
+	// Tell next controller in turn
+	PlayerControllerInTurn->Client_StartTurn();
 }
 
 void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)

@@ -20,9 +20,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int MaxNumberOfPlayers;
 
-	/*UPROPERTY(BlueprintReadOnly)
-	TArray<class AGamer*> Players;*/
-
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
@@ -34,10 +31,17 @@ protected:
 
 	TArray<class ALudoPlayerStart*> AvailablePlayerStarts;
 
+	class ALudoPlayerController* GetPlayerControllerInTurn() { return PlayerControllerInTurn; };
+
 private:
+	class ALudoPlayerController* PlayerControllerInTurn;
+
 	void CreatePlayerStarts(uint8 PlayerCount);
 
 	bool CheckGameReady();
 
 	void StartGame();
+
+public:
+	void NextTurn();
 };

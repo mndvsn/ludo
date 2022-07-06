@@ -21,6 +21,18 @@ public:
 
 	// RPCs
 
+	UFUNCTION(Client, Reliable)
+	void Client_StartTurn();
+
+	UFUNCTION(Client, Reliable)
+	void Client_EndTurn();
+
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void Server_RequestEndTurn();
+
+	UFUNCTION(BlueprintPure)
+	bool IsInTurn() { return InTurn; };
+
+private:
+	bool InTurn;
 };

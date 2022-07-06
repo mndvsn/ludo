@@ -33,6 +33,11 @@ const AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
 	return CastChecked<AGamerState>(PlayerStatePtr->Get());
 }
 
+const class AGamerState* ALudoGameState::GetGamerStateInTurn() const
+{
+	return GetGamerStateForIndex(CurrentPlayerIndex);
+}
+
 bool ALudoGameState::IsPlayerTurn(APlayerController* Player)
 {
 	return true;

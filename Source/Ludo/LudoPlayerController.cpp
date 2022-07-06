@@ -2,6 +2,7 @@
 
 
 #include "LudoPlayerController.h"
+#include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
 
@@ -20,12 +21,28 @@ int8 ALudoPlayerController::GetPlayerIndex() const
 	return GetPlayerState<AGamerState>()->GetPlayerIndex();
 }
 
+void ALudoPlayerController::Client_StartTurn_Implementation()
+{
+	InTurn = true;
+
+	// broadcast event
+}
+
+void ALudoPlayerController::Client_EndTurn_Implementation()
+{
+	InTurn = false;
+
+	// broadcast event
+}
+
 void ALudoPlayerController::Server_RequestEndTurn_Implementation()
 {
-	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
-	if (State == nullptr) return;
+	//TODO: Check if this player is actually in turn
 
-	State->AdvanceTurn();
+	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
+	{
+		GameMode->NextTurn();
+	}
 }
 
 bool ALudoPlayerController::Server_RequestEndTurn_Validate()
