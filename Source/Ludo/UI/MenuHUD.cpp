@@ -7,7 +7,7 @@
 
 AMenuHUD::AMenuHUD()
 {
-	ConstructorHelpers::FClassFinder<UUserWidget> Menu_BPClass(TEXT("/Game/UI/W_MainMenu"));
+	ConstructorHelpers::FClassFinder<UUserWidget> Menu_BPClass(TEXT("/Game/UI/MainMenu/W_MainMenu"));
 	if (Menu_BPClass.Class) {
 		MenuClass = Menu_BPClass.Class;
 	}
@@ -31,7 +31,7 @@ void AMenuHUD::ShowMenu()
 {
 	APlayerController *PlayerController = GetOwner<APlayerController>();
 	if (PlayerController == nullptr) return;
-	if (!MenuIsValid()) return;
+	if (!IsValid(Menu)) return;
 
 	Menu->bIsFocusable = true;
 
@@ -47,7 +47,7 @@ void AMenuHUD::ShowMenu()
 
 void AMenuHUD::HideMenu()
 {
-	if (!MenuIsValid()) return;
+	if (!IsValid(Menu)) return;
 
 	Menu->RemoveFromParent();
 
@@ -57,9 +57,4 @@ void AMenuHUD::HideMenu()
 	FInputModeGameOnly InputModeData;
 	PlayerController->SetInputMode(InputModeData);
 	PlayerController->SetShowMouseCursor(false);
-}
-
-bool AMenuHUD::MenuIsValid()
-{
-	return Menu != nullptr;
 }

@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 
 #include "Game/LudoGameState.h"
+#include "UI/GameHUD.h"
 
 
 UGameQuickMenuWidget::UGameQuickMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
@@ -21,6 +22,8 @@ void UGameQuickMenuWidget::NativeOnInitialized()
 	if (State == nullptr) return;
 
 	State->GetEvents()->OnTurnChange.AddDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
+
+	OnShowMenu.AddDynamic(this, &UGameQuickMenuWidget::ButtonMenuReleased);
 }
 
 void UGameQuickMenuWidget::RemoveFromParent()
@@ -41,4 +44,12 @@ void UGameQuickMenuWidget::OnTurnChange(uint8 NewPlayerIndex)
 {
 	FText NewText = FText::FromString(FString::Printf(TEXT("Player turn: %d"), NewPlayerIndex));
 	LabelPlayerTurn->SetText(NewText);
+}
+
+void UGameQuickMenuWidget::ButtonMenuReleased()
+{
+	AGameHUD* GameHUD = GetOwningPlayer()->GetHUD<AGameHUD>();
+	if (!ensure(IsValid(GameHUD))) return;
+
+	GameHUD->ShowInGameMenu();
 }

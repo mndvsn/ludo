@@ -4,34 +4,38 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "MenuHUD.generated.h"
+#include "GameHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LUDO_API AMenuHUD : public AHUD
+class LUDO_API AGameHUD : public AHUD
 {
 	GENERATED_BODY()
 
 public:
-	AMenuHUD();
+	AGameHUD();
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void ConstructMenu();
+	void Show();
 
 	UFUNCTION(BlueprintCallable)
-	void ShowMenu();
+	void Hide();
 
-	UFUNCTION(BlueprintCallable)
-	void HideMenu();
+	UFUNCTION()
+	void ShowInGameMenu();
 
 protected:
+	UFUNCTION()
+	void ConstructHUD();
+
+private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UUserWidget> MenuClass;
+	TSubclassOf<class UUserWidget> GameWidget_Class;
 
 	UPROPERTY()
-	class UUserWidget* Menu;
+	class UGameOverlayWidget* GameWidget;
 };

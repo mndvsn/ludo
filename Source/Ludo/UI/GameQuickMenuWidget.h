@@ -33,4 +33,7 @@ private:
 
 	UFUNCTION()
 	void OnTurnChange(uint8 NewPlayerIndex);
+
+	UFUNCTION()
+	void ButtonMenuReleased();
 };

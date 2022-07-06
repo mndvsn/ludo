@@ -7,6 +7,7 @@
 
 #include "LudoGameState.h"
 #include "LudoPlayerController.h"
+#include "UI/GameHUD.h"
 #include "GamerState.h"
 #include "Actors/Gamer.h"
 #include "Actors/LudoPlayerStart.h"
@@ -24,6 +25,7 @@ ALudoGameModeBase::ALudoGameModeBase()
 	GameStateClass = ALudoGameState::StaticClass();
 	PlayerControllerClass = ALudoPlayerController::StaticClass();
 	PlayerStateClass = AGamerState::StaticClass();
+	HUDClass = AGameHUD::StaticClass();
 
 	PrimaryActorTick.bCanEverTick = false;
 

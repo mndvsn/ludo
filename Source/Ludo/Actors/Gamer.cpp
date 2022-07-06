@@ -11,7 +11,7 @@
 
 #include "Game/LudoGameInstance.h"
 #include "Game/GamerState.h"
-#include "UI/GameQuickMenuWidget.h"
+#include "UI/GameHUD.h"
 #include "LudoPlayerController.h"
 
 // Sets default values
@@ -48,12 +48,6 @@ AGamer::AGamer()
 	
 	// Don't auto possess (handled by game mode)
 	//AutoPossessPlayer = EAutoReceiveInput::Disabled;
-
-	// Find UI class
-	ConstructorHelpers::FClassFinder<UUserWidget> DefaultHUD_BPClass(TEXT("/Game/UI/W_Game_QuickMenu"));
-	if (DefaultHUD_BPClass.Class) {
-		DefaultHUD_Class = DefaultHUD_BPClass.Class;
-	}
 }
 
 // Called when the game starts or when spawned
@@ -68,14 +62,6 @@ void AGamer::BeginPlay()
 
 	// Put PlayerIndex in PlayerLabel
 	//UpdatePlayerLabel();
-	
-	// Create and display HUD
-	if (IsLocallyControlled() && DefaultHUD_Class != nullptr)
-	{
-		DefaultHUD = Cast<UGameQuickMenuWidget>(CreateWidget(GetWorld(), DefaultHUD_Class));
-		DefaultHUD->AddToViewport();
-		DefaultHUD->OnShowMenu.AddDynamic(this, &AGamer::ShowInGameMenu);
-	}
 }
 
 void AGamer::Tick(float DeltaTime)
@@ -102,7 +88,7 @@ void AGamer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
 	// System
-	PlayerInputComponent->BindAction("Menu", IE_Pressed, this, &AGamer::ShowInGameMenu);
+	PlayerInputComponent->BindAction("Menu", IE_Pressed, this, &AGamer::MenuKeyPressed);
 
 	// Camera
 	PlayerInputComponent->BindAxis("CameraUp", this, &AGamer::PushCameraUp);
@@ -193,6 +179,14 @@ float AGamer::SetCameraZoom(float InputDelta)
 	return NewZoom;
 }
 
+void AGamer::MenuKeyPressed()
+{
+	AGameHUD* GameHUD = GetController<APlayerController>()->GetHUD<AGameHUD>();
+	if (!ensure(IsValid(GameHUD))) return;
+
+	GameHUD->ShowInGameMenu();
+}
+
 void AGamer::UpdatePlayerLabel()
 {
 	AGamerState* GamerState = GetPlayerState<AGamerState>();
@@ -200,11 +194,4 @@ void AGamer::UpdatePlayerLabel()
 	{
 		PlayerLabel->SetText(FText::FromString(GamerState->GetPlayerName()));
 	}
-}
-
-void AGamer::ShowInGameMenu()
-{
-	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
-	if (GameInstance == nullptr) return;
-	GameInstance->EndGame();
 }

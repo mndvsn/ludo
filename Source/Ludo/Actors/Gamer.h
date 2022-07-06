@@ -38,10 +38,6 @@ public:
 	FORCEINLINE class UTextRenderComponent* GetPlayerLabel() const { return PlayerLabel; }
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UUserWidget> DefaultHUD_Class;
-	class UGameQuickMenuWidget* DefaultHUD;
-
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -55,6 +51,8 @@ protected:
 
 	float SetCameraZoom(float InputDelta);
 
+	UFUNCTION()
+	void MenuKeyPressed();
 
 public:	
 	// Called to bind functionality to input
@@ -65,7 +63,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	void UpdatePlayerLabel();
-
-	UFUNCTION()
-	void ShowInGameMenu();
 };
