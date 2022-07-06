@@ -106,8 +106,6 @@ void AGamer::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	UpdatePlayerLabel();
-	
-	GEngine->AddOnScreenDebugMessage(0, 5.0f, FColor::Blue, FString::Printf(TEXT("OnRep: %s"), *GetPlayerState()->GetPlayerName()), true);
 }
 
 void AGamer::PushCameraUp(float AxisValue)

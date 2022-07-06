@@ -3,6 +3,7 @@
 
 #include "LudoPlayerController.h"
 #include "Game/LudoGameState.h"
+#include "Game/GamerState.h"
 
 
 ALudoPlayerController::ALudoPlayerController()
@@ -14,10 +15,9 @@ ALudoPlayerController::ALudoPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
-void ALudoPlayerController::SetPlayerIndex(int val)
+int8 ALudoPlayerController::GetPlayerIndex() const
 {
-	PlayerIndex = val;
-	UE_LOG(LogTemp, Warning, TEXT("Tilldelad player index: %d"), val);
+	return GetPlayerState<AGamerState>()->GetPlayerIndex();
 }
 
 void ALudoPlayerController::Server_RequestEndTurn_Implementation()

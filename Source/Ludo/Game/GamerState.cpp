@@ -2,31 +2,70 @@
 
 
 #include "GamerState.h"
-#include "../Actors/Gamer.h"
+#include "Net/UnrealNetwork.h"
+
+#include "Actors/Gamer.h"
 
 AGamerState::AGamerState()
 {
 	// Use custom player names
-	bUseCustomPlayerNames = true;
+	// expects GetPlayerNameCustom()
+	//bUseCustomPlayerNames = true;
+}
+
+void AGamerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGamerState, PlayerIndex);
 }
 
 /**
  * Player name updated
  */
-void AGamerState::OnRep_PlayerName()
-{
-	UpdatePlayerName();
-}
-
 void AGamerState::UpdatePlayerName()
 {
-	AController* OwnerController = GetOwner<AController>();
-	if (OwnerController)
+	OnRep_PlayerName();
+}
+
+void AGamerState::OnRep_PlayerName()
+{
+	if (AController* OwnerController = GetOwner<AController>())
 	{
-		AGamer* Gamer = Cast<AGamer>(OwnerController->GetPawn());
-		if (Gamer)
+		if (AGamer* Gamer = Cast<AGamer>(OwnerController->GetPawn()))
 		{
 			Gamer->UpdatePlayerLabel();
 		}
+	}
+}
+
+void AGamerState::OnRep_PlayerIndex()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Assigned Player index: %d"), PlayerIndex);
+}
+
+void AGamerState::SetPlayerIndex(int NewIndex)
+{
+	PlayerIndex = NewIndex;
+	OnRep_PlayerIndex();
+}
+
+void AGamerState::CopyProperties(class APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (AGamerState* GamerState = CastChecked<AGamerState>(PlayerState))
+	{
+		GamerState->SetPlayerIndex(GetPlayerIndex());
+	}
+}
+
+void AGamerState::OverrideWith(class APlayerState* PlayerState)
+{
+	Super::OverrideWith(PlayerState);
+
+	if (AGamerState* GamerState = CastChecked<AGamerState>(PlayerState))
+	{
+		SetPlayerIndex(GamerState->PlayerIndex);
 	}
 }

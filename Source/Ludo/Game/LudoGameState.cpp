@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "LudoGameModeBase.h"
+#include "Game/GamerState.h"
 
 
 ALudoGameState::ALudoGameState()
@@ -17,6 +18,19 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
+}
+
+const AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
+{
+	const TObjectPtr<APlayerState>* PlayerStatePtr = PlayerArray.FindByPredicate([PlayerIndex](const TObjectPtr<APlayerState>& PlayerState)
+	{
+		auto GamerState = Cast<AGamerState>(PlayerState);
+		return (GamerState->GetPlayerIndex() == PlayerIndex);
+	});
+
+	if (!PlayerStatePtr) return nullptr;
+
+	return CastChecked<AGamerState>(PlayerStatePtr->Get());
 }
 
 bool ALudoGameState::IsPlayerTurn(APlayerController* Player)

@@ -41,43 +41,46 @@ void ALudoGameModeBase::PostLogin(APlayerController* NewPlayer)
 
 	const int &NumPlayers = GetNumPlayers();
 
-	CheckGameReady();
-}
-
-void ALudoGameModeBase::CheckGameReady()
-{
-	if (GetNumPlayers() == 2) // or expected number of players
+	if (CheckGameReady())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
-
-		// Go to first turn
-		GetGameState<ALudoGameState>()->AdvanceTurn();
+		StartGame();
 	}
+}
+
+bool ALudoGameModeBase::CheckGameReady()
+{
+	return GetNumPlayers() == 2; // or expected number of players
+}
+
+void ALudoGameModeBase::StartGame()
+{
+	// Go to first turn
+	GetGameState<ALudoGameState>()->AdvanceTurn();
 }
 
 void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	const int &NumPlayers = GetNumPlayers();
-
-	if (ALudoPlayerController* Player = CastChecked<ALudoPlayerController>(NewPlayer))
-	{
-		Player->SetPlayerIndex(NumPlayers - 1);
-		Player->GetPlayerState<AGamerState>()->SetPlayerName(FString::Printf(TEXT("Player %d"), NumPlayers));
-	}
-
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
-	if (ALudoPlayerController* Player = CastChecked<ALudoPlayerController>(NewPlayer))
+	const int &NumPlayers = GetNumPlayers();
+	
+	ALudoPlayerController* Player = CastChecked<ALudoPlayerController>(NewPlayer);
+	if (!Player) return;
+
+	ChangeName(Player, FString::Printf(TEXT("Player %d"), NumPlayers), false);
+	
+	AGamerState* PlayerState = Player->GetPlayerState<AGamerState>();
+	PlayerState->SetPlayerIndex(NumPlayers - 1);
+
+	//-----------
+	// Set player label as server
+	if (AGamer* Gamer = Player->GetPawn<AGamer>())
 	{
-		// Set player label as server
-		if (AGamer* Gamer = Player->GetPawn<AGamer>())
-		{
-			Gamer->UpdatePlayerLabel();
-		}
-
-		// Spawn Yard
-
+		Gamer->UpdatePlayerLabel();
 	}
+
+	// Spawn Yard
 }
 
 AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)

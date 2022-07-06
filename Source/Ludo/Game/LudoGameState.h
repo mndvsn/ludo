@@ -18,6 +18,8 @@ class LUDO_API ALudoGameState : public AGameStateBase
 	ALudoGameState();
 
 public:
+	const class AGamerState* GetGamerStateForIndex(int8 PlayerIndex) const;
+
 	bool IsPlayerTurn(APlayerController* Player);
 
 	void AdvanceTurn();
@@ -26,7 +28,7 @@ private:
 	UPROPERTY(BlueprintGetter="GetEvents")
 	ULudoEventComponent* EventComponent;
 
-	UPROPERTY(Replicated, ReplicatedUsing=OnRep_CurrentPlayerIndex)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerIndex)
 	int8 CurrentPlayerIndex = -1;
 
 	UFUNCTION()

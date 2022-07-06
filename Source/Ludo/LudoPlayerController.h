@@ -17,14 +17,10 @@ class LUDO_API ALudoPlayerController : public APlayerController
 public:
 	ALudoPlayerController();
 
-	int GetPlayerIndex() const { return PlayerIndex; }
-	void SetPlayerIndex(int val);
+	int8 GetPlayerIndex() const;
 
 	// RPCs
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void Server_RequestEndTurn();
-
-private:
-	int PlayerIndex;
 };

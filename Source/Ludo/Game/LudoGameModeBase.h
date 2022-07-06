@@ -35,8 +35,9 @@ protected:
 	TArray<class ALudoPlayerStart*> AvailablePlayerStarts;
 
 private:
-
 	void CreatePlayerStarts(uint8 PlayerCount);
 
-	void CheckGameReady();
+	bool CheckGameReady();
+
+	void StartGame();
 };

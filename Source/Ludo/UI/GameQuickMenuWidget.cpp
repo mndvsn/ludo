@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 
 #include "Game/LudoGameState.h"
+#include "Game/GamerState.h"
 #include "UI/GameHUD.h"
 
 
@@ -16,22 +17,22 @@ UGameQuickMenuWidget::UGameQuickMenuWidget(const FObjectInitializer& ObjectIniti
 
 void UGameQuickMenuWidget::NativeOnInitialized()
 {
-	if (GetWorld() == nullptr) return;
-
-	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
-	if (State == nullptr) return;
-
-	State->GetEvents()->OnTurnChange.AddDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
+	if (UWorld* World = GetWorld())
+	{
+		if (ALudoGameState* State = World->GetGameState<ALudoGameState>())
+		{
+			State->GetEvents()->OnTurnChange.AddDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
+		}
+	}
 
 	OnShowMenu.AddDynamic(this, &UGameQuickMenuWidget::ButtonMenuReleased);
 }
 
 void UGameQuickMenuWidget::RemoveFromParent()
 {
-	if (GetWorld() != nullptr)
+	if (UWorld* World = GetWorld())
 	{
-		ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
-		if (State != nullptr)
+		if (ALudoGameState* State = World->GetGameState<ALudoGameState>())
 		{
 			State->GetEvents()->OnTurnChange.RemoveDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
 		}
@@ -42,14 +43,20 @@ void UGameQuickMenuWidget::RemoveFromParent()
 
 void UGameQuickMenuWidget::OnTurnChange(uint8 NewPlayerIndex)
 {
-	FText NewText = FText::FromString(FString::Printf(TEXT("Player turn: %d"), NewPlayerIndex));
+	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
+	if (!IsValid(State)) return;
+
+	const AGamerState* GamerState = State->GetGamerStateForIndex(NewPlayerIndex);
+	if (!IsValid(GamerState)) return;
+
+	FText NewText = FText::FromString(GamerState->GetPlayerName());
 	LabelPlayerTurn->SetText(NewText);
 }
 
 void UGameQuickMenuWidget::ButtonMenuReleased()
 {
-	AGameHUD* GameHUD = GetOwningPlayer()->GetHUD<AGameHUD>();
-	if (!ensure(IsValid(GameHUD))) return;
-
-	GameHUD->ShowInGameMenu();
+	if (AGameHUD* GameHUD = GetOwningPlayer()->GetHUD<AGameHUD>())
+	{
+		GameHUD->ShowInGameMenu();
+	}
 }
