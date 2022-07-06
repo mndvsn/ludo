@@ -4,11 +4,6 @@
 #include "LudoGameInstance.h"
 
 
-ULudoGameInstance::ULudoGameInstance()
-{
-
-}
-
 void ULudoGameInstance::Init()
 {
 	Super::Init();
@@ -52,4 +47,9 @@ void ULudoGameInstance::HandleTravelFailure(UWorld* World, ETravelFailure::Type 
 	UEngine* Engine = GetEngine();
 	if (!ensure(Engine != nullptr)) return;
 	Engine->AddOnScreenDebugMessage(0, 5, FColor::Red, ErrorString);
+}
+
+void ULudoGameInstance::Shutdown()
+{
+	Super::Shutdown();
 }

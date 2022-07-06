@@ -20,7 +20,7 @@ void AGamerState::OnRep_PlayerName()
 
 void AGamerState::UpdatePlayerName()
 {
-	AController* OwnerController = Cast<AController>(GetOwner());
+	AController* OwnerController = GetOwner<AController>();
 	if (OwnerController)
 	{
 		AGamer* Gamer = Cast<AGamer>(OwnerController->GetPawn());

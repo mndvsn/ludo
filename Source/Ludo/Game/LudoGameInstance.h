@@ -14,16 +14,17 @@ class LUDO_API ULudoGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-	ULudoGameInstance();
-
 public:
-	void Init() override;
 
+	virtual void Init() override;
+	
 	void CreateGameCPU(uint32 NumCPUPlayers = 3);
 
 	void CreateGame();
 
 	void EndGame();
+
+	virtual void Shutdown() override;
 
 private:
 	void HandleNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);

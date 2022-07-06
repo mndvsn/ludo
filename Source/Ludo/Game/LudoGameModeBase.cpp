@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
+#include "LudoGameState.h"
 #include "LudoPlayerController.h"
 #include "GamerState.h"
 #include "Actors/Gamer.h"
@@ -20,6 +21,7 @@ ALudoGameModeBase::ALudoGameModeBase()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
+	GameStateClass = ALudoGameState::StaticClass();
 	PlayerControllerClass = ALudoPlayerController::StaticClass();
 	PlayerStateClass = AGamerState::StaticClass();
 
@@ -37,9 +39,17 @@ void ALudoGameModeBase::PostLogin(APlayerController* NewPlayer)
 
 	const int &NumPlayers = GetNumPlayers();
 
-	if (NumPlayers == 2) // or expected number of players
+	CheckGameReady();
+}
+
+void ALudoGameModeBase::CheckGameReady()
+{
+	if (GetNumPlayers() == 2) // or expected number of players
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
+
+		// Go to first turn
+		GetGameState<ALudoGameState>()->AdvanceTurn();
 	}
 }
 
@@ -82,11 +92,6 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return StartSpot;
 }
 
-//bool ALudoGameModeBase::ShouldSpawnAtStartSpot(AController* Player)
-//{
-//	return true;
-//}
-
 void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
@@ -98,26 +103,6 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 	int NumberOfPlayers = MaxNumberOfPlayers;
 
 	CreatePlayerStarts(NumberOfPlayers);
-
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), AvailableStartPoints);
-/*
-	for (int i = 0; i < NumberOfPlayers; i++)
-	{
-		UWorld* World = GetWorld();
-
-		FActorSpawnParameters SpawnParams = FActorSpawnParameters();
-		
-		FRotator PlayerRotation = FRotator(0.f, 0.f, 90.f * i);
-
-		const AGamer* Player = World->SpawnActor<AGamer>(AGamer::StaticClass(), FVector::ZeroVector, PlayerRotation, SpawnParams);
-
-		Players->Add(Player);
-
-		UE_LOG(LogTemp, Warning, TEXT("Player: %s"), Player);
-	}
-
-	APlayerController *PlayerController = GetWorld()->GetFirstPlayerController();
-	PlayerController->Possess(Players[0]);*/
 }
 
 void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)

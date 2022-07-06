@@ -11,7 +11,7 @@
 
 #include "Game/LudoGameInstance.h"
 #include "Game/GamerState.h"
-#include "UI/DefaultHUD.h"
+#include "UI/GameQuickMenuWidget.h"
 #include "LudoPlayerController.h"
 
 // Sets default values
@@ -72,7 +72,7 @@ void AGamer::BeginPlay()
 	// Create and display HUD
 	if (IsLocallyControlled() && DefaultHUD_Class != nullptr)
 	{
-		DefaultHUD = Cast<UDefaultHUD>(CreateWidget(GetWorld(), DefaultHUD_Class));
+		DefaultHUD = Cast<UGameQuickMenuWidget>(CreateWidget(GetWorld(), DefaultHUD_Class));
 		DefaultHUD->AddToViewport();
 		DefaultHUD->OnShowMenu.AddDynamic(this, &AGamer::ShowInGameMenu);
 	}

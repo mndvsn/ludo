@@ -40,7 +40,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<class UUserWidget> DefaultHUD_Class;
-	class UDefaultHUD* DefaultHUD;
+	class UGameQuickMenuWidget* DefaultHUD;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

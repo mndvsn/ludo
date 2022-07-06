@@ -2,6 +2,8 @@
 
 
 #include "LudoPlayerController.h"
+#include "Game/LudoGameState.h"
+
 
 ALudoPlayerController::ALudoPlayerController()
 {
@@ -16,4 +18,17 @@ void ALudoPlayerController::SetPlayerIndex(int val)
 {
 	PlayerIndex = val;
 	UE_LOG(LogTemp, Warning, TEXT("Tilldelad player index: %d"), val);
+}
+
+void ALudoPlayerController::Server_RequestEndTurn_Implementation()
+{
+	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
+	if (State == nullptr) return;
+
+	State->AdvanceTurn();
+}
+
+bool ALudoPlayerController::Server_RequestEndTurn_Validate()
+{
+	return true;
 }

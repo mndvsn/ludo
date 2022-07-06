@@ -24,24 +24,19 @@ public:
 	TArray<class AGamer*> Players;*/
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
-
-	/*virtual void BeginPlay() override;
-	virtual void StartPlay() override;*/
-	
-	//TArray<class APlayerStart*> GetAvailableStartPoints();
 	
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 protected:
-
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
-	//virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
-
 	TArray<class ALudoPlayerStart*> AvailablePlayerStarts;
+
 private:
 
 	void CreatePlayerStarts(uint8 PlayerCount);
+
+	void CheckGameReady();
 };

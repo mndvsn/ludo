@@ -20,6 +20,11 @@ public:
 	int GetPlayerIndex() const { return PlayerIndex; }
 	void SetPlayerIndex(int val);
 
+	// RPCs
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
+	void Server_RequestEndTurn();
+
 private:
 	int PlayerIndex;
 };
