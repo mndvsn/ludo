@@ -65,6 +65,8 @@ void ALudoGameModeBase::StartGame()
 	
 	// Tell player controller in turn
 	PlayerControllerInTurn->Client_StartTurn();
+
+	UE_LOG(LogTemp, Warning, TEXT("-- Start: P%d --"), State->GetCurrentPlayerIndex() + 1);
 }
 
 void ALudoGameModeBase::NextTurn()
@@ -74,6 +76,8 @@ void ALudoGameModeBase::NextTurn()
 	// Tell player turn has ended
 	PlayerControllerInTurn->Client_EndTurn();
 
+	UE_LOG(LogTemp, Warning, TEXT("-- End: P%d --"), State->GetCurrentPlayerIndex() + 1);
+
 	State->AdvanceTurn();
 
 	// Update controller in turn
@@ -81,6 +85,8 @@ void ALudoGameModeBase::NextTurn()
 
 	// Tell next controller in turn
 	PlayerControllerInTurn->Client_StartTurn();
+
+	UE_LOG(LogTemp, Warning, TEXT("-- Start: P%d --"), State->GetCurrentPlayerIndex() + 1);
 }
 
 void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
