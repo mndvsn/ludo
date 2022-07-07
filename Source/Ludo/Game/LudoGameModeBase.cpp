@@ -118,10 +118,16 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	UE_LOG(LogTemp, Warning, TEXT("Give player start -> %s"), *Player->GetName());
 	ALudoPlayerStart* StartSpot = nullptr;
 
-	if (AvailablePlayerStarts.Num() > 0)
+	if (!PlayerStarts.IsEmpty())
 	{
-		StartSpot = AvailablePlayerStarts[0];
-		AvailablePlayerStarts.RemoveAt(0);
+		auto UnclaimedPlayerStart = PlayerStarts.FindByPredicate([](ALudoPlayerStart* PlayerStart) {
+			return !PlayerStart->IsClaimed();
+		});
+		if (UnclaimedPlayerStart)
+		{
+			StartSpot = *UnclaimedPlayerStart;
+			StartSpot->TryClaim(Player);
+		}
 	}
 
 	return StartSpot;
@@ -147,11 +153,10 @@ void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
 
 	for (uint8 i=0; i < PlayerCount; i++)
 	{
-		FRotator StartRotation;
-		StartRotation.Yaw = i * (360.0f / PlayerCount);
+		const FRotator StartRotation = FRotator(0, i * (360.0f / PlayerCount), 0);
 
 		ALudoPlayerStart* PlayerStart = World->SpawnActor<ALudoPlayerStart>(FVector::ZeroVector, StartRotation);
-		PlayerStart->SetPlayerIndex(i);
-		AvailablePlayerStarts.Add(PlayerStart);
+		PlayerStart->SetPlayerSlot(i);
+		PlayerStarts.Add(PlayerStart);
 	}
 }

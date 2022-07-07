@@ -15,13 +15,23 @@ class LUDO_API ALudoPlayerStart : public APlayerStart
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure)
-	const uint8 GetPlayerIndex() const { return PlayerIndex; };
+	const uint8 GetPlayerSlot() const { return PlayerSlot; };
 
-	UFUNCTION(BlueprintCallable)
-	void SetPlayerIndex(uint8 Index);
+	void SetPlayerSlot(uint8 SlotIndex);
 
-private:
-	UPROPERTY(BlueprintGetter="GetPlayerIndex")
-	uint8 PlayerIndex;
+	bool IsClaimed() const { return Claimed; };
+
+	bool TryClaim(AController* InController);
+
+protected:
+	void CheckUnclaimed();
+
+	UPROPERTY(Transient)
+	TObjectPtr<AController> ClaimingController = nullptr;
+
+	UPROPERTY()
+	bool Claimed = false;
+
+	UPROPERTY()
+	uint8 PlayerSlot = -1;
 };

@@ -76,3 +76,6 @@ DerivedDataCache/*
 
 # Packaged
 Distributable/*
+
+# Development screenshots
+/*.shot.png

@@ -29,7 +29,7 @@ protected:
 
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
-	TArray<class ALudoPlayerStart*> AvailablePlayerStarts;
+	TArray<class ALudoPlayerStart*> PlayerStarts;
 
 	class ALudoPlayerController* GetPlayerControllerInTurn() { return PlayerControllerInTurn; };
 
