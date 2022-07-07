@@ -14,6 +14,8 @@ ALudoPlayerController::ALudoPlayerController()
 	ClickEventKeys.Add(EKeys::RightMouseButton);
 	//bEnableTouchEvents = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+
+	PlayerEventComponent = CreateDefaultSubobject<ULudoPlayerEventComponent>("PlayerEventComponent");
 }
 
 int8 ALudoPlayerController::GetPlayerIndex() const
@@ -25,14 +27,14 @@ void ALudoPlayerController::Client_StartTurn_Implementation()
 {
 	InTurn = true;
 
-	// broadcast event
+	GetEvents()->OnPlayerTurn.Broadcast(true);
 }
 
 void ALudoPlayerController::Client_EndTurn_Implementation()
 {
 	InTurn = false;
 
-	// broadcast event
+	GetEvents()->OnPlayerTurn.Broadcast(false);
 }
 
 void ALudoPlayerController::Server_RequestEndTurn_Implementation()

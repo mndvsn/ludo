@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Actors/LudoPlayerEventComponent.h"
 #include "LudoPlayerController.generated.h"
 
 /**
@@ -30,9 +31,17 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void Server_RequestEndTurn();
 
+private:
+	bool InTurn;
+
+	UPROPERTY(BlueprintGetter = "GetEvents")
+	ULudoPlayerEventComponent* PlayerEventComponent;
+
+public:
 	UFUNCTION(BlueprintPure)
 	bool IsInTurn() { return InTurn; };
 
-private:
-	bool InTurn;
+	UFUNCTION(BlueprintPure)
+	ULudoPlayerEventComponent* GetEvents() { return PlayerEventComponent; };
+
 };

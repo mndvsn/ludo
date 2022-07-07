@@ -4,7 +4,9 @@
 #include "GameQuickMenuWidget.h"
 
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 
+#include "LudoPlayerController.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
 #include "UI/GameHUD.h"
@@ -25,6 +27,11 @@ void UGameQuickMenuWidget::NativeOnInitialized()
 		}
 	}
 
+	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	{
+		PC->GetEvents()->OnPlayerTurn.AddDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
+	}
+
 	OnShowMenu.AddDynamic(this, &UGameQuickMenuWidget::ButtonMenuReleased);
 }
 
@@ -36,6 +43,11 @@ void UGameQuickMenuWidget::RemoveFromParent()
 		{
 			State->GetEvents()->OnTurnChange.RemoveDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
 		}
+	}
+
+	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	{
+		PC->GetEvents()->OnPlayerTurn.RemoveDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
 	}
 
 	Super::RemoveFromParent();
@@ -58,5 +70,17 @@ void UGameQuickMenuWidget::ButtonMenuReleased()
 	if (AGameHUD* GameHUD = GetOwningPlayer()->GetHUD<AGameHUD>())
 	{
 		GameHUD->ShowInGameMenu();
+	}
+}
+
+void UGameQuickMenuWidget::OnPlayerTurn(bool IsPlayerTurn)
+{
+	if (IsPlayerTurn)
+	{
+		PlayerTurnBackground->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		PlayerTurnBackground->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

@@ -8,12 +8,13 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameEventDelegate_OnTurnChange, uint8, NewPlayerIndex);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Category="Global Events")
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Category="Global Events")
 class LUDO_API ULudoEventComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	ULudoEventComponent();
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Game Events")

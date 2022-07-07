@@ -31,9 +31,15 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* LabelPlayerTurn;
 
+	UPROPERTY(meta = (BindWidget))
+	class UImage* PlayerTurnBackground;
+
 	UFUNCTION()
 	void OnTurnChange(uint8 NewPlayerIndex);
 
 	UFUNCTION()
 	void ButtonMenuReleased();
+
+	UFUNCTION()
+	void OnPlayerTurn(bool IsPlayerTurn);
 };
