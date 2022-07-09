@@ -17,19 +17,18 @@ class LUDO_API UGameActionsWidget : public UUserWidget
 public:
 	UGameActionsWidget(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Events")
+	void OnPlayerTurn(bool IsPlayerTurn);
+
 protected:
 	void NativeOnInitialized() override;
 
 	void RemoveFromParent() override;
 
-private:
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class UButton* ButtonThrowDice;
 
-	UFUNCTION()
-	void ButtonThrowDiceReleased();
-
-	UFUNCTION()
-	void OnPlayerTurn(bool IsPlayerTurn);
+	UFUNCTION(BlueprintNativeEvent, Category="Events")
+	void OnButtonThrowDiceReleased();
 
 };

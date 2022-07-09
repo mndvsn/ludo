@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowMenuSignature);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerTurnNameChanged, FString, PlayerName);
+
 /**
  * 
  */
@@ -19,27 +21,30 @@ class LUDO_API UGameQuickMenuWidget : public UUserWidget
 public:
 	UGameQuickMenuWidget(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Events")
 	FShowMenuSignature OnShowMenu;
 
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FPlayerTurnNameChanged OnPlayerTurnNameChanged;
+
 protected:
+	UFUNCTION(BlueprintNativeEvent, Category="Events")
+	void OnPlayerTurn(bool IsPlayerTurn);
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	class UTextBlock* LabelPlayerTurn;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	class UImage* PlayerTurnBackground;
+
 	void NativeOnInitialized() override;
 
 	void RemoveFromParent() override;
 
 private:
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* LabelPlayerTurn;
-
-	UPROPERTY(meta = (BindWidget))
-	class UImage* PlayerTurnBackground;
-
 	UFUNCTION()
 	void OnTurnChange(uint8 NewPlayerIndex);
 
 	UFUNCTION()
 	void ButtonMenuReleased();
-
-	UFUNCTION()
-	void OnPlayerTurn(bool IsPlayerTurn);
 };

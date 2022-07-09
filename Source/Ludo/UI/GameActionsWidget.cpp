@@ -17,7 +17,7 @@ void UGameActionsWidget::NativeOnInitialized()
 {
 	if (ButtonThrowDice)
 	{
-		ButtonThrowDice->OnReleased.AddDynamic(this, &UGameActionsWidget::ButtonThrowDiceReleased);
+		ButtonThrowDice->OnReleased.AddDynamic(this, &UGameActionsWidget::OnButtonThrowDiceReleased);
 		ButtonThrowDice->SetIsEnabled(false);
 	}
 
@@ -47,13 +47,13 @@ void UGameActionsWidget::RemoveFromParent()
 
 	if (ButtonThrowDice)
 	{
-		ButtonThrowDice->OnReleased.RemoveDynamic(this, &UGameActionsWidget::ButtonThrowDiceReleased);
+		ButtonThrowDice->OnReleased.RemoveDynamic(this, &UGameActionsWidget::OnButtonThrowDiceReleased);
 	}
 
 	Super::RemoveFromParent();
 }
 
-void UGameActionsWidget::ButtonThrowDiceReleased()
+void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 {
 	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
 	{
@@ -64,8 +64,7 @@ void UGameActionsWidget::ButtonThrowDiceReleased()
 	}
 }
 
-void UGameActionsWidget::OnPlayerTurn(bool IsPlayerTurn)
+void UGameActionsWidget::OnPlayerTurn_Implementation(bool IsPlayerTurn)
 {
-	if (!ButtonThrowDice) return;
-	ButtonThrowDice->SetIsEnabled(IsPlayerTurn);
+	
 }

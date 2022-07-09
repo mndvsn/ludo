@@ -18,7 +18,7 @@ void ALudoAIController::Client_StartTurn()
 
 	UE_LOG(LogLudoGM, Verbose, TEXT("Client_StartTurn (AI)"));
 
-	Server_RequestEndTurn();
+	Process();
 }
 
 void ALudoAIController::Client_EndTurn()
@@ -41,4 +41,15 @@ void ALudoAIController::Server_RequestEndTurn()
 AGamerState* ALudoAIController::GetGamerState()
 {
 	return GetPlayerState<AGamerState>();
+}
+
+void ALudoAIController::Process()
+{
+	float RandomDelay = FMath::RandRange(0.5, 2.5);
+	GetWorld()->GetTimerManager().SetTimer(WaitTimer, this, &ALudoAIController::OnWaited, RandomDelay, false);
+}
+
+void ALudoAIController::OnWaited()
+{
+	Server_RequestEndTurn();
 }

@@ -56,13 +56,15 @@ void UGameQuickMenuWidget::RemoveFromParent()
 void UGameQuickMenuWidget::OnTurnChange(uint8 NewPlayerIndex)
 {
 	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
-	if (!IsValid(State)) return;
+	check(State);
 
 	const AGamerState* GamerState = State->GetGamerStateForIndex(NewPlayerIndex);
-	if (!IsValid(GamerState)) return;
+	check(GamerState);
 
-	FText NewText = FText::FromString(GamerState->GetPlayerName());
-	LabelPlayerTurn->SetText(NewText);
+	FString PlayerName = GamerState->GetPlayerName();
+
+	UE_LOG(LogTemp, Warning, TEXT("Player name: %s"), *PlayerName);
+	OnPlayerTurnNameChanged.Broadcast(PlayerName);
 }
 
 void UGameQuickMenuWidget::ButtonMenuReleased()
@@ -73,14 +75,7 @@ void UGameQuickMenuWidget::ButtonMenuReleased()
 	}
 }
 
-void UGameQuickMenuWidget::OnPlayerTurn(bool IsPlayerTurn)
+void UGameQuickMenuWidget::OnPlayerTurn_Implementation(bool IsPlayerTurn)
 {
-	if (IsPlayerTurn)
-	{
-		PlayerTurnBackground->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		PlayerTurnBackground->SetVisibility(ESlateVisibility::Hidden);
-	}
+	
 }

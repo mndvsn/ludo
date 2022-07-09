@@ -18,20 +18,23 @@ class LUDO_API ALudoAIController : public AAIController, public ILudoGamerInterf
 public:
 	ALudoAIController(const FObjectInitializer& ObjectInitializer);
 
-	// RPCs
-
-	//UFUNCTION(Client, Reliable)
 	virtual void Client_StartTurn() override;
 
-	//UFUNCTION(Client, Reliable)
 	virtual void Client_EndTurn() override;
 
-	//UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Server_RequestEndTurn() override;
 
 	virtual AGamerState* GetGamerState() override;
 
+protected:
+	void Process();
+
+	UFUNCTION()
+	void OnWaited();
+
 private:
 	bool bInTurn;
+
+	FTimerHandle WaitTimer;
 
 };
