@@ -11,6 +11,8 @@ AGamerState::AGamerState()
 	// Use custom player names
 	// expects GetPlayerNameCustom()
 	//bUseCustomPlayerNames = true;
+
+	PlayState = EPlayState::Transitioning;
 }
 
 void AGamerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

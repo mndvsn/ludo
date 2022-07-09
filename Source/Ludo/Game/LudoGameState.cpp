@@ -20,7 +20,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
 }
 
-const AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
+AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
 {
 	const TObjectPtr<APlayerState>* PlayerStatePtr = PlayerArray.FindByPredicate([PlayerIndex](const TObjectPtr<APlayerState>& PlayerState)
 	{
@@ -33,7 +33,7 @@ const AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
 	return CastChecked<AGamerState>(PlayerStatePtr->Get());
 }
 
-const class AGamerState* ALudoGameState::GetGamerStateInTurn() const
+class AGamerState* ALudoGameState::GetGamerStateInTurn() const
 {
 	return GetGamerStateForIndex(CurrentPlayerIndex);
 }

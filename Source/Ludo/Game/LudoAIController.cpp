@@ -3,6 +3,7 @@
 
 #include "LudoAIController.h"
 #include "Game/LudoGameModeBase.h"
+#include "Game/GamerState.h"
 
 
 ALudoAIController::ALudoAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,4 +36,9 @@ void ALudoAIController::Server_RequestEndTurn()
 	{
 		GameMode->NextTurn();
 	}
+}
+
+AGamerState* ALudoAIController::GetGamerState()
+{
+	return GetPlayerState<AGamerState>();
 }

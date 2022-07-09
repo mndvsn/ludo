@@ -29,6 +29,8 @@ public:
 	//UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Server_RequestEndTurn() override;
 
+	virtual AGamerState* GetGamerState() override;
+
 private:
 	bool bInTurn;
 

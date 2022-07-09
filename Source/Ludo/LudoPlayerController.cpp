@@ -27,7 +27,7 @@ int8 ALudoPlayerController::GetPlayerIndex() const
 void ALudoPlayerController::Client_StartTurn_Implementation()
 {
 	bInTurn = true;
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_StartTurn (%d)"), HasAuthority());
+	UE_LOG(LogLudoGM, Verbose, TEXT("Client_StartTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
 
 	GetEvents()->OnPlayerTurn.Broadcast(true);
 }
@@ -35,7 +35,7 @@ void ALudoPlayerController::Client_StartTurn_Implementation()
 void ALudoPlayerController::Client_EndTurn_Implementation()
 {
 	bInTurn = false;
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_EndTurn (%d)"), HasAuthority());
+	UE_LOG(LogLudoGM, Verbose, TEXT("Client_EndTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
 
 	GetEvents()->OnPlayerTurn.Broadcast(false);
 }
@@ -65,6 +65,11 @@ void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* Pl
 	{
 		GameState->GetEvents()->OnPlayStateChange.Broadcast(StateTyped, EPlayState::Ready);
 	}
+}
+
+class AGamerState* ALudoPlayerController::GetGamerState()
+{
+	return GetPlayerState<AGamerState>();
 }
 
 void ALudoPlayerController::OnRep_PlayerState()

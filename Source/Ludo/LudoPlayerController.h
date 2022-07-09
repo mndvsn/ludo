@@ -35,6 +35,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_NotifyOnReady(class APlayerState* PlayerStateReady);
 
+	virtual class AGamerState* GetGamerState() override;
+
 	virtual void OnRep_PlayerState() override;
 
 private:

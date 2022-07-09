@@ -70,8 +70,11 @@ private:
 
 	bool CheckGameReady();
 
-	void StartGame();
+	void UpdateCurrentControllerState(bool bIsStartingTurn = true);
 
 public:
+	void StartGame();
+
 	void NextTurn();
+
 };

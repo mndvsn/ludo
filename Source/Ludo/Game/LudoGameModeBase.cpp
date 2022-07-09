@@ -96,38 +96,49 @@ void ALudoGameModeBase::StartGame()
 {
 	UE_LOG(LogLudoGM, Verbose, TEXT("StartGame"));
 
-	ALudoGameState* State = GetGameState<ALudoGameState>();
-	
 	// Go to first turn
-	State->AdvanceTurn();
-
-	// Set controller in turn
-	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
-	
-	// Tell player in turn
-	PlayerInTurn->Client_StartTurn();
-
-	UE_LOG(LogLudoGM, Verbose, TEXT("Start turn: P%d"), State->GetCurrentPlayerIndex() + 1);
+	NextTurn();
 }
 
 void ALudoGameModeBase::NextTurn()
 {
 	ALudoGameState* State = GetGameState<ALudoGameState>();
 
-	// Tell player turn has ended
-	PlayerInTurn->Client_EndTurn();
-
-	UE_LOG(LogLudoGM, Verbose, TEXT("End turn: P%d"), State->GetCurrentPlayerIndex() + 1);
-
+	// If a players turn is ending
+	if (State->GetCurrentPlayerIndex() >= 0)
+	{
+		UpdateCurrentControllerState(false);
+	}
+	
+	// Set next turn
 	State->AdvanceTurn();
 
 	// Update controller in turn
 	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 
-	// Tell next controller in turn
-	PlayerInTurn->Client_StartTurn();
+	UpdateCurrentControllerState(true);
+}
 
-	UE_LOG(LogLudoGM, Verbose, TEXT("Start turn: P%d"), State->GetCurrentPlayerIndex() + 1);
+void ALudoGameModeBase::UpdateCurrentControllerState(bool bIsStartingTurn /*= true*/)
+{
+	if (!ensure(PlayerInTurn)) return;
+
+	AGamerState* GamerState = PlayerInTurn->GetGamerState();
+
+	// Update their status 
+	GamerState->SetPlayState(bIsStartingTurn ? EPlayState::Playing : EPlayState::Waiting);
+
+	// Tell player turn has started or ended
+	if (bIsStartingTurn)
+	{
+		UE_LOG(LogLudoGM, Verbose, TEXT("Start turn: P%d"), GamerState->GetPlayerIndex() + 1);
+		PlayerInTurn->Client_StartTurn();
+	}
+	else
+	{
+		UE_LOG(LogLudoGM, Verbose, TEXT("End turn: P%d"), GamerState->GetPlayerIndex() + 1);
+		PlayerInTurn->Client_EndTurn();
+	}
 }
 
 void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)

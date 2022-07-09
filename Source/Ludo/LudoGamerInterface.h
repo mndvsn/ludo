@@ -29,4 +29,5 @@ public:
 	//UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Server_RequestEndTurn() = 0;
 
+	virtual class AGamerState* GetGamerState() = 0;
 };
