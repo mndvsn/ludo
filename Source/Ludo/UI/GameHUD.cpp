@@ -9,10 +9,7 @@
 
 AGameHUD::AGameHUD()
 {
-	ConstructorHelpers::FClassFinder<UUserWidget> GameWidget_BPClass(TEXT("/Game/UI/Game/W_Game"));
-	if (GameWidget_BPClass.Class) {
-		GameWidget_Class = GameWidget_BPClass.Class;
-	}
+	GameWidgetClass = UGameOverlayWidget::StaticClass();
 }
 
 void AGameHUD::BeginPlay()
@@ -34,12 +31,12 @@ void AGameHUD::Hide()
 
 void AGameHUD::ConstructHUD()
 {
-	if (!IsValid(GameWidget_Class)) return;
+	if (!IsValid(GameWidgetClass)) return;
 
 	APlayerController* PlayerController = GetOwner<APlayerController>();
 	if (!IsValid(PlayerController)) return;
 
-	GameWidget = CreateWidget<UGameOverlayWidget>(PlayerController, GameWidget_Class);
+	GameWidget = CreateWidget<UGameOverlayWidget>(PlayerController, GameWidgetClass);
 	GameWidget->AddToViewport();
 }
 

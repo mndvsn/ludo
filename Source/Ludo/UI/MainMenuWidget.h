@@ -43,13 +43,13 @@ private:
 	class UButton* ButtonExitGame;
 
 	UPROPERTY(EditAnywhere, Category="Content")
-	TSubclassOf<class UMainMenuSubWidget> DefaultMainContent_Class;
+	TSubclassOf<class UMainMenuSubWidget> MainContentClass;
 
 	UPROPERTY()
 	UMainMenuSubWidget* RootMenu;
 
 	UPROPERTY(EditAnywhere, Category = "Content")
-	TSubclassOf<class UMainMenuSubWidget> CreateGameWidget_Class;
+	TSubclassOf<class UMainMenuSubWidget> CreateGameWidgetClass;
 
 	TArray<EMainMenu> MenuStack;
 

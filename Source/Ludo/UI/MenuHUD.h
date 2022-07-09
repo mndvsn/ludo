@@ -31,7 +31,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UUserWidget> MenuClass;
+	TSubclassOf<class UMainMenuWidget> MenuClass;
 
 	UPROPERTY()
 	class UUserWidget* Menu;

@@ -4,13 +4,12 @@
 #include "MenuHUD.h"
 #include "Blueprint/UserWidget.h"
 
+#include "UI/MainMenuWidget.h"
+
 
 AMenuHUD::AMenuHUD()
 {
-	ConstructorHelpers::FClassFinder<UUserWidget> Menu_BPClass(TEXT("/Game/UI/MainMenu/W_MainMenu"));
-	if (Menu_BPClass.Class) {
-		MenuClass = Menu_BPClass.Class;
-	}
+	MenuClass = UMainMenuWidget::StaticClass();
 }
 
 void AMenuHUD::BeginPlay()

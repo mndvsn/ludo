@@ -34,7 +34,7 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UUserWidget> GameWidget_Class;
+	TSubclassOf<class UGameOverlayWidget> GameWidgetClass;
 
 	UPROPERTY()
 	class UGameOverlayWidget* GameWidget;

@@ -15,6 +15,9 @@
 UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
 {
 	Super::NativeOnInitialized();
+
+	MainContentClass = UModeSelectWidget::StaticClass();
+	CreateGameWidgetClass = UCreateGameWidget::StaticClass();
 }
 
 void UMainMenuWidget::NativeOnInitialized()
@@ -27,8 +30,8 @@ void UMainMenuWidget::NativeOnInitialized()
 	}
 
 	// Create root main menu content
-	if (DefaultMainContent_Class == nullptr) return;
-	RootMenu = CreateWidget<UMainMenuSubWidget>(this, DefaultMainContent_Class);
+	if (MainContentClass == nullptr) return;
+	RootMenu = CreateWidget<UMainMenuSubWidget>(this, MainContentClass);
 	RootMenu->SetMenuInterface(this);
 
 	NavigateMenu(RootMenu->GetEnum());
@@ -56,8 +59,8 @@ void UMainMenuWidget::NavigateMenu(EMainMenu ToMenu)
 	}
 	case EMainMenu::MM_CreateGame:
 	{
-		if (CreateGameWidget_Class == nullptr) return;
-		UCreateGameWidget* CreateGameWidget = CreateWidget<UCreateGameWidget>(this, CreateGameWidget_Class);
+		if (CreateGameWidgetClass == nullptr) return;
+		UCreateGameWidget* CreateGameWidget = CreateWidget<UCreateGameWidget>(this, CreateGameWidgetClass);
 		CreateGameWidget->SetMenuInterface(this);
 
 		SetMainContent(CreateGameWidget);
