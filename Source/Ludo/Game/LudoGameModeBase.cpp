@@ -7,6 +7,7 @@
 
 #include "LudoGameState.h"
 #include "LudoPlayerController.h"
+#include "LudoAIController.h"
 #include "UI/GameHUD.h"
 #include "GamerState.h"
 #include "Actors/Gamer.h"
@@ -29,46 +30,84 @@ ALudoGameModeBase::ALudoGameModeBase()
 	PlayerStateClass = AGamerState::StaticClass();
 	HUDClass = AGameHUD::StaticClass();
 
-	PrimaryActorTick.bCanEverTick = false;
+	//bUseSeamlessTravel = true;
 
-	// Set optimal number of players in this game mode
-	MaxNumberOfPlayers = 4;
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	// Override settings from URL
+	NumPlayers = UGameplayStatics::GetIntOption(Options, TEXT("Players"), NumPlayers);
+	NumPlayersCPU = UGameplayStatics::GetIntOption(Options, TEXT("CPU"), NumPlayersCPU);
+	bShouldSpawnCPU = NumPlayersCPU > 0;
+
+	CreatePlayerStarts(NumPlayers);
+}
+
+void ALudoGameModeBase::InitGameState()
+{
+	Super::InitGameState();
+
+	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+	{
+		State->GetEvents()->OnPlayStateChange.AddDynamic(this, &ALudoGameModeBase::OnPlayStateChange);
+	}
 }
 
 void ALudoGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
+	UE_LOG(LogLudoGM, Verbose, TEXT("PostLogin: %s"), *NewPlayer->GetName());
+	
 	Super::PostLogin(NewPlayer);
+}
 
-	UE_LOG(LogTemp, Warning, TEXT("New player: %s"), *NewPlayer->GetName());
+void ALudoGameModeBase::OnPostLogin(AController* NewPlayer)
+{
+	UE_LOG(LogLudoGM, Verbose, TEXT("OnPostLogin: %s"), *NewPlayer->GetName());
+}
 
-	const int &NumPlayers = GetNumPlayers();
-
-	if (CheckGameReady())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
-		StartGame();
-	}
+void ALudoGameModeBase::GenericPlayerInitialization(AController* C)
+{
+	UE_LOG(LogLudoGM, Verbose, TEXT("GenericPlayerInitialization: %s"), *C->GetName());
+	
+	Super::GenericPlayerInitialization(C);
 }
 
 bool ALudoGameModeBase::CheckGameReady()
 {
-	return GetNumPlayers() == 2; // or expected number of players
+	// Check if all players are ready
+	bool Ready = false;
+
+	//const int& NumCurrentPlayers = GetNumPlayersTotal();
+	
+	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+	{
+		// Game is ready if expected number of players is in
+		Ready = (State->GetNumPlayersReady() == NumPlayers);
+	}
+
+	return Ready;
 }
 
 void ALudoGameModeBase::StartGame()
 {
+	UE_LOG(LogLudoGM, Verbose, TEXT("StartGame"));
+
 	ALudoGameState* State = GetGameState<ALudoGameState>();
 	
 	// Go to first turn
 	State->AdvanceTurn();
 
 	// Set controller in turn
-	PlayerControllerInTurn = CastChecked<ALudoPlayerController>(State->GetGamerStateInTurn()->GetPlayerController());
+	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 	
-	// Tell player controller in turn
-	PlayerControllerInTurn->Client_StartTurn();
+	// Tell player in turn
+	PlayerInTurn->Client_StartTurn();
 
-	UE_LOG(LogTemp, Warning, TEXT("-- Start: P%d --"), State->GetCurrentPlayerIndex() + 1);
+	UE_LOG(LogLudoGM, Verbose, TEXT("Start turn: P%d"), State->GetCurrentPlayerIndex() + 1);
 }
 
 void ALudoGameModeBase::NextTurn()
@@ -76,37 +115,53 @@ void ALudoGameModeBase::NextTurn()
 	ALudoGameState* State = GetGameState<ALudoGameState>();
 
 	// Tell player turn has ended
-	PlayerControllerInTurn->Client_EndTurn();
+	PlayerInTurn->Client_EndTurn();
 
-	UE_LOG(LogTemp, Warning, TEXT("-- End: P%d --"), State->GetCurrentPlayerIndex() + 1);
+	UE_LOG(LogLudoGM, Verbose, TEXT("End turn: P%d"), State->GetCurrentPlayerIndex() + 1);
 
 	State->AdvanceTurn();
 
 	// Update controller in turn
-	PlayerControllerInTurn = CastChecked<ALudoPlayerController>(State->GetGamerStateInTurn()->GetPlayerController());
+	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 
 	// Tell next controller in turn
-	PlayerControllerInTurn->Client_StartTurn();
+	PlayerInTurn->Client_StartTurn();
 
-	UE_LOG(LogTemp, Warning, TEXT("-- Start: P%d --"), State->GetCurrentPlayerIndex() + 1);
+	UE_LOG(LogLudoGM, Verbose, TEXT("Start turn: P%d"), State->GetCurrentPlayerIndex() + 1);
 }
 
 void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
+	UE_LOG(LogLudoGM, Verbose, TEXT("HandleStartingNewPlayer: %s"), *NewPlayer->GetName());
+	
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
-	const int &NumPlayers = GetNumPlayers();
-	
-	ALudoPlayerController* Player = CastChecked<ALudoPlayerController>(NewPlayer);
-	if (!Player) return;
+	SetupPlayer(NewPlayer);
 
-	ChangeName(Player, FString::Printf(TEXT("Player %d"), NumPlayers), false);
-	
+	if (bShouldSpawnCPU && NewPlayer->IsLocalController())
+	{
+		// Controller is PlayerController, create CPU
+		CreateCPUPlayers(NumPlayersCPU);
+	}
+}
+
+void ALudoGameModeBase::SetupPlayer(AController* Player)
+{
+	const int& NumCurrentPlayers = GetNumPlayersTotal();
+
 	AGamerState* PlayerState = Player->GetPlayerState<AGamerState>();
-	PlayerState->SetPlayerIndex(NumPlayers - 1);
+	ALudoPlayerStart* StartSpot = Cast<ALudoPlayerStart>(Player->StartSpot.Get());
+	if (StartSpot)
+	{
+		PlayerState->SetPlayerIndex(StartSpot->GetPlayerSlot());
+		ChangeName(Player, FString::Printf(TEXT("Player %d"), StartSpot->GetPlayerSlot()+1), false);
+	}
+	else
+	{
+		PlayerState->SetPlayerIndex(NumCurrentPlayers-1);
+		ChangeName(Player, FString::Printf(TEXT("Player %d"), NumCurrentPlayers), false);
+	}
 
-	//-----------
-	// Set player label as server
 	if (AGamer* Gamer = Player->GetPawn<AGamer>())
 	{
 		Gamer->UpdatePlayerLabel();
@@ -117,7 +172,7 @@ void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController
 
 AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Give player start -> %s"), *Player->GetName());
+	UE_LOG(LogLudoGM, Verbose, TEXT("ChoosePlayerStart: %s"), *Player->GetName());
 	ALudoPlayerStart* StartSpot = nullptr;
 
 	if (!PlayerStarts.IsEmpty())
@@ -132,20 +187,9 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 		}
 	}
 
+	Player->StartSpot = StartSpot;
+
 	return StartSpot;
-}
-
-void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
-{
-	Super::InitGame(MapName, Options, ErrorMessage);
-
-	UE_LOG(LogTemp, Warning, TEXT("INIT!"));
-
-	if (!MaxNumberOfPlayers) return;
-	
-	int NumberOfPlayers = MaxNumberOfPlayers;
-
-	CreatePlayerStarts(NumberOfPlayers);
 }
 
 void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
@@ -155,10 +199,77 @@ void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
 
 	for (uint8 i=0; i < PlayerCount; i++)
 	{
-		const FRotator StartRotation = FRotator(0, i * (360.0f / PlayerCount), 0);
+		const FRotator StartRotation = FRotator(0, i * (360.0f / 4), 0); // 4 sides of board, PlayerCount can be used but is bugged
 
 		ALudoPlayerStart* PlayerStart = World->SpawnActor<ALudoPlayerStart>(FVector::ZeroVector, StartRotation);
 		PlayerStart->SetPlayerSlot(i);
 		PlayerStarts.Add(PlayerStart);
+	}
+}
+
+void ALudoGameModeBase::CreateCPUPlayers(uint8 NumCPUPlayers)
+{
+	UE_LOG(LogLudoGM, Verbose, TEXT("Create %d CPUs"), NumCPUPlayers);
+
+	for (uint8 n = 0; n < NumCPUPlayers; ++n)
+	{
+		SpawnCPU();
+	}
+
+	bShouldSpawnCPU = false;
+}
+
+void ALudoGameModeBase::SpawnCPU()
+{
+	FActorSpawnParameters SpawnInfo;
+
+	ALudoAIController* NewController = GetWorld()->SpawnActor<ALudoAIController>(ALudoAIController::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
+
+	if (NewController)
+	{	
+		if (NewController->PlayerState != nullptr)
+		{
+			NewController->PlayerState->SetPlayerName(TEXT("CPU"));
+			NewController->PlayerState->SetIsABot(true);
+		}
+
+		CPUPlayers.Add(NewController);
+
+		DispatchPostLogin(NewController);
+		RestartPlayer(NewController);
+		SetupPlayer(NewController);
+		
+		if (ALudoPlayerController* PC = GetWorld()->GetFirstPlayerController<ALudoPlayerController>())
+		{
+			PC->Server_NotifyOnReady(NewController->PlayerState);
+		}
+	}
+}
+
+int32 ALudoGameModeBase::GetNumPlayersTotal()
+{
+	/*int32 PlayerCount = GetNumPlayers();
+	int32 CPUPlayerCount = CPUPlayers.Num();
+
+	return PlayerCount + CPUPlayerCount;*/
+
+	int32 PlayerCount = 0;
+	for (FConstControllerIterator Iterator = GetWorld()->GetControllerIterator(); Iterator; ++Iterator)
+	{
+		AController* ControllerActor = Iterator->Get();
+		if (ControllerActor && ControllerActor->PlayerState)
+		{
+			PlayerCount++;
+		}
+	}
+	return PlayerCount;
+}
+
+void ALudoGameModeBase::OnPlayStateChange(AGamerState* GamerState, EPlayState State)
+{
+	if (CheckGameReady())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
+		StartGame();
 	}
 }

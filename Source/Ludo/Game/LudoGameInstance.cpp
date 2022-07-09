@@ -14,20 +14,27 @@ void ULudoGameInstance::Init()
 	Engine->OnTravelFailure().AddUObject(this, &ULudoGameInstance::HandleTravelFailure);
 }
 
-void ULudoGameInstance::CreateGameCPU(uint32 NumCPUPlayers)
+void ULudoGameInstance::CreateGameCPU(uint8 InPlayers = 4, uint8 InCPU = 3)
 {
-	if (GetEngine() == nullptr) return;
-	GetEngine()->AddOnScreenDebugMessage(0, 4, FColor::Red, FString::Printf(TEXT("Creating game with CPU: %d"), NumCPUPlayers));
+	if (UEngine* Engine = GetEngine())
+	{
+		Engine->AddOnScreenDebugMessage(0, 4, FColor::Red, FString::Printf(TEXT("Creating game with %d players, %d CPU"), InPlayers, InCPU));
 
-	CreateGame();
+		CreateGame(InPlayers, InCPU);
+	}
 }
 
-void ULudoGameInstance::CreateGame()
+void ULudoGameInstance::CreateGame(uint8 InPlayers, uint8 InCPU = 0)
 {
-	UWorld* World = GetWorld();
-	if (!ensure(World != nullptr)) return;
+	if (UWorld* World = GetWorld())
+	{
+		FString TravelURL;
+		TravelURL = TEXT("/Game/Maps/L_Standard");
+		TravelURL += FString::Printf(TEXT("?Players=%d"), InPlayers);
+		TravelURL += FString::Printf(TEXT("?CPU=%d"), InCPU);
 
-	World->ServerTravel("/Game/Maps/L_Standard");
+		World->ServerTravel(TravelURL);
+	}
 }
 
 void ULudoGameInstance::EndGame()

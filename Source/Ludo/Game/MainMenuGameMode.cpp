@@ -10,4 +10,6 @@ AMainMenuGameMode::AMainMenuGameMode()
 {
 	DefaultPawnClass = ADefaultPawn::StaticClass();
 	HUDClass = AMenuHUD::StaticClass();
+
+	//bUseSeamlessTravel = true;
 }

@@ -6,6 +6,16 @@
 #include "GameFramework/PlayerState.h"
 #include "GamerState.generated.h"
 
+
+UENUM(BlueprintType)
+enum class EPlayState : uint8
+{
+	Transitioning  UMETA(DisplayName = "Transitioning"),
+	Ready  UMETA(DisplayName = "Ready"),
+	Playing  UMETA(DisplayName = "Playing"),
+	Waiting  UMETA(DisplayName = "Waiting"),
+};
+
 /**
  * 
  */
@@ -28,9 +38,15 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerIndex)
 	int8 PlayerIndex = -1;
 
+	UPROPERTY(Replicated)
+	EPlayState PlayState;
+
 public:
 	int8 GetPlayerIndex() const { return PlayerIndex; }
 	void SetPlayerIndex(int NewIndex);
+
+	EPlayState GetPlayState() const { return PlayState; }
+	void SetPlayState(EPlayState State) { PlayState = State; };
 
 	//virtual FString GetPlayerNameCustom() const;
 

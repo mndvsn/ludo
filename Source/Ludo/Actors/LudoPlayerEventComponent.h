@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerEventDelegate_OnPlayerTurn, bool, IsPlayerTurn);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerEventDelegate_OnPlayerStateInit);
+
 
 UCLASS(ClassGroup = (Custom), meta=(BlueprintSpawnableComponent), Category="Player Events")
 class LUDO_API ULudoPlayerEventComponent : public UActorComponent
@@ -19,4 +21,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Player Events")
 	FPlayerEventDelegate_OnPlayerTurn OnPlayerTurn;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Player Events")
+	FPlayerEventDelegate_OnPlayerStateInit OnPlayerStateInit;
 };

@@ -3,6 +3,7 @@
 
 #include "GameActionsWidget.h"
 #include "Components/Button.h"
+#include "Game/GamerState.h"
 
 #include "LudoPlayerController.h"
 
@@ -14,15 +15,26 @@ UGameActionsWidget::UGameActionsWidget(const FObjectInitializer& ObjectInitializ
 
 void UGameActionsWidget::NativeOnInitialized()
 {
-	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
-	{
-		PC->GetEvents()->OnPlayerTurn.AddDynamic(this, &UGameActionsWidget::OnPlayerTurn);
-	}
-
 	if (ButtonThrowDice)
 	{
 		ButtonThrowDice->OnReleased.AddDynamic(this, &UGameActionsWidget::ButtonThrowDiceReleased);
 		ButtonThrowDice->SetIsEnabled(false);
+	}
+
+	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	{
+		PC->GetEvents()->OnPlayerTurn.AddDynamic(this, &UGameActionsWidget::OnPlayerTurn);
+
+		// Notify server on loaded/ready
+		if (AGamerState* GamerState = PC->GetPlayerState<AGamerState>())
+		{
+			PC->Server_NotifyOnReady(GamerState);
+		}
+		else
+		{
+			// Replication takes more time, set flag in PC
+			PC->SetClientReadyOnPlayerState(true);
+		}
 	}
 }
 

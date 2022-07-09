@@ -18,6 +18,7 @@ public:
 	AMenuHUD();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
 	UFUNCTION(BlueprintCallable)
 	void ConstructMenu();

@@ -24,6 +24,8 @@ public:
 
 	bool IsPlayerTurn(APlayerController* Player);
 
+	uint8 GetNumPlayersReady();
+
 	void AdvanceTurn();
 
 private:

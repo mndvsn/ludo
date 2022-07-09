@@ -6,5 +6,5 @@
 AStandardGameMode::AStandardGameMode()
 {
 	// Set number of players in this game mode
-	MaxNumberOfPlayers = 4;
+	//NumPlayers = 4;
 }

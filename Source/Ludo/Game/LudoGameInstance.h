@@ -18,9 +18,9 @@ public:
 
 	virtual void Init() override;
 	
-	void CreateGameCPU(uint32 NumCPUPlayers = 3);
+	void CreateGameCPU(uint8 InPlayers, uint8 InCPU);
 
-	void CreateGame();
+	void CreateGame(uint8 InPlayers, uint8 InCPU);
 
 	void EndGame();
 

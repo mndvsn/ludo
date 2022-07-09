@@ -24,12 +24,12 @@ void UCreateGameWidget::NativeOnInitialized()
 void UCreateGameWidget::ButtonCreateGameReleased()
 {
 	if (SliderPlayersCPU == nullptr) return;
-	uint32 NumPlayersCPU = (uint32)SliderPlayersCPU->GetValue();
+	uint8 NumPlayersCPU = static_cast<uint8>(SliderPlayersCPU->GetValue());
 
 	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
 	if (GameInstance == nullptr) return;
 
-	GameInstance->CreateGameCPU(NumPlayersCPU);
+	GameInstance->CreateGameCPU(NumPlayersCPU + 1, NumPlayersCPU);
 }
 
 void UCreateGameWidget::ButtonBackReleased()

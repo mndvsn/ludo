@@ -16,6 +16,16 @@ AMenuHUD::AMenuHUD()
 void AMenuHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ConstructMenu();
+	ShowMenu();
+}
+
+void AMenuHUD::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	HideMenu();
 }
 
 void AMenuHUD::ConstructMenu()

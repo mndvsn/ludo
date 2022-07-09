@@ -43,6 +43,22 @@ bool ALudoGameState::IsPlayerTurn(APlayerController* Player)
 	return true;
 }
 
+uint8 ALudoGameState::GetNumPlayersReady()
+{
+	uint8 ReadyCount = 0;
+	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
+	{
+		if (AGamerState* GamerState = Cast<AGamerState>(*p))
+		{
+			if (GamerState->GetPlayState() == EPlayState::Ready)
+			{
+				ReadyCount++;
+			}
+		}
+	}
+	return ReadyCount;
+}
+
 void ALudoGameState::AdvanceTurn()
 {
 	if (!HasAuthority()) return;

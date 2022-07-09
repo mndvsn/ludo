@@ -18,6 +18,7 @@ void AGamerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGamerState, PlayerIndex);
+	DOREPLIFETIME(AGamerState, PlayState);
 }
 
 /**
@@ -41,7 +42,7 @@ void AGamerState::OnRep_PlayerName()
 
 void AGamerState::OnRep_PlayerIndex()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Assigned Player index: %d"), PlayerIndex);
+	UE_LOG(LogTemp, Verbose, TEXT("Assigned PlayerIndex: %d"), PlayerIndex);
 }
 
 void AGamerState::SetPlayerIndex(int NewIndex)
