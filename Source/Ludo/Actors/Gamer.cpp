@@ -45,9 +45,6 @@ AGamer::AGamer()
 	
 	PlayerLabel = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PlayerLabel"));
 	PlayerLabel->SetupAttachment(RootComponent);
-	
-	// Don't auto possess (handled by game mode)
-	//AutoPossessPlayer = EAutoReceiveInput::Disabled;
 }
 
 // Called when the game starts or when spawned
@@ -55,13 +52,7 @@ void AGamer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	CameraRotationStep = (360.0f / 4);// / PC->InputYawScale; // 90
-
-	//PC->SetControlRotation(FRotator(-80.f, 0, 0));
-
-	// Put PlayerIndex in PlayerLabel
-	//UpdatePlayerLabel();
 }
 
 void AGamer::Tick(float DeltaTime)

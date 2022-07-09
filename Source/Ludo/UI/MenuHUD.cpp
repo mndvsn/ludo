@@ -51,10 +51,10 @@ void AMenuHUD::HideMenu()
 
 	Menu->RemoveFromParent();
 
-	APlayerController* PlayerController = GetOwner<APlayerController>();
-	if (PlayerController == nullptr) return;
-
-	FInputModeGameOnly InputModeData;
-	PlayerController->SetInputMode(InputModeData);
-	PlayerController->SetShowMouseCursor(false);
+	if (APlayerController* PlayerController = GetOwner<APlayerController>())
+	{
+		FInputModeGameOnly InputModeData;
+		PlayerController->SetInputMode(InputModeData);
+		PlayerController->SetShowMouseCursor(false);
+	}
 }

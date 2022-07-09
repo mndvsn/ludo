@@ -25,14 +25,14 @@ int8 ALudoPlayerController::GetPlayerIndex() const
 
 void ALudoPlayerController::Client_StartTurn_Implementation()
 {
-	InTurn = true;
+	bInTurn = true;
 
 	GetEvents()->OnPlayerTurn.Broadcast(true);
 }
 
 void ALudoPlayerController::Client_EndTurn_Implementation()
 {
-	InTurn = false;
+	bInTurn = false;
 
 	GetEvents()->OnPlayerTurn.Broadcast(false);
 }

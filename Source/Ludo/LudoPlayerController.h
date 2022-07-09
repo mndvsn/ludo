@@ -32,14 +32,14 @@ public:
 	void Server_RequestEndTurn();
 
 private:
-	bool InTurn;
+	bool bInTurn = false;
 
 	UPROPERTY(BlueprintGetter = "GetEvents")
 	ULudoPlayerEventComponent* PlayerEventComponent;
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool IsInTurn() { return InTurn; };
+	bool IsInTurn() { return bInTurn; };
 
 	UFUNCTION(BlueprintPure)
 	ULudoPlayerEventComponent* GetEvents() { return PlayerEventComponent; };

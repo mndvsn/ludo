@@ -47,7 +47,7 @@ void ALudoGameState::AdvanceTurn()
 {
 	if (!HasAuthority()) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("-- ADVANCE TURN --"));
+	UE_LOG(LogLudoGM, Verbose, TEXT("AdvanceTurn"));
 
 	uint8 NumPlayers = PlayerArray.Num();
 
