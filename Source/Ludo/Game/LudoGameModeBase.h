@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "LudoGameModeBase.generated.h"
 
+
+DECLARE_LOG_CATEGORY_EXTERN(LogLudoGM, Verbose, All);
 /**
  * 
  */
