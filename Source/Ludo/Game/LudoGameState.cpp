@@ -4,6 +4,7 @@
 #include "LudoGameState.h"
 #include "Net/UnrealNetwork.h"
 
+#include "LudoLog.h"
 #include "LudoGameModeBase.h"
 #include "Game/GamerState.h"
 
@@ -63,7 +64,7 @@ void ALudoGameState::AdvanceTurn()
 {
 	if (!HasAuthority()) return;
 
-	UE_LOG(LogLudoGM, Verbose, TEXT("AdvanceTurn"));
+	UE_LOG(LogLudoGS, Verbose, TEXT("AdvanceTurn"));
 
 	uint8 NumPlayers = PlayerArray.Num();
 

@@ -8,8 +8,6 @@
 #include "LudoGameModeBase.generated.h"
 
 
-DECLARE_LOG_CATEGORY_EXTERN(LogLudoGM, Verbose, All);
-
 enum class EPlayState : uint8;
 
 /**

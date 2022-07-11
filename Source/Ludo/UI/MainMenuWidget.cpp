@@ -7,6 +7,7 @@
 #include "Components/NamedSlot.h"
 #include "Components/Button.h"
 
+#include "LudoLog.h"
 #include "MainMenuSubWidget.h"
 #include "ModeSelectWidget.h"
 #include "CreateGameWidget.h"
@@ -39,12 +40,12 @@ void UMainMenuWidget::NativeOnInitialized()
 
 void UMainMenuWidget::NavigateMenu(EMainMenu ToMenu)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Navigate"));
+	UE_LOG(LogLudo, Warning, TEXT("Navigate"));
 
 	EMainMenu CurrentMenu = (MenuStack.Num() > 0) ? MenuStack.Top() : EMainMenu::MM_None;
 	if (CurrentMenu == ToMenu)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Navigation failed: Already at target menu"));
+		UE_LOG(LogLudo, Warning, TEXT("Navigation failed: Already at target menu"));
 		return;
 	}
 
@@ -79,7 +80,7 @@ void UMainMenuWidget::ReturnToParentMenu()
 {
 	if (MenuStack.Num() < 2)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Navigation failed: Already at root menu"));
+		UE_LOG(LogLudo, Warning, TEXT("Navigation failed: Already at root menu"));
 		return;
 	}
 

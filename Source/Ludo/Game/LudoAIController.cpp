@@ -2,6 +2,7 @@
 
 
 #include "LudoAIController.h"
+#include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/GamerState.h"
 
@@ -16,7 +17,7 @@ void ALudoAIController::Client_StartTurn()
 {
 	bInTurn = true;
 
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_StartTurn (AI)"));
+	UE_LOG(LogLudo, Verbose, TEXT("Client_StartTurn (AI)"));
 
 	Process();
 }
@@ -25,7 +26,7 @@ void ALudoAIController::Client_EndTurn()
 {
 	bInTurn = false;
 
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_EndTurn (AI)"));
+	UE_LOG(LogLudo, Verbose, TEXT("Client_EndTurn (AI)"));
 }
 
 void ALudoAIController::Server_RequestEndTurn()

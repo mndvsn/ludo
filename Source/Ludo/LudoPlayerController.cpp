@@ -3,6 +3,8 @@
 
 #include "LudoPlayerController.h"
 #include "GameFramework/GameStateBase.h"
+
+#include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
@@ -27,7 +29,7 @@ int8 ALudoPlayerController::GetPlayerIndex() const
 void ALudoPlayerController::Client_StartTurn_Implementation()
 {
 	bInTurn = true;
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_StartTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
+	UE_LOG(LogLudo, Verbose, TEXT("Client_StartTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
 
 	GetEvents()->OnPlayerTurn.Broadcast(true);
 }
@@ -35,7 +37,7 @@ void ALudoPlayerController::Client_StartTurn_Implementation()
 void ALudoPlayerController::Client_EndTurn_Implementation()
 {
 	bInTurn = false;
-	UE_LOG(LogLudoGM, Verbose, TEXT("Client_EndTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
+	UE_LOG(LogLudo, Verbose, TEXT("Client_EndTurn (%s)"), HasAuthority() ? TEXT("Auth") : TEXT("Client"));
 
 	GetEvents()->OnPlayerTurn.Broadcast(false);
 }

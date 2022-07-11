@@ -4,6 +4,7 @@
 #include "GamerState.h"
 #include "Net/UnrealNetwork.h"
 
+#include "LudoLog.h"
 #include "Actors/Gamer.h"
 
 AGamerState::AGamerState()
@@ -44,7 +45,7 @@ void AGamerState::OnRep_PlayerName()
 
 void AGamerState::OnRep_PlayerIndex()
 {
-	UE_LOG(LogTemp, Verbose, TEXT("Assigned PlayerIndex: %d"), PlayerIndex);
+	UE_LOG(LogLudoGS, Verbose, TEXT("Assigned PlayerIndex: %d"), PlayerIndex);
 }
 
 void AGamerState::SetPlayerIndex(int NewIndex)

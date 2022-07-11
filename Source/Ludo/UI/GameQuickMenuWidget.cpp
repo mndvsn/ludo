@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
+#include "LudoLog.h"
 #include "LudoPlayerController.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
@@ -63,7 +64,7 @@ void UGameQuickMenuWidget::OnTurnChange(uint8 NewPlayerIndex)
 
 	FString PlayerName = GamerState->GetPlayerName();
 
-	UE_LOG(LogTemp, Warning, TEXT("Player name: %s"), *PlayerName);
+	UE_LOG(LogLudoEvent, Verbose, TEXT("Player name: %s"), *PlayerName);
 	OnPlayerTurnNameChanged.Broadcast(PlayerName);
 }
 

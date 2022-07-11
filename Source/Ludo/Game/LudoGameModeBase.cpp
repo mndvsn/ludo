@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
+#include "LudoLog.h"
 #include "LudoGameState.h"
 #include "LudoPlayerController.h"
 #include "LudoAIController.h"
@@ -13,7 +14,6 @@
 #include "Actors/Gamer.h"
 #include "Actors/LudoPlayerStart.h"
 
-DEFINE_LOG_CATEGORY(LogLudoGM);
 
 
 ALudoGameModeBase::ALudoGameModeBase()
