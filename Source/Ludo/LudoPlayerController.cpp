@@ -3,11 +3,13 @@
 
 #include "LudoPlayerController.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
+#include "Actors/Board.h"
 
 
 ALudoPlayerController::ALudoPlayerController()
@@ -81,5 +83,16 @@ void ALudoPlayerController::OnRep_PlayerState()
 	if (bClientReadyOnPlayerState)
 	{
 		Server_NotifyOnReady(GetPlayerState<AGamerState>());
+	}
+}
+
+void ALudoPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AActor* Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoard::StaticClass());
+	if (Actor)
+	{
+		TheBoard = Cast<ABoard>(Actor);
 	}
 }

@@ -5,6 +5,8 @@
 #include "Components/Button.h"
 #include "Game/GamerState.h"
 
+#include "Actors/Board.h"
+
 #include "LudoPlayerController.h"
 
 
@@ -57,10 +59,12 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 {
 	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
 	{
-		if (PC->IsInTurn())
+		/*if (PC->IsInTurn())
 		{
 			PC->Server_RequestEndTurn();
-		}
+		}*/
+
+		PC->TheBoard->Search(0, 3);
 	}
 }
 

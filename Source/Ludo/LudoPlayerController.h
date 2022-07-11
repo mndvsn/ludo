@@ -39,6 +39,9 @@ public:
 
 	virtual void OnRep_PlayerState() override;
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 	bool bInTurn = false;
 	bool bClientReadyOnPlayerState = true;
@@ -47,6 +50,9 @@ private:
 	ULudoPlayerEventComponent* PlayerEventComponent;
 
 public:
+	UPROPERTY()
+	class ABoard* TheBoard;
+
 	UFUNCTION(BlueprintPure)
 	bool IsInTurn() { return bInTurn; };
 
