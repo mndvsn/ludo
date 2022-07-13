@@ -19,8 +19,6 @@ class LUDO_API UGameQuickMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UGameQuickMenuWidget(const FObjectInitializer& ObjectInitializer);
-
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Events")
 	FShowMenuSignature OnShowMenu;
 
@@ -37,7 +35,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class UImage* PlayerTurnBackground;
 
-	void NativeOnInitialized() override;
+	virtual void NativeOnInitialized() override;
 
 	void RemoveFromParent() override;
 

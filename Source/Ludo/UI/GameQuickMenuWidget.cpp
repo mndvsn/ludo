@@ -13,13 +13,10 @@
 #include "UI/GameHUD.h"
 
 
-UGameQuickMenuWidget::UGameQuickMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
-{
-	Super::NativeOnInitialized();
-}
-
 void UGameQuickMenuWidget::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+
 	if (UWorld* World = GetWorld())
 	{
 		if (ALudoGameState* State = World->GetGameState<ALudoGameState>())
