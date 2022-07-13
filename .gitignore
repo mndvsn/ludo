@@ -75,7 +75,7 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # Packaged
-Distributable/*
+Packaged/*
 
 # Development screenshots
 /*.shot.png

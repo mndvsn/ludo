@@ -14,14 +14,24 @@ class LUDO_API ASquare : public AActor
 	
 public:	
 	ASquare();
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<USceneComponent> Scene;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Materials")
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 	
-	void AddNext(ASquare* NewSquare);
-	TArray<ASquare*> GetNext() { return Next; };
+	void AddNext(TObjectPtr<ASquare> NewSquare);
+	TArray<TObjectPtr<ASquare>> GetNext() { return Next; };
 
 protected:
 	virtual void BeginPlay() override;
 
-	TArray<ASquare*> Next;
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<ASquare>> Next;
 
 
 public:
@@ -31,5 +41,7 @@ public:
 	void SetHighlight(bool Highlighted);
 
 	FString GetDebugText();
+
+	UPROPERTY(EditAnywhere)
 	int32 Index = -1;
 };

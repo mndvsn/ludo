@@ -64,7 +64,7 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 			PC->Server_RequestEndTurn();
 		}*/
 
-		PC->TheBoard->Search(0, 3);
+		PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));
 	}
 }
 

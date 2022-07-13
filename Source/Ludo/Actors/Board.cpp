@@ -3,6 +3,7 @@
 
 #include "Actors/Board.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Actors/Square.h"
 
@@ -11,12 +12,40 @@ ABoard::ABoard()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	SquareClass = ASquare::StaticClass();
+
+	// Billboard sprite size
+	SpriteScale = 3.0f;
+}
+
+void ABoard::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//SpawnSquares();
+
+	TArray<TObjectPtr<AActor>> FoundSquares;
+	UGameplayStatics::GetAllActorsOfClass(this, ASquare::StaticClass(), FoundSquares);
+	if (FoundSquares.Num() > 0)
+	{
+		for (TObjectPtr<AActor> Actor : FoundSquares)
+		{
+			if (TObjectPtr<ASquare> Square = Cast<ASquare>(Actor))
+			{
+				Squares.Add(Square);
+			}
+		}
+
+		Algo::SortBy(Squares, &ASquare::Index);
+	}
+}
+
+void ABoard::SpawnSquares()
+{
 	uint8 Items = 20;
 
 	ASquare* Square = nullptr;
@@ -29,7 +58,7 @@ void ABoard::BeginPlay()
 
 	for (uint8 i = 0; i < Items; i++)
 	{
-		double deg = (PI*2 / Items) * i;
+		double deg = (PI * 2 / Items) * i;
 		double x, y;
 		FMath::SinCos(&x, &y, deg);
 
@@ -38,8 +67,18 @@ void ABoard::BeginPlay()
 		SquarePos.Y = FMath::Clamp(x * radius, -width / 2, width / 2);
 		SquarePos.Z = 0;
 
-		Square = GetWorld()->SpawnActor<ASquare>(SquareClass, SquarePos, FRotator::ZeroRotator);
-		Square->Index = i;
+		FTransform SquareTransform;
+		SquareTransform.SetLocation(SquarePos);
+
+		TObjectPtr<AActor> ActorSpawned = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, SquareClass.LoadSynchronous(), SquareTransform);
+
+		Square = Cast<ASquare>(ActorSpawned);
+		if (Square)
+		{
+			Square->Index = i;
+		}
+		ActorSpawned->FinishSpawning(SquareTransform);
+
 		Square->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
 
 		Squares.Add(Square);
@@ -47,41 +86,32 @@ void ABoard::BeginPlay()
 		if (LastSquare != nullptr) {
 			LastSquare->AddNext(Square);
 		}
-
 		LastSquare = Square;
 	}
 
 	if (!Squares.IsEmpty())
 	{
 		LastSquare->AddNext(Squares[0]);
-		//Squares[0]->SetHighlight(true);
 	}
-}
-
-void ABoard::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void ABoard::Search(int StartIndex, int JumpLimit)
 {
-	for (ASquare* Sq : Squares)
+	for (TObjectPtr<ASquare> Sq : Squares)
 	{
 		Sq->SetHighlight(false);
 	}
 	///
-
-	StartIndex += IndexInternal;
 
 	if (!Squares.IsValidIndex(StartIndex) || Squares[StartIndex] == nullptr) return;
 
 	ASquare* StartSquare = Squares[StartIndex];
 	StartSquare->SetHighlight(true);
 
-	TQueue<ASquare*> Near;
+	TQueue<TObjectPtr<ASquare>> Near;
 	Near.Enqueue(StartSquare);
 
-	TSet<ASquare*> Reachable;
+	TSet<TObjectPtr<ASquare>> Reachable;
 	Reachable.Add(StartSquare);
 
 	short Jumps = 0;
@@ -89,10 +119,10 @@ void ABoard::Search(int StartIndex, int JumpLimit)
 	{
 		if (Jumps >= JumpLimit) break;
 
-		ASquare* Current;
+		TObjectPtr<ASquare> Current;
 		Near.Dequeue(Current);
 
-		for (ASquare* Next : Current->GetNext())
+		for (TObjectPtr<ASquare> Next : Current->GetNext())
 		{
 			if (!Reachable.Contains(Next))
 			{
@@ -104,7 +134,5 @@ void ABoard::Search(int StartIndex, int JumpLimit)
 			}
 		}
 	}
-
-	IndexInternal++;
 }
 

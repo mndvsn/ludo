@@ -8,10 +8,16 @@
 ASquare::ASquare()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetActorTickInterval(1.0);
+	SetActorTickInterval(10.0);
+
+	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Scene;
+
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetupAttachment(Scene);
 }
 
-void ASquare::AddNext(ASquare* NewSquare)
+void ASquare::AddNext(TObjectPtr<ASquare> NewSquare)
 {
 	Next.Add(NewSquare);
 }
@@ -25,7 +31,7 @@ void ASquare::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	DrawDebugString(GetWorld(), FVector(0, 0, 50), GetDebugText(), this, FColor::Red);
+	//DrawDebugString(GetWorld(), FVector(0, 0, 50), GetDebugText(), this, FColor::Red);
 }
 
 FString ASquare::GetDebugText()

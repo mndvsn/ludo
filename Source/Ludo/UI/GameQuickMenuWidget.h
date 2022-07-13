@@ -10,6 +10,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowMenuSignature);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerTurnNameChanged, FString, PlayerName);
 
+class UImage;
+class UTextBlock;
+
 /**
  * 
  */
@@ -30,10 +33,10 @@ protected:
 	void OnPlayerTurn(bool IsPlayerTurn);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UTextBlock* LabelPlayerTurn;
+	TObjectPtr<UTextBlock> LabelPlayerTurn;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-	class UImage* PlayerTurnBackground;
+	TObjectPtr<UImage> PlayerTurnBackground;
 
 	virtual void NativeOnInitialized() override;
 

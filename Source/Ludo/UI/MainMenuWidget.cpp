@@ -40,8 +40,6 @@ void UMainMenuWidget::NativeOnInitialized()
 
 void UMainMenuWidget::NavigateMenu(EMainMenu ToMenu)
 {
-	UE_LOG(LogLudo, Warning, TEXT("Navigate"));
-
 	EMainMenu CurrentMenu = (MenuStack.Num() > 0) ? MenuStack.Top() : EMainMenu::MM_None;
 	if (CurrentMenu == ToMenu)
 	{

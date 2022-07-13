@@ -7,6 +7,8 @@
 #include "Board.generated.h"
 
 
+class ASquare;
+
 UCLASS()
 class LUDO_API ABoard : public AActor
 {
@@ -15,20 +17,22 @@ class LUDO_API ABoard : public AActor
 public:
 	ABoard();
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void Tick(float DeltaTime) override;
+	void SpawnSquares();
 
+public:	
 	void Search(int StartIndex, int JumpLimit);
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class ASquare> SquareClass;
+	TSoftClassPtr<ASquare> SquareClass;
 
 	UPROPERTY()
-	TArray<class ASquare*> Squares;
+	TArray<TObjectPtr<ASquare>> Squares;
 
 	UPROPERTY()
 	int8 IndexInternal;

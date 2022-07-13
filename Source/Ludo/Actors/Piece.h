@@ -6,16 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Piece.generated.h"
 
-UENUM(BlueprintType)
-enum class EPieceColor : uint8
-{
-	RED			UMETA(DisplayName = "Red"),
-	BLUE		UMETA(DisplayName = "Blue"),
-	GREEN		UMETA(DisplayName = "Green"),
-	YELLOW		UMETA(DisplayName = "Yellow"),
-	WHITE		UMETA(DisplayName = "White"),
-	BLACK		UMETA(DisplayName = "Black")
-};
+
+class UPlayerCore;
 
 UCLASS()
 class LUDO_API APiece : public AActor
@@ -26,20 +18,18 @@ public:
 	// Sets default values for this actor's properties
 	APiece();
 
-	static const FColor PieceColors[6];
-
 	UPROPERTY(BlueprintReadOnly)
-	USceneComponent* Scene;
+	TObjectPtr<USceneComponent> Scene;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* StaticMesh;
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Materials")
-	UMaterialInstanceDynamic* ColorMaterialInstance;
+	UPROPERTY(BlueprintReadWrite, Category = "Materials")
+	TObjectPtr<UMaterialInstanceDynamic> ColorMaterialInstance;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Piece")
-	EPieceColor PieceColorIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece")
+	TObjectPtr<UPlayerCore> PlayerCore;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

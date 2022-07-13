@@ -2,6 +2,8 @@
 
 
 #include "Piece.h"
+#include "Common/PlayerCore.h"
+
 
 // Sets default values
 APiece::APiece()
@@ -10,9 +12,6 @@ APiece::APiece()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
-
-	// Color defaults to Red
-	PieceColorIndex = EPieceColor::RED;
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Scene;
@@ -25,19 +24,4 @@ APiece::APiece()
 void APiece::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UMaterialInterface* Material = StaticMesh->GetMaterial(0);
-	ColorMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-
-	ColorMaterialInstance->SetVectorParameterValue("Color", FLinearColor(APiece::PieceColors[(int)PieceColorIndex]));
-	StaticMesh->SetMaterial(0, ColorMaterialInstance);
 }
-
-const FColor APiece::PieceColors[6] = {
-	FColor::FromHex("cf2037"),
-	FColor::FromHex("2f52a4"),
-	FColor::FromHex("149b49"),
-	FColor::FromHex("fcd20f"),
-	FColor::FromHex("FFFFFF"),
-	FColor::FromHex("231f20")
-};
