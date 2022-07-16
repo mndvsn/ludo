@@ -53,7 +53,13 @@ void ALudoGameModeBase::InitGameState()
 
 	if (ALudoGameState* State = GetGameState<ALudoGameState>())
 	{
-		State->GetEvents()->OnPlayStateChange.AddDynamic(this, &ALudoGameModeBase::OnPlayStateChange);
+		State->SetPlayerCountForGame(NumPlayers);
+
+		GameEventsInterface = State;
+		if (GameEventsInterface)
+		{
+			PlayStateChangedHandle = GameEventsInterface->GetPlayStateChangedDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayStateChanged);
+		}
 	}
 }
 
@@ -149,10 +155,15 @@ void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController
 
 	SetupPlayer(NewPlayer);
 
-	if (bShouldSpawnCPU && NewPlayer->IsLocalController())
+	if (TObjectPtr<ALudoPlayerController> PC = Cast<ALudoPlayerController>(NewPlayer))
 	{
-		// Controller is PlayerController, create CPU
-		CreateCPUPlayers(NumPlayersCPU);
+		PC->SetGameEventsInterface(GetWorld()->GetGameState<ALudoGameState>());
+
+		// Check if PlayerController is server controlled
+		if (bShouldSpawnCPU && NewPlayer->IsLocalPlayerController())
+		{
+			CreateCPUPlayers(NumPlayersCPU);
+		}
 	}
 }
 
@@ -276,11 +287,24 @@ int32 ALudoGameModeBase::GetNumPlayersTotal()
 	return PlayerCount;
 }
 
-void ALudoGameModeBase::OnPlayStateChange(AGamerState* GamerState, EPlayState State)
+void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, EPlayState State)
 {
 	if (CheckGameReady())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
 		StartGame();
+	}
+}
+
+void ALudoGameModeBase::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (GameEventsInterface && PlayStateChangedHandle.IsValid())
+	{
+		GameEventsInterface->GetPlayStateChangedDelegate().Remove(PlayStateChangedHandle);
+
+		PlayStateChangedHandle.Reset();
+		GameEventsInterface = nullptr;
 	}
 }

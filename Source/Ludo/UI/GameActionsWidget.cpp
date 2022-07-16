@@ -3,20 +3,16 @@
 
 #include "GameActionsWidget.h"
 #include "Components/Button.h"
-#include "Game/GamerState.h"
 
+#include "Game/GamerState.h"
+#include "LudoPlayerController.h"
 #include "Actors/Board.h"
 
-#include "LudoPlayerController.h"
-
-
-UGameActionsWidget::UGameActionsWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)
-{
-	Super::NativeOnInitialized();
-}
 
 void UGameActionsWidget::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+
 	if (ButtonThrowDice)
 	{
 		ButtonThrowDice->OnReleased.AddDynamic(this, &UGameActionsWidget::OnButtonThrowDiceReleased);
@@ -25,28 +21,24 @@ void UGameActionsWidget::NativeOnInitialized()
 
 	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
 	{
-		PC->GetEvents()->OnPlayerTurn.AddDynamic(this, &UGameActionsWidget::OnPlayerTurn);
+		PlayerEventsInterface = PC;
 
-		// Notify server on loaded/ready
-		if (AGamerState* GamerState = PC->GetPlayerState<AGamerState>())
+		if (PlayerEventsInterface)
 		{
-			PC->Server_NotifyOnReady(GamerState);
-		}
-		else
-		{
-			// Replication takes more time, set flag in PC
-			PC->SetClientReadyOnPlayerState(true);
+			PlayerEventsInterface->GetPlayerTurnDelegate().AddDynamic(this, &UGameActionsWidget::OnPlayerTurn);
 		}
 	}
 }
 
 void UGameActionsWidget::RemoveFromParent()
 {
-	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	if (PlayerEventsInterface)
 	{
-		PC->GetEvents()->OnPlayerTurn.RemoveDynamic(this, &UGameActionsWidget::OnPlayerTurn);
-	}
+		PlayerEventsInterface->GetPlayerTurnDelegate().RemoveDynamic(this, &UGameActionsWidget::OnPlayerTurn);
 
+		PlayerEventsInterface = nullptr;
+	}
+	
 	if (ButtonThrowDice)
 	{
 		ButtonThrowDice->OnReleased.RemoveDynamic(this, &UGameActionsWidget::OnButtonThrowDiceReleased);
@@ -59,16 +51,16 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 {
 	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
 	{
-		/*if (PC->IsInTurn())
+		if (PC->IsInTurn())
 		{
 			PC->Server_RequestEndTurn();
-		}*/
+		}
 
-		PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));
+		//PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));
 	}
 }
 
-void UGameActionsWidget::OnPlayerTurn_Implementation(bool IsPlayerTurn)
+void UGameActionsWidget::OnPlayerTurn_Implementation(bool bIsPlayerTurn)
 {
-	
+
 }

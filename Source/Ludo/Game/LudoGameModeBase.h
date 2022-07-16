@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Game/GameEventsInterface.h"
 #include "LudoGamerInterface.h"
 #include "LudoGameModeBase.generated.h"
 
 
+class ALudoPlayerStart;
+class ALudoAIController;
 enum class EPlayState : uint8;
 
 /**
@@ -48,14 +51,19 @@ protected:
 
 	void SetupPlayer(AController* Player);
 
-	TArray<class ALudoPlayerStart*> PlayerStarts;
+	TArray<ALudoPlayerStart*> PlayerStarts;
 
-	TArray<class ALudoAIController*> CPUPlayers;
+	TArray<ALudoAIController*> CPUPlayers;
 
 	ILudoGamerInterface* GetPlayerInTurn() { return PlayerInTurn; };
 
-	UFUNCTION()
-	void OnPlayStateChange(class AGamerState* GamerState, EPlayState State);
+	UFUNCTION(Category = "Events")
+	void OnPlayStateChanged(AGamerState* GamerState, EPlayState State);
+
+	UPROPERTY()
+	TScriptInterface<IGameEventsInterface> GameEventsInterface;
+
+	FDelegateHandle PlayStateChangedHandle;
 
 private:
 	ILudoGamerInterface* PlayerInTurn;
@@ -69,6 +77,8 @@ private:
 	bool CheckGameReady();
 
 	void UpdateCurrentControllerState(bool bIsStartingTurn = true);
+
+	virtual void BeginDestroy() override;
 
 public:
 	void StartGame();

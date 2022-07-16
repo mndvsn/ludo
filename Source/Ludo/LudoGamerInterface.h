@@ -6,6 +6,9 @@
 #include "UObject/Interface.h"
 #include "LudoGamerInterface.generated.h"
 
+
+class AGamerState;
+
 UINTERFACE(MinimalAPI)
 class ULudoGamerInterface : public UInterface
 {
@@ -29,5 +32,5 @@ public:
 	//UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Server_RequestEndTurn() = 0;
 
-	virtual class AGamerState* GetGamerState() = 0;
+	virtual TObjectPtr<AGamerState> GetGamerState() = 0;
 };

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Actors/PlayerEventsInterface.h"
+#include "Game/GameEventsInterface.h"
 #include "GameQuickMenuWidget.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowMenuSignature);
@@ -30,7 +32,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category="Events")
-	void OnPlayerTurn(bool IsPlayerTurn);
+	void OnPlayerTurn(bool bIsPlayerTurn);
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UTextBlock> LabelPlayerTurn;
@@ -43,6 +45,13 @@ protected:
 	void RemoveFromParent() override;
 
 private:
+	UPROPERTY()
+	TScriptInterface<IPlayerEventsInterface> PlayerEventsInterface;
+
+	UPROPERTY()
+	TScriptInterface<IGameEventsInterface> GameEventsInterface;
+	FDelegateHandle TurnChangedHandle;
+
 	UFUNCTION()
 	void OnTurnChange(uint8 NewPlayerIndex);
 

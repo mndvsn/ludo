@@ -6,6 +6,9 @@
 #include "GameFramework/HUD.h"
 #include "GameHUD.generated.h"
 
+
+DECLARE_DELEGATE(FUIE_OnGameHUDReady);
+
 /**
  * 
  */
@@ -27,6 +30,11 @@ public:
 
 	UFUNCTION()
 	void ShowInGameMenu();
+
+	FUIE_OnGameHUDReady OnGameHUDReady;
+
+	UFUNCTION(BlueprintCallable, Category="Events")
+	void OnFinishConstructHUD();
 
 protected:
 	UFUNCTION()

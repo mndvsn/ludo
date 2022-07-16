@@ -17,17 +17,14 @@ void UGameQuickMenuWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	if (UWorld* World = GetWorld())
+	if (GameEventsInterface = GetWorld()->GetGameState<ALudoGameState>())
 	{
-		if (ALudoGameState* State = World->GetGameState<ALudoGameState>())
-		{
-			State->GetEvents()->OnTurnChange.AddDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
-		}
+		TurnChangedHandle = GameEventsInterface->GetTurnChangedDelegate().AddUObject(this, &UGameQuickMenuWidget::OnTurnChange);
 	}
 
-	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	if (PlayerEventsInterface = GetOwningPlayer<ALudoPlayerController>())
 	{
-		PC->GetEvents()->OnPlayerTurn.AddDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
+		PlayerEventsInterface->GetPlayerTurnDelegate().AddDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
 	}
 
 	OnShowMenu.AddDynamic(this, &UGameQuickMenuWidget::ButtonMenuReleased);
@@ -35,17 +32,19 @@ void UGameQuickMenuWidget::NativeOnInitialized()
 
 void UGameQuickMenuWidget::RemoveFromParent()
 {
-	if (UWorld* World = GetWorld())
+	if (GameEventsInterface && TurnChangedHandle.IsValid())
 	{
-		if (ALudoGameState* State = World->GetGameState<ALudoGameState>())
-		{
-			State->GetEvents()->OnTurnChange.RemoveDynamic(this, &UGameQuickMenuWidget::OnTurnChange);
-		}
+		GameEventsInterface->GetTurnChangedDelegate().Remove(TurnChangedHandle);
+
+		TurnChangedHandle.Reset();
+		GameEventsInterface = nullptr;
 	}
 
-	if (ALudoPlayerController* PC = GetOwningPlayer<ALudoPlayerController>())
+	if (PlayerEventsInterface)
 	{
-		PC->GetEvents()->OnPlayerTurn.RemoveDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
+		PlayerEventsInterface->GetPlayerTurnDelegate().RemoveDynamic(this, &UGameQuickMenuWidget::OnPlayerTurn);
+
+		PlayerEventsInterface = nullptr;
 	}
 
 	Super::RemoveFromParent();
@@ -53,16 +52,16 @@ void UGameQuickMenuWidget::RemoveFromParent()
 
 void UGameQuickMenuWidget::OnTurnChange(uint8 NewPlayerIndex)
 {
-	ALudoGameState* State = GetWorld()->GetGameState<ALudoGameState>();
-	check(State);
-
-	const AGamerState* GamerState = State->GetGamerStateForIndex(NewPlayerIndex);
-	check(GamerState);
-
-	FString PlayerName = GamerState->GetPlayerName();
-
-	UE_LOG(LogLudoEvent, Verbose, TEXT("Player name: %s"), *PlayerName);
-	OnPlayerTurnNameChanged.Broadcast(PlayerName);
+	UE_LOG(LogLudo, Verbose, TEXT("OnTurnChange: %d (%s)"), NewPlayerIndex, GetOwningPlayer()->HasAuthority() ? TEXT("Auth") : TEXT("Client"));
+	if (ALudoGameState* State = Cast<ALudoGameState>(GameEventsInterface.GetObject()))
+	{
+		const TObjectPtr<AGamerState> GamerState = State->GetGamerStateForIndex(NewPlayerIndex);
+		if (GamerState)
+		{
+			const FString PlayerName = GamerState->GetPlayerName();
+			OnPlayerTurnNameChanged.Broadcast(PlayerName);
+		}
+	}
 }
 
 void UGameQuickMenuWidget::ButtonMenuReleased()
@@ -73,7 +72,7 @@ void UGameQuickMenuWidget::ButtonMenuReleased()
 	}
 }
 
-void UGameQuickMenuWidget::OnPlayerTurn_Implementation(bool IsPlayerTurn)
+void UGameQuickMenuWidget::OnPlayerTurn_Implementation(bool bIsPlayerTurn)
 {
 	
 }

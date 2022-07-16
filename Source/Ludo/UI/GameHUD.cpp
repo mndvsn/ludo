@@ -31,13 +31,17 @@ void AGameHUD::Hide()
 
 void AGameHUD::ConstructHUD()
 {
-	if (!IsValid(GameWidgetClass)) return;
+	if (GameWidgetClass)
+	{
+		GameWidget = CreateWidget<UGameOverlayWidget>(GetOwner<APlayerController>(), GameWidgetClass);
+		GameWidget->AddToViewport();
+	}
+	OnFinishConstructHUD();
+}
 
-	APlayerController* PlayerController = GetOwner<APlayerController>();
-	if (!IsValid(PlayerController)) return;
-
-	GameWidget = CreateWidget<UGameOverlayWidget>(PlayerController, GameWidgetClass);
-	GameWidget->AddToViewport();
+void AGameHUD::OnFinishConstructHUD()
+{
+	OnGameHUDReady.ExecuteIfBound();
 }
 
 void AGameHUD::ShowInGameMenu()

@@ -24,7 +24,7 @@ public:
 
 	virtual void Server_RequestEndTurn() override;
 
-	virtual AGamerState* GetGamerState() override;
+	virtual TObjectPtr<AGamerState> GetGamerState() override;
 
 protected:
 	void Process();

@@ -9,19 +9,15 @@
 #include "Game/GamerState.h"
 
 
-ALudoGameState::ALudoGameState()
-{
-	EventComponent = CreateDefaultSubobject<ULudoEventComponent>("EventComponent");
-}
-
 void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
 }
 
-AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
+TObjectPtr<AGamerState> ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
 {
 	const TObjectPtr<APlayerState>* PlayerStatePtr = PlayerArray.FindByPredicate([PlayerIndex](const TObjectPtr<APlayerState>& PlayerState)
 	{
@@ -34,12 +30,12 @@ AGamerState* ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
 	return CastChecked<AGamerState>(PlayerStatePtr->Get());
 }
 
-class AGamerState* ALudoGameState::GetGamerStateInTurn() const
+TObjectPtr<AGamerState> ALudoGameState::GetGamerStateInTurn() const
 {
 	return GetGamerStateForIndex(CurrentPlayerIndex);
 }
 
-bool ALudoGameState::IsPlayerTurn(APlayerController* Player)
+bool ALudoGameState::IsPlayerTurn(TObjectPtr<APlayerController> Player)
 {
 	return true;
 }
@@ -49,7 +45,7 @@ uint8 ALudoGameState::GetNumPlayersReady()
 	uint8 ReadyCount = 0;
 	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
 	{
-		if (AGamerState* GamerState = Cast<AGamerState>(*p))
+		if (TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
 		{
 			if (GamerState->GetPlayState() == EPlayState::Ready)
 			{
@@ -58,6 +54,22 @@ uint8 ALudoGameState::GetNumPlayersReady()
 		}
 	}
 	return ReadyCount;
+}
+
+uint8 ALudoGameState::GetNumPlayersReplicated()
+{
+	uint8 PlayerCount = 0;
+	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
+	{
+		if (TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
+		{
+			if (GamerState->GetPlayerIndex() > -1)
+			{
+				PlayerCount++;
+			}
+		}
+	}
+	return PlayerCount;
 }
 
 void ALudoGameState::AdvanceTurn()
@@ -73,10 +85,10 @@ void ALudoGameState::AdvanceTurn()
 		CurrentPlayerIndex = 0;
 	}
 
-	GetEvents()->OnTurnChange.Broadcast(CurrentPlayerIndex);
+	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }
 
 void ALudoGameState::OnRep_CurrentPlayerIndex()
 {
-	GetEvents()->OnTurnChange.Broadcast(CurrentPlayerIndex);
+	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }

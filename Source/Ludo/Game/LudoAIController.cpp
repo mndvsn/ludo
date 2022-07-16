@@ -39,7 +39,7 @@ void ALudoAIController::Server_RequestEndTurn()
 	}
 }
 
-AGamerState* ALudoAIController::GetGamerState()
+TObjectPtr<AGamerState> ALudoAIController::GetGamerState()
 {
 	return GetPlayerState<AGamerState>();
 }

@@ -4,36 +4,41 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "Actors/LudoEventComponent.h"
+#include "Game/GameEventsInterface.h"
 #include "LudoGameState.generated.h"
+
+
+class AGamerState;
 
 /**
  * 
  */
 UCLASS()
-class LUDO_API ALudoGameState : public AGameStateBase
+class LUDO_API ALudoGameState : public AGameStateBase, public IGameEventsInterface
 {
 	GENERATED_BODY()
 
-	ALudoGameState();
-
 public:
-	class AGamerState* GetGamerStateForIndex(int8 PlayerIndex) const;
+	TObjectPtr<AGamerState> GetGamerStateForIndex(int8 PlayerIndex) const;
 
-	class AGamerState* GetGamerStateInTurn() const;
+	TObjectPtr<AGamerState> GetGamerStateInTurn() const;
 
-	bool IsPlayerTurn(APlayerController* Player);
+	bool IsPlayerTurn(TObjectPtr<APlayerController> Player);
 
 	uint8 GetNumPlayersReady();
+	uint8 GetNumPlayersReplicated();
 
 	void AdvanceTurn();
 
 private:
-	UPROPERTY(BlueprintGetter="GetEvents")
-	ULudoEventComponent* EventComponent;
+	FGE_OnTurnChangedNative OnTurnChangedNative;
+	FGE_OnPlayStateChangedNative OnPlayStateChangedNative;
 
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerIndex)
 	int8 CurrentPlayerIndex = -1;
+
+	UPROPERTY(Replicated)
+	uint8 PlayerCountForGame = 0;
 
 	UFUNCTION()
 	void OnRep_CurrentPlayerIndex();
@@ -41,6 +46,9 @@ private:
 public:
 	int8 GetCurrentPlayerIndex() { return CurrentPlayerIndex; };
 
-	UFUNCTION(BlueprintPure)
-	ULudoEventComponent* GetEvents() { return EventComponent; };
+	uint8 GetPlayerCountForGame() { return PlayerCountForGame; };
+	void SetPlayerCountForGame(uint8 Count) { PlayerCountForGame = Count; };
+
+	virtual FGE_OnTurnChangedNative& GetTurnChangedDelegate() override { return OnTurnChangedNative; };
+	virtual FGE_OnPlayStateChangedNative& GetPlayStateChangedDelegate() override { return OnPlayStateChangedNative; };
 };
