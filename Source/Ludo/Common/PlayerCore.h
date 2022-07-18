@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 Id;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(TitleProperty=DisplayName))
 	FString DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
