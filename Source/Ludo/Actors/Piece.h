@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
 	TObjectPtr<UPlayerCore> PlayerCore;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintNativeEvent)
 	void OnRep_PlayerCore();
 
 	virtual void BeginPlay() override;
