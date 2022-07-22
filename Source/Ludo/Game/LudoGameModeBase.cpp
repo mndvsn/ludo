@@ -13,6 +13,9 @@
 #include "GamerState.h"
 #include "Actors/Gamer.h"
 #include "Actors/LudoPlayerStart.h"
+#include "Actors/Board.h"
+#include "Actors/Yard.h"
+#include "Actors/Piece.h"
 
 
 
@@ -85,14 +88,12 @@ void ALudoGameModeBase::GenericPlayerInitialization(AController* C)
 bool ALudoGameModeBase::CheckGameReady()
 {
 	// Check if all players are ready
-	bool Ready = false;
-
-	//const int& NumCurrentPlayers = GetNumPlayersTotal();
+	bool Ready = false;	
 	
 	if (ALudoGameState* State = GetGameState<ALudoGameState>())
 	{
 		// Game is ready if expected number of players is in
-		Ready = (State->GetNumPlayersReady() == NumPlayers);
+		Ready = (State->GetNumPlayersReady() == State->GetPlayerCountForGame());
 	}
 
 	return Ready;
@@ -123,6 +124,11 @@ void ALudoGameModeBase::NextTurn()
 	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 
 	UpdateCurrentControllerState(true);
+}
+
+void ALudoGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void ALudoGameModeBase::UpdateCurrentControllerState(bool bIsStartingTurn /*= true*/)
@@ -188,8 +194,6 @@ void ALudoGameModeBase::SetupPlayer(AController* Player)
 	{
 		Gamer->UpdatePlayerLabel();
 	}
-
-	// Spawn Yard
 }
 
 AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
@@ -268,6 +272,37 @@ void ALudoGameModeBase::SpawnCPU()
 	}
 }
 
+void ALudoGameModeBase::SetBoard(TObjectPtr<ABoard> BoardActor)
+{
+	if (!BoardActor) return;
+	TheBoard = BoardActor;
+}
+
+void ALudoGameModeBase::SetupBoard()
+{
+	if (!GetBoard()) return;
+
+	// Spawn player pieces
+	for (auto& PlayerState : GetGameState<ALudoGameState>()->PlayerArray)
+	{
+		TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(PlayerState);
+		SpawnPiecesForPlayer(GamerState->GetPlayerIndex());
+	}
+
+	StartGame();
+}
+
+void ALudoGameModeBase::SpawnPiecesForPlayer(uint8 PlayerIndex)
+{
+	if (!GetBoard()) return;
+
+	UE_LOG(LogLudoGM, Verbose, TEXT("Spawn Pieces for player index %d"), PlayerIndex);
+	if (TObjectPtr<AYard> Yard = GetBoard()->GetYard(PlayerIndex))
+	{
+		Yard->SpawnPieces();
+	}
+}
+
 int32 ALudoGameModeBase::GetNumPlayersTotal()
 {
 	/*int32 PlayerCount = GetNumPlayers();
@@ -289,10 +324,27 @@ int32 ALudoGameModeBase::GetNumPlayersTotal()
 
 void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, EPlayState State)
 {
-	if (CheckGameReady())
+	if (State != EPlayState::Ready) return;
+
+	if (!CheckGameReady()) return;
+	
+	if (GetBoard())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Game is ready!"));
-		StartGame();
+		if (GetBoard()->bYardsFound)
+		{
+			SetupBoard();				
+		}
+		else
+		{
+			TheBoard->OnFoundYards.BindLambda([this]()
+			{
+				SetupBoard();
+			});
+		}
+	}
+	else
+	{
+		UE_LOG(LogLudoGM, Error, TEXT("Board not loaded, can't spawn player Yards!"));
 	}
 }
 

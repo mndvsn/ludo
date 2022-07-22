@@ -8,6 +8,7 @@
 
 
 class UPlayerCore;
+class APiece;
 
 UCLASS()
 class LUDO_API AYard : public AActor
@@ -27,14 +28,19 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Materials")
 	TObjectPtr<UMaterialInstanceDynamic> ColorMaterialInstance;
 
+	void SpawnPieces();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Yard")
 	TObjectPtr<UPlayerCore> PlayerCore;
+
+	UPROPERTY(EditDefaultsOnly, Category="Yard")
+	TSoftClassPtr<APiece> PieceClass;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-
-
+	UPROPERTY(EditAnywhere)
+	int32 Index = -1;
 };

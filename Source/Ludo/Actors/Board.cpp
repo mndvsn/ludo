@@ -6,12 +6,15 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Actors/Square.h"
+#include "Actors/Yard.h"
 
 
 ABoard::ABoard()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	SquareClass = ASquare::StaticClass();
+
+	bReplicates = true;
 
 	// Billboard sprite size
 	SpriteScale = 3.0f;
@@ -26,8 +29,7 @@ void ABoard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//SpawnSquares();
-
+	// Find placed Squares
 	TArray<TObjectPtr<AActor>> FoundSquares;
 	UGameplayStatics::GetAllActorsOfClass(this, ASquare::StaticClass(), FoundSquares);
 	if (FoundSquares.Num() > 0)
@@ -42,57 +44,32 @@ void ABoard::BeginPlay()
 
 		Algo::SortBy(Squares, &ASquare::Index);
 	}
+
+	// Find placed Yards
+	TArray<TObjectPtr<AActor>> FoundYards;
+	UGameplayStatics::GetAllActorsOfClass(this, AYard::StaticClass(), FoundYards);
+	if (FoundYards.Num() > 0)
+	{
+		for (TObjectPtr<AActor> Actor : FoundYards)
+		{
+			if (TObjectPtr<AYard> Yard = Cast<AYard>(Actor))
+			{
+				Yards.Add(Yard);
+			}
+		}
+
+		Algo::SortBy(Yards, &AYard::Index);
+
+		bYardsFound = true;
+		OnFoundYards.ExecuteIfBound();
+	}
 }
 
-void ABoard::SpawnSquares()
+TObjectPtr<AYard> ABoard::GetYard(uint8 PlayerIndex)
 {
-	uint8 Items = 20;
+	if (Yards.IsEmpty()) return nullptr;
 
-	ASquare* Square = nullptr;
-	ASquare* LastSquare = nullptr;
-
-	double width = 850;
-	double height = 850;
-
-	double radius = 0.5 * FMath::Sqrt(FMath::Pow(width, 2) + FMath::Pow(height, 2));
-
-	for (uint8 i = 0; i < Items; i++)
-	{
-		double deg = (PI * 2 / Items) * i;
-		double x, y;
-		FMath::SinCos(&x, &y, deg);
-
-		FVector SquarePos;
-		SquarePos.X = FMath::Clamp(y * radius, -height / 2, height / 2);
-		SquarePos.Y = FMath::Clamp(x * radius, -width / 2, width / 2);
-		SquarePos.Z = 0;
-
-		FTransform SquareTransform;
-		SquareTransform.SetLocation(SquarePos);
-
-		TObjectPtr<AActor> ActorSpawned = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, SquareClass.LoadSynchronous(), SquareTransform);
-
-		Square = Cast<ASquare>(ActorSpawned);
-		if (Square)
-		{
-			Square->Index = i;
-		}
-		ActorSpawned->FinishSpawning(SquareTransform);
-
-		Square->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-
-		Squares.Add(Square);
-
-		if (LastSquare != nullptr) {
-			LastSquare->AddNext(Square);
-		}
-		LastSquare = Square;
-	}
-
-	if (!Squares.IsEmpty())
-	{
-		LastSquare->AddNext(Squares[0]);
-	}
+	return Yards[PlayerIndex];
 }
 
 void ABoard::Search(int StartIndex, int JumpLimit)

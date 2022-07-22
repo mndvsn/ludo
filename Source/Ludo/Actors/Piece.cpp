@@ -2,13 +2,13 @@
 
 
 #include "Piece.h"
+#include "LudoLog.h"
+#include "Net/UnrealNetwork.h"
 #include "Common/PlayerCore.h"
 
 
-// Sets default values
 APiece::APiece()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
@@ -20,8 +20,24 @@ APiece::APiece()
 	StaticMesh->SetupAttachment(Scene);
 }
 
-// Called when the game starts or when spawned
+void APiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APiece, PlayerCore);
+}
+
+void APiece::OnRep_PlayerCore()
+{
+
+}
+
 void APiece::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void APiece::SetPlayerCore(TObjectPtr<UPlayerCore> InPlayerCore)
+{
+	PlayerCore = InPlayerCore;
 }

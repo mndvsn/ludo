@@ -113,6 +113,12 @@ void ALudoPlayerController::BeginPlay()
 	if (TObjectPtr<AActor> Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoard::StaticClass()))
 	{
 		TheBoard = Cast<ABoard>(Actor);
+
+		if (HasAuthority())
+		{
+			TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+			GameMode->SetBoard(TheBoard);
+		}
 	}
 }
 

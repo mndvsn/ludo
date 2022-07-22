@@ -33,7 +33,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<ASquare>> Next;
 
-
 public:
 	virtual void Tick(float DeltaTime) override;
 

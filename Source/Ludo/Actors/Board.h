@@ -7,7 +7,10 @@
 #include "Board.generated.h"
 
 
+DECLARE_DELEGATE(FGE_OnBoardFoundYards);
+
 class ASquare;
+class AYard;
 
 UCLASS()
 class LUDO_API ABoard : public AActor
@@ -19,13 +22,16 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	TObjectPtr<AYard> GetYard(uint8 PlayerIndex);
+
+	void Search(int StartIndex, int JumpLimit);
+
+	FGE_OnBoardFoundYards OnFoundYards;
+
+	bool bYardsFound;
+
 protected:
 	virtual void BeginPlay() override;
-
-	void SpawnSquares();
-
-public:	
-	void Search(int StartIndex, int JumpLimit);
 
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -35,6 +41,6 @@ private:
 	TArray<TObjectPtr<ASquare>> Squares;
 
 	UPROPERTY()
-	int8 IndexInternal;
+	TArray<TObjectPtr<AYard>> Yards;
 
 };

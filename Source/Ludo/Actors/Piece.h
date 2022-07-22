@@ -14,8 +14,7 @@ class LUDO_API APiece : public AActor
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this actor's properties
+public:
 	APiece();
 
 	UPROPERTY(BlueprintReadOnly)
@@ -28,12 +27,15 @@ public:
 	TObjectPtr<UMaterialInstanceDynamic> ColorMaterialInstance;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
 	TObjectPtr<UPlayerCore> PlayerCore;
 
-	// Called when the game starts or when spawned
+	UFUNCTION()
+	void OnRep_PlayerCore();
+
 	virtual void BeginPlay() override;
 
 public:
-	
+	void SetPlayerCore(TObjectPtr<UPlayerCore> InPlayerCore);
+
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+
 #include "Game/GameEventsInterface.h"
 #include "LudoGamerInterface.h"
 #include "LudoGameModeBase.generated.h"
@@ -11,6 +12,7 @@
 
 class ALudoPlayerStart;
 class ALudoAIController;
+class ABoard;
 enum class EPlayState : uint8;
 
 /**
@@ -66,6 +68,7 @@ protected:
 	FDelegateHandle PlayStateChangedHandle;
 
 private:
+	TObjectPtr<ABoard> TheBoard;
 	ILudoGamerInterface* PlayerInTurn;
 
 	void CreatePlayerStarts(uint8 PlayerCount);
@@ -74,6 +77,10 @@ private:
 
 	void SpawnCPU();
 
+	void SpawnPiecesForPlayer(uint8 PlayerIndex);
+
+	void SetupBoard();
+
 	bool CheckGameReady();
 
 	void UpdateCurrentControllerState(bool bIsStartingTurn = true);
@@ -81,8 +88,13 @@ private:
 	virtual void BeginDestroy() override;
 
 public:
+	TObjectPtr<ABoard> GetBoard() { return TheBoard; };
+	void SetBoard(TObjectPtr<ABoard> BoardActor);
+
 	void StartGame();
 
 	void NextTurn();
+
+	virtual void BeginPlay() override;
 
 };
