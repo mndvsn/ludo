@@ -44,6 +44,20 @@ void ALudoPlayerController::Client_EndTurn_Implementation()
 	OnPlayerTurn.Broadcast(false);
 }
 
+void ALudoPlayerController::Server_RequestEndTurn_Implementation()
+{
+	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
+	{
+		GameMode->NextTurn();
+	}
+}
+
+bool ALudoPlayerController::Server_RequestEndTurn_Validate()
+{
+	//TODO: Check if this player is actually in turn
+	return true;
+}
+
 void ALudoPlayerController::ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
@@ -51,10 +65,7 @@ void ALudoPlayerController::ThrowDie()
 	TObjectPtr<AGamer> Gamer = GetGamer();
 	Gamer->Server_ThrowDie();
 
-	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
-	{
-		GameMode->NextTurn();
-	}
+	Server_RequestEndTurn();
 }
 
 void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* PlayerStateReady)

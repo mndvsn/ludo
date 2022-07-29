@@ -36,6 +36,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	virtual void Client_EndTurn() override;
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void Server_RequestEndTurn() override;
+
 	virtual void ThrowDie() override;
 
 	UFUNCTION(Server, Reliable)

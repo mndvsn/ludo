@@ -30,6 +30,9 @@ public:
 	//UFUNCTION(Client, Reliable)
 	virtual void Client_EndTurn() = 0;
 
+	//UFUNCTION(Server, Reliable, WithValidation)
+	virtual void Server_RequestEndTurn() = 0;
+
 	virtual void ThrowDie() = 0;
 
 	virtual TObjectPtr<AGamer> GetGamer() = 0;

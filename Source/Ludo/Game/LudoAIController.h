@@ -25,6 +25,8 @@ public:
 
 	virtual void Client_EndTurn() override;
 
+	virtual void Server_RequestEndTurn() override;
+
 	virtual void ThrowDie() override;
 
 	virtual TObjectPtr<AGamer> GetGamer() override;

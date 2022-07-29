@@ -30,6 +30,14 @@ void ALudoAIController::Client_EndTurn()
 	UE_LOG(LogLudo, Verbose, TEXT("Client_EndTurn (AI)"));
 }
 
+void ALudoAIController::Server_RequestEndTurn()
+{
+	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
+	{
+		GameMode->NextTurn();
+	}
+}
+
 void ALudoAIController::ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
@@ -37,10 +45,7 @@ void ALudoAIController::ThrowDie()
 	TObjectPtr<AGamer> Gamer = GetGamer();
 	Gamer->Server_ThrowDie();
 
-	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
-	{
-		GameMode->NextTurn();
-	}
+	Server_RequestEndTurn();
 }
 
 TObjectPtr<AGamer> ALudoAIController::GetGamer()
