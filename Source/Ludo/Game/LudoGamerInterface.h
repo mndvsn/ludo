@@ -30,7 +30,7 @@ public:
 	virtual void Client_EndTurn() = 0;
 
 	//UFUNCTION(Server, Reliable, WithValidation)
-	virtual void Server_RequestEndTurn() = 0;
+	virtual void Server_ThrowDie() = 0;
 
 	virtual TObjectPtr<AGamerState> GetGamerState() = 0;
 };

@@ -22,7 +22,7 @@ public:
 
 	virtual void Client_EndTurn() override;
 
-	virtual void Server_RequestEndTurn() override;
+	virtual void Server_ThrowDie() override;
 
 	virtual TObjectPtr<AGamerState> GetGamerState() override;
 

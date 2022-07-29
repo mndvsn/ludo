@@ -10,6 +10,7 @@
 #include "LudoPlayerController.generated.h"
 
 
+class APlayerState;
 class AGamerState;
 class ABoard;
 
@@ -35,10 +36,10 @@ public:
 	virtual void Client_EndTurn() override;
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void Server_RequestEndTurn() override;
+	virtual void Server_ThrowDie() override;
 
 	UFUNCTION(Server, Reliable)
-	void Server_NotifyOnReady(class APlayerState* PlayerStateReady);
+	void Server_NotifyOnReady(APlayerState* PlayerStateReady);
 
 	void CheckPlayerStates();
 

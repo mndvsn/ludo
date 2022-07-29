@@ -29,9 +29,13 @@ void ALudoAIController::Client_EndTurn()
 	UE_LOG(LogLudo, Verbose, TEXT("Client_EndTurn (AI)"));
 }
 
-void ALudoAIController::Server_RequestEndTurn()
+void ALudoAIController::Server_ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
+
+	//
+	// Run gameplay actions on Pawn instead??
+	//
 
 	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
 	{
@@ -52,5 +56,5 @@ void ALudoAIController::Process()
 
 void ALudoAIController::OnWaited()
 {
-	Server_RequestEndTurn();
+	Server_ThrowDie();
 }

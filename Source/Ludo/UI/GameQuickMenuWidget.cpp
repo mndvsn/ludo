@@ -7,7 +7,7 @@
 #include "Components/Image.h"
 
 #include "LudoLog.h"
-#include "LudoPlayerController.h"
+#include "Game/LudoPlayerController.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
 #include "UI/GameHUD.h"

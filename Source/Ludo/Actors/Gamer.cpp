@@ -10,9 +10,9 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "Game/LudoGameInstance.h"
+#include "Game/LudoPlayerController.h"
 #include "Game/GamerState.h"
 #include "UI/GameHUD.h"
-#include "LudoPlayerController.h"
 
 // Sets default values
 AGamer::AGamer()

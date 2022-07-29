@@ -43,9 +43,16 @@ void ALudoPlayerController::Client_EndTurn_Implementation()
 	OnPlayerTurn.Broadcast(false);
 }
 
-void ALudoPlayerController::Server_RequestEndTurn_Implementation()
+void ALudoPlayerController::Server_ThrowDie_Implementation()
 {
 	//TODO: Check if this player is actually in turn
+
+	//
+	// Run gameplay actions on Pawn instead??
+	//
+
+	char Number = static_cast<char>(FMath::RandRange(0, 6));
+	UE_LOG(LogLudo, Warning, TEXT("%s throws a %d!"), *GetName(), Number);
 
 	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
 	{
@@ -53,7 +60,7 @@ void ALudoPlayerController::Server_RequestEndTurn_Implementation()
 	}
 }
 
-bool ALudoPlayerController::Server_RequestEndTurn_Validate()
+bool ALudoPlayerController::Server_ThrowDie_Validate()
 {
 	return true;
 }

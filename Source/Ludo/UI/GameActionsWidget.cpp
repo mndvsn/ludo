@@ -5,7 +5,7 @@
 #include "Components/Button.h"
 
 #include "Game/GamerState.h"
-#include "LudoPlayerController.h"
+#include "Game/LudoPlayerController.h"
 #include "Actors/Board.h"
 
 
@@ -53,7 +53,7 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 	{
 		if (PC->IsInTurn())
 		{
-			PC->Server_RequestEndTurn();
+			PC->Server_ThrowDie();
 		}
 
 		//PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));
