@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "LudoGamerInterface.generated.h"
+#include "LudoControllerInterface.generated.h"
 
 
 class AGamerState;
 
 UINTERFACE(MinimalAPI)
-class ULudoGamerInterface : public UInterface
+class ULudoControllerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,7 +18,7 @@ class ULudoGamerInterface : public UInterface
 /**
  * 
  */
-class LUDO_API ILudoGamerInterface
+class LUDO_API ILudoControllerInterface
 {
 	GENERATED_BODY()
 

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Game/GameEventsInterface.h"
+#include "Game/LudoControllerInterface.h"
 #include "Actors/PlayerEventsInterface.h"
-#include "LudoGamerInterface.h"
 #include "LudoPlayerController.generated.h"
 
 
@@ -18,7 +18,7 @@ class ABoard;
  * 
  */
 UCLASS()
-class LUDO_API ALudoPlayerController : public APlayerController, public ILudoGamerInterface, public IPlayerEventsInterface
+class LUDO_API ALudoPlayerController : public APlayerController, public ILudoControllerInterface, public IPlayerEventsInterface
 {
 	GENERATED_BODY()
 

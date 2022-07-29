@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 
 #include "Game/GameEventsInterface.h"
-#include "LudoGamerInterface.h"
+#include "Game/LudoControllerInterface.h"
 #include "LudoGameModeBase.generated.h"
 
 
@@ -57,7 +57,7 @@ protected:
 
 	TArray<ALudoAIController*> CPUPlayers;
 
-	ILudoGamerInterface* GetPlayerInTurn() { return PlayerInTurn; };
+	ILudoControllerInterface* GetPlayerInTurn() { return PlayerInTurn; };
 
 	UFUNCTION(Category = "Events")
 	void OnPlayStateChanged(AGamerState* GamerState, EPlayState State);
@@ -69,7 +69,7 @@ protected:
 
 private:
 	TObjectPtr<ABoard> TheBoard;
-	ILudoGamerInterface* PlayerInTurn;
+	ILudoControllerInterface* PlayerInTurn;
 
 	void CreatePlayerStarts(uint8 PlayerCount);
 

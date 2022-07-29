@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "LudoGamerInterface.h"
+#include "Game/LudoControllerInterface.h"
 #include "LudoAIController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LUDO_API ALudoAIController : public AAIController, public ILudoGamerInterface
+class LUDO_API ALudoAIController : public AAIController, public ILudoControllerInterface
 {
 	GENERATED_BODY()
 

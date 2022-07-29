@@ -121,7 +121,7 @@ void ALudoGameModeBase::NextTurn()
 	State->AdvanceTurn();
 
 	// Update controller in turn
-	PlayerInTurn = CastChecked<ILudoGamerInterface>(State->GetGamerStateInTurn()->GetOwningController());
+	PlayerInTurn = CastChecked<ILudoControllerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 
 	UpdateCurrentControllerState(true);
 }
