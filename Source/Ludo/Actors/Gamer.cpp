@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
+#include "LudoLog.h"
 #include "Game/LudoGameInstance.h"
 #include "Game/LudoPlayerController.h"
 #include "Game/GamerState.h"
@@ -183,4 +184,17 @@ void AGamer::UpdatePlayerLabel()
 	{
 		PlayerLabel->SetText(FText::FromString(GamerState->GetPlayerName()));
 	}
+}
+
+void AGamer::Server_ThrowDie_Implementation()
+{
+	//TODO: Check if this player is actually in turn
+
+	char Number = static_cast<char>(FMath::RandRange(0, 6));
+	UE_LOG(LogLudo, Warning, TEXT("%s throws a %d!"), *GetController()->GetName(), Number);
+}
+
+bool AGamer::Server_ThrowDie_Validate()
+{
+	return true;
 }

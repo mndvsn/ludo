@@ -5,6 +5,7 @@
 #include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/GamerState.h"
+#include "Actors/Gamer.h"
 
 
 ALudoAIController::ALudoAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -29,18 +30,22 @@ void ALudoAIController::Client_EndTurn()
 	UE_LOG(LogLudo, Verbose, TEXT("Client_EndTurn (AI)"));
 }
 
-void ALudoAIController::Server_ThrowDie()
+void ALudoAIController::ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
 
-	//
-	// Run gameplay actions on Pawn instead??
-	//
+	TObjectPtr<AGamer> Gamer = GetGamer();
+	Gamer->Server_ThrowDie();
 
 	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
 	{
 		GameMode->NextTurn();
 	}
+}
+
+TObjectPtr<AGamer> ALudoAIController::GetGamer()
+{
+	return GetPawn<AGamer>();
 }
 
 TObjectPtr<AGamerState> ALudoAIController::GetGamerState()
@@ -56,5 +61,5 @@ void ALudoAIController::Process()
 
 void ALudoAIController::OnWaited()
 {
-	Server_ThrowDie();
+	ThrowDie();
 }

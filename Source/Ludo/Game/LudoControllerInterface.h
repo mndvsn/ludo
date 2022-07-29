@@ -8,6 +8,7 @@
 
 
 class AGamerState;
+class AGamer;
 
 UINTERFACE(MinimalAPI)
 class ULudoControllerInterface : public UInterface
@@ -29,8 +30,9 @@ public:
 	//UFUNCTION(Client, Reliable)
 	virtual void Client_EndTurn() = 0;
 
-	//UFUNCTION(Server, Reliable, WithValidation)
-	virtual void Server_ThrowDie() = 0;
+	virtual void ThrowDie() = 0;
+
+	virtual TObjectPtr<AGamer> GetGamer() = 0;
 
 	virtual TObjectPtr<AGamerState> GetGamerState() = 0;
 };

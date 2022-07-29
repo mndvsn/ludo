@@ -7,6 +7,9 @@
 #include "Game/LudoControllerInterface.h"
 #include "LudoAIController.generated.h"
 
+class AGamer;
+class AGamerState;
+
 /**
  * 
  */
@@ -22,7 +25,9 @@ public:
 
 	virtual void Client_EndTurn() override;
 
-	virtual void Server_ThrowDie() override;
+	virtual void ThrowDie() override;
+
+	virtual TObjectPtr<AGamer> GetGamer() override;
 
 	virtual TObjectPtr<AGamerState> GetGamerState() override;
 

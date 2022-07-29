@@ -13,6 +13,7 @@
 class APlayerState;
 class AGamerState;
 class ABoard;
+class AGamer;
 
 /**
  * 
@@ -35,8 +36,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	virtual void Client_EndTurn() override;
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void Server_ThrowDie() override;
+	virtual void ThrowDie() override;
 
 	UFUNCTION(Server, Reliable)
 	void Server_NotifyOnReady(APlayerState* PlayerStateReady);
@@ -67,6 +67,8 @@ private:
 public:
 	UPROPERTY()
 	TObjectPtr<ABoard> TheBoard;
+
+	virtual TObjectPtr<AGamer> GetGamer() override;
 
 	UFUNCTION(BlueprintPure)
 	bool IsInTurn() { return bInTurn; };

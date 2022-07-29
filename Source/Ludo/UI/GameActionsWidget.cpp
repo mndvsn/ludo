@@ -53,7 +53,7 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 	{
 		if (PC->IsInTurn())
 		{
-			PC->Server_ThrowDie();
+			PC->ThrowDie();
 		}
 
 		//PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));

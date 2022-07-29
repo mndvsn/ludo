@@ -63,4 +63,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	void UpdatePlayerLabel();
+
+	//~=============================================================================
+	// Player gameplay actions
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void Server_ThrowDie();
 };

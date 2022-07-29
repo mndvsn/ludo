@@ -9,6 +9,7 @@
 #include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Game/GamerState.h"
+#include "Actors/Gamer.h"
 #include "Actors/Board.h"
 #include "UI/GameHUD.h"
 
@@ -43,26 +44,17 @@ void ALudoPlayerController::Client_EndTurn_Implementation()
 	OnPlayerTurn.Broadcast(false);
 }
 
-void ALudoPlayerController::Server_ThrowDie_Implementation()
+void ALudoPlayerController::ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
 
-	//
-	// Run gameplay actions on Pawn instead??
-	//
-
-	char Number = static_cast<char>(FMath::RandRange(0, 6));
-	UE_LOG(LogLudo, Warning, TEXT("%s throws a %d!"), *GetName(), Number);
+	TObjectPtr<AGamer> Gamer = GetGamer();
+	Gamer->Server_ThrowDie();
 
 	if (ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>())
 	{
 		GameMode->NextTurn();
 	}
-}
-
-bool ALudoPlayerController::Server_ThrowDie_Validate()
-{
-	return true;
 }
 
 void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* PlayerStateReady)
@@ -148,4 +140,9 @@ void ALudoPlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUD
 void ALudoPlayerController::OnGameHUDReady()
 {
 
+}
+
+TObjectPtr<AGamer> ALudoPlayerController::GetGamer()
+{
+	return GetPawn<AGamer>();
 }
