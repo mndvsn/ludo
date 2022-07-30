@@ -15,6 +15,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
+	DOREPLIFETIME(ALudoGameState, DieThrowList);
 }
 
 TObjectPtr<AGamerState> ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) const
@@ -37,7 +38,13 @@ TObjectPtr<AGamerState> ALudoGameState::GetGamerStateInTurn() const
 
 bool ALudoGameState::IsPlayerTurn(TObjectPtr<APlayerController> Player)
 {
-	return true;
+	auto GamerState = Player->GetPlayerState<AGamerState>();
+	return (GamerState->GetPlayerIndex() == CurrentPlayerIndex);
+}
+
+bool ALudoGameState::PlayerHasPieceOnBoard(int8 PlayerIndex)
+{
+	return false;
 }
 
 uint8 ALudoGameState::GetNumPlayersReady()
@@ -91,4 +98,19 @@ void ALudoGameState::AdvanceTurn()
 void ALudoGameState::OnRep_CurrentPlayerIndex()
 {
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
+}
+
+void ALudoGameState::AddDieThrow(FDieThrow Throw)
+{
+	if (!HasAuthority()) return;
+
+	DieThrowList.Add(Throw);
+
+	OnRep_DieThrowList();
+}
+
+void ALudoGameState::OnRep_DieThrowList()
+{
+	FDieThrow Throw = GetLastThrow();
+	OnDieThrowNative.Broadcast(Throw);
 }

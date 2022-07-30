@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 
+#include "Game/LudoGameState.h"
 #include "Game/GameEventsInterface.h"
 #include "Game/LudoControllerInterface.h"
 #include "LudoGameModeBase.generated.h"
@@ -92,6 +93,8 @@ public:
 	void SetBoard(TObjectPtr<ABoard> BoardActor);
 
 	void StartGame();
+
+	void AddPlayerThrow(FDieThrow Throw);
 
 	void NextTurn();
 

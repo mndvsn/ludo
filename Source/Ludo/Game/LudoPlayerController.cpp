@@ -64,8 +64,6 @@ void ALudoPlayerController::ThrowDie()
 
 	TObjectPtr<AGamer> Gamer = GetGamer();
 	Gamer->Server_ThrowDie();
-
-	Server_RequestEndTurn();
 }
 
 void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* PlayerStateReady)

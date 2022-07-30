@@ -107,6 +107,13 @@ void ALudoGameModeBase::StartGame()
 	NextTurn();
 }
 
+void ALudoGameModeBase::AddPlayerThrow(FDieThrow Throw)
+{
+	// add throw to dice throws list
+	ALudoGameState* State = GetGameState<ALudoGameState>();
+	State->AddDieThrow(Throw);
+}
+
 void ALudoGameModeBase::NextTurn()
 {
 	ALudoGameState* State = GetGameState<ALudoGameState>();

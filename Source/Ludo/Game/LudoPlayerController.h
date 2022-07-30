@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Game/GameEventsInterface.h"
 #include "Game/LudoControllerInterface.h"
+#include "Game/LudoGameState.h"
 #include "Actors/PlayerEventsInterface.h"
 #include "LudoPlayerController.generated.h"
 
@@ -40,6 +41,9 @@ public:
 	virtual void Server_RequestEndTurn() override;
 
 	virtual void ThrowDie() override;
+
+	/*UFUNCTION(NetMulticast, Reliable)
+	void Client_OnDieThrown(FDieThrow Throw);*/
 
 	UFUNCTION(Server, Reliable)
 	void Server_NotifyOnReady(APlayerState* PlayerStateReady);

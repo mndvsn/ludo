@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "Gamer.generated.h"
 
+
+struct FDieThrow;
+
 UCLASS()
 class LUDO_API AGamer : public APawn
 {
@@ -68,5 +71,7 @@ public:
 	// Player gameplay actions
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void Server_ThrowDie();
+	void Server_ThrowDie();
+
+	void OnDieThrow(FDieThrow Throw);
 };

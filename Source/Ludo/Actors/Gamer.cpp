@@ -11,6 +11,8 @@
 
 #include "LudoLog.h"
 #include "Game/LudoGameInstance.h"
+#include "Game/LudoGameModeBase.h"
+#include "Game/LudoGameState.h"
 #include "Game/LudoPlayerController.h"
 #include "Game/GamerState.h"
 #include "UI/GameHUD.h"
@@ -54,6 +56,11 @@ void AGamer::BeginPlay()
 	Super::BeginPlay();
 
 	CameraRotationStep = (360.0f / 4);// / PC->InputYawScale; // 90
+
+	if (TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>())
+	{
+		GameState->GetDieThrowDelegate().AddUObject(this, &AGamer::OnDieThrow);
+	}
 }
 
 void AGamer::Tick(float DeltaTime)
@@ -190,11 +197,51 @@ void AGamer::Server_ThrowDie_Implementation()
 {
 	//TODO: Check if this player is actually in turn
 
-	char Number = static_cast<char>(FMath::RandRange(0, 6));
-	UE_LOG(LogLudo, Warning, TEXT("%s throws a %d!"), *GetController()->GetName(), Number);
+	FDieThrow Throw;
+	Throw.PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
+	Throw.Result = static_cast<uint8>(FMath::RandRange(1, 6));
+
+	UE_LOG(LogLudo, Verbose, TEXT("Player index %d throws a %d!"), Throw.PlayerIndex, Throw.Result);
+
+	ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode< ALudoGameModeBase>();
+	GameMode->AddPlayerThrow(Throw);
 }
 
 bool AGamer::Server_ThrowDie_Validate()
 {
 	return true;
+}
+
+void AGamer::OnDieThrow(FDieThrow Throw)
+{
+	TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
+
+	// check if this Gamer is relevant for the throw
+	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
+	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
+	if (!bIsRelevant) return;
+	
+	// Get the result of die thrown
+	const bool bCanMovePiece = GameState->PlayerHasPieceOnBoard(PlayerIndex);
+	//UE_LOG(LogLudo, Verbose, TEXT("%s: PlayerIndex %d rolled %d"), *GetName(), Throw.PlayerIndex, Throw.Result);
+
+	if (Throw.Result == 1 || Throw.Result == 6)
+	{
+		UE_LOG(LogLudo, Verbose, TEXT("PlayerIndex %d can move a piece from Yard"), Throw.PlayerIndex);
+
+		//GetPiece
+	}
+
+	/*if (bCanMovePiece)
+	{
+		// move a piece with Throw.Result
+	}*/
+
+	if (HasAuthority())
+	{
+		if (TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
+		{
+			ControllerInterface->Server_RequestEndTurn();
+		}
+	}
 }

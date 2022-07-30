@@ -8,9 +8,13 @@
 #include "GameEventsInterface.generated.h"
 
 
+struct FDieThrow;
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FGE_OnTurnChangedNative, uint8);
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FGE_OnPlayStateChangedNative, AGamerState*, EPlayState);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FGE_OnDieThrowNative, FDieThrow);
 
 UINTERFACE(MinimalAPI)
 class UGameEventsInterface : public UInterface
@@ -30,4 +34,5 @@ public:
 
 	virtual FGE_OnPlayStateChangedNative& GetPlayStateChangedDelegate() = 0;
 	
+	virtual FGE_OnDieThrowNative& GetDieThrowDelegate() = 0;
 };

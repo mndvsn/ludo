@@ -45,7 +45,9 @@ void ALudoAIController::ThrowDie()
 	TObjectPtr<AGamer> Gamer = GetGamer();
 	Gamer->Server_ThrowDie();
 
-	Server_RequestEndTurn();
+	// handle die etc, from game state
+	// 
+	//Server_RequestEndTurn();
 }
 
 TObjectPtr<AGamer> ALudoAIController::GetGamer()
