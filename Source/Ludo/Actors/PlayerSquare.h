@@ -18,7 +18,7 @@ class LUDO_API APlayerSquare : public ASquare
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Square")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetPlayerCore, Category="Square")
 	TObjectPtr<UPlayerCore> PlayerCore;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Square")
@@ -27,4 +27,7 @@ protected:
 public:
 	UFUNCTION(BlueprintPure)
 	bool IsHome() const { return bIsHome; };
+
+	UFUNCTION(BlueprintPure)
+	UPlayerCore* GetPlayerCore() { return PlayerCore; };
 };

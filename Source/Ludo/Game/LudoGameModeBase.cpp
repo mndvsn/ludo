@@ -190,6 +190,22 @@ void ALudoGameModeBase::SetupPlayer(AController* Player)
 	{
 		PlayerState->SetPlayerIndex(StartSpot->GetPlayerSlot());
 		ChangeName(Player, FString::Printf(TEXT("Player %d"), StartSpot->GetPlayerSlot()+1), false);
+
+		/*UPlayerCore* PlayerCore;
+		switch (StartSpot->GetPlayerSlot())
+		{
+		case 0:
+		default:
+			
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		}
+		PlayerState->SetPlayerCore(PlayerCore);*/
 	}
 	else
 	{
@@ -293,19 +309,23 @@ void ALudoGameModeBase::SetupBoard()
 	for (auto& PlayerState : GetGameState<ALudoGameState>()->PlayerArray)
 	{
 		TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(PlayerState);
-		SpawnPiecesForPlayer(GamerState->GetPlayerIndex());
+		SpawnPiecesForPlayer(GamerState);
 	}
 
 	StartGame();
 }
 
-void ALudoGameModeBase::SpawnPiecesForPlayer(uint8 PlayerIndex)
+void ALudoGameModeBase::SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState)
 {
 	if (!GetBoard()) return;
 
+	const uint8 PlayerIndex = GamerState->GetPlayerIndex();
+	const TObjectPtr<AGamer> Gamer = Cast<AGamer>(GamerState->GetPawn());
+
 	UE_LOG(LogLudoGM, Verbose, TEXT("Spawn Pieces for player index %d"), PlayerIndex);
 	if (TObjectPtr<AYard> Yard = GetBoard()->GetYard(PlayerIndex))
-	{
+	{	
+		Yard->SetGamer(Gamer);
 		Yard->SpawnPieces();
 	}
 }

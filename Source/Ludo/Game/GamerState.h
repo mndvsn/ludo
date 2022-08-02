@@ -16,6 +16,9 @@ enum class EPlayState : uint8
 	Waiting  UMETA(DisplayName = "Waiting"),
 };
 
+class UPlayerCore;
+class APlayerState;
+
 /**
  * 
  */
@@ -41,9 +44,15 @@ private:
 	UPROPERTY(Replicated)
 	EPlayState PlayState;
 
+	UPROPERTY(Replicated)
+	TObjectPtr<UPlayerCore> PlayerCore;
+
 public:
 	int8 GetPlayerIndex() const { return PlayerIndex; }
 	void SetPlayerIndex(int NewIndex);
+
+	TObjectPtr<UPlayerCore> GetPlayerCore() const { return PlayerCore; }
+	void SetPlayerCore(TObjectPtr<UPlayerCore> NewCore);
 
 	EPlayState GetPlayState() const { return PlayState; }
 	void SetPlayState(EPlayState State) { PlayState = State; };
@@ -52,9 +61,9 @@ public:
 
 protected:
 	// Used to copy properties from the current PlayerState to the passed one
-	virtual void CopyProperties(class APlayerState* PlayerState);
+	virtual void CopyProperties(APlayerState* PlayerState);
 	
 	// Used to override the current PlayerState with the properties of the passed one
-	virtual void OverrideWith(class APlayerState* PlayerState);
+	virtual void OverrideWith(APlayerState* PlayerState);
 
 };

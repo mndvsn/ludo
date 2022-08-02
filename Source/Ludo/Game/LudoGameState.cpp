@@ -5,8 +5,9 @@
 #include "Net/UnrealNetwork.h"
 
 #include "LudoLog.h"
-#include "LudoGameModeBase.h"
+#include "Game/LudoGameModeBase.h"
 #include "Game/GamerState.h"
+#include "Actors/Piece.h"
 
 
 void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

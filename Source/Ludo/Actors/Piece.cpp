@@ -12,6 +12,7 @@ APiece::APiece()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
+	SetReplicateMovement(true);
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Scene;

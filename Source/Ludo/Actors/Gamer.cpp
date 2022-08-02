@@ -15,6 +15,7 @@
 #include "Game/LudoGameState.h"
 #include "Game/LudoPlayerController.h"
 #include "Game/GamerState.h"
+#include "Actors/Piece.h"
 #include "UI/GameHUD.h"
 
 // Sets default values
@@ -193,6 +194,20 @@ void AGamer::UpdatePlayerLabel()
 	}
 }
 
+void AGamer::AddPiece(TObjectPtr<APiece> Piece)
+{
+	if (!Piece) return;
+
+	Pieces.Add(Piece);
+}
+
+APiece* AGamer::GetPiece(uint8 AtIndex)
+{
+	if (!Pieces.IsValidIndex(AtIndex)) return nullptr;
+
+	return Pieces[AtIndex];
+}
+
 void AGamer::Server_ThrowDie_Implementation()
 {
 	//TODO: Check if this player is actually in turn
@@ -229,7 +244,10 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 	{
 		UE_LOG(LogLudo, Verbose, TEXT("PlayerIndex %d can move a piece from Yard"), Throw.PlayerIndex);
 
-		//GetPiece
+		if (APiece* Piece = GetPiece(0))
+		{
+			UE_LOG(LogLudo, Warning, TEXT("Piece: %s"), *Piece->GetName());
+		}
 	}
 
 	/*if (bCanMovePiece)

@@ -78,7 +78,7 @@ private:
 
 	void SpawnCPU();
 
-	void SpawnPiecesForPlayer(uint8 PlayerIndex);
+	void SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState);
 
 	void SetupBoard();
 

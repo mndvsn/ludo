@@ -10,8 +10,6 @@
 
 class AGamerState;
 
-
-
 /**
  *
  */
@@ -62,7 +60,7 @@ private:
 
 	UPROPERTY(ReplicatedUsing=OnRep_DieThrowList)
 	TArray<FDieThrow> DieThrowList;
-
+	
 	UFUNCTION()
 	void OnRep_CurrentPlayerIndex();
 

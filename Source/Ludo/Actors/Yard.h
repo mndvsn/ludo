@@ -9,6 +9,7 @@
 
 class UPlayerCore;
 class APiece;
+class AGamer;
 
 UCLASS()
 class LUDO_API AYard : public AActor
@@ -40,7 +41,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+private:
+	UPROPERTY(BlueprintGetter=GetGamer)
+	TObjectPtr<AGamer> Gamer;
+
 public:	
 	UPROPERTY(EditAnywhere)
 	int32 Index = -1;
+
+	UFUNCTION(BlueprintPure)
+	AGamer* GetGamer() { return Gamer; };
+
+	void SetGamer(TObjectPtr<AGamer> NewGamer) { Gamer = NewGamer; };
 };

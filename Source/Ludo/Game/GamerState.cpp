@@ -6,6 +6,7 @@
 
 #include "LudoLog.h"
 #include "LudoPlayerController.h"
+#include "Common/PlayerCore.h"
 #include "Actors/Gamer.h"
 
 AGamerState::AGamerState()
@@ -23,6 +24,7 @@ void AGamerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(AGamerState, PlayerIndex);
 	DOREPLIFETIME(AGamerState, PlayState);
+	DOREPLIFETIME(AGamerState, PlayerCore);
 }
 
 /**
@@ -56,7 +58,13 @@ void AGamerState::SetPlayerIndex(int NewIndex)
 	PlayerIndex = NewIndex;
 }
 
-void AGamerState::CopyProperties(class APlayerState* PlayerState)
+void AGamerState::SetPlayerCore(TObjectPtr<UPlayerCore> NewCore)
+{
+	UE_LOG(LogLudoGS, Verbose, TEXT("SetPlayerCore: %s > %d (Auth)"), *GetPlayerName(), *NewCore->DisplayName);
+	PlayerCore = NewCore;
+}
+
+void AGamerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
 
@@ -64,10 +72,11 @@ void AGamerState::CopyProperties(class APlayerState* PlayerState)
 	{
 		GamerState->SetPlayerIndex(GetPlayerIndex());
 		GamerState->SetPlayState(PlayState);
+		GamerState->SetPlayerCore(PlayerCore);
 	}
 }
 
-void AGamerState::OverrideWith(class APlayerState* PlayerState)
+void AGamerState::OverrideWith(APlayerState* PlayerState)
 {
 	Super::OverrideWith(PlayerState);
 
@@ -75,5 +84,6 @@ void AGamerState::OverrideWith(class APlayerState* PlayerState)
 	{
 		SetPlayState(GamerState->PlayState);
 		SetPlayerIndex(GamerState->PlayerIndex);
+		SetPlayerCore(GamerState->PlayerCore);
 	}
 }

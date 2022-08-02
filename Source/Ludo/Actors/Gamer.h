@@ -8,6 +8,7 @@
 
 
 struct FDieThrow;
+class APiece;
 
 UCLASS()
 class LUDO_API AGamer : public APawn
@@ -31,6 +32,9 @@ private:
 	float CameraZoomMin = 3000.f;
 	float CameraZoomMax = 10000.f;
 	float CameraRotationStep;
+
+	UPROPERTY()
+	TArray<TObjectPtr<APiece>> Pieces;
 
 public:
 	// Sets default values for this pawn's properties
@@ -66,6 +70,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	void UpdatePlayerLabel();
+
+	void AddPiece(TObjectPtr<APiece> Piece);
+
+	UFUNCTION(BlueprintCallable)
+	APiece* GetPiece(uint8 AtIndex);
 
 	//~=============================================================================
 	// Player gameplay actions

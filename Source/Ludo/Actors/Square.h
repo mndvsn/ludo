@@ -7,6 +7,29 @@
 #include "Square.generated.h"
 
 
+class APiece;
+
+/**
+ *
+ */
+USTRUCT(BlueprintType)
+struct FSquareData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	uint8 Index;
+
+	UPROPERTY()
+	TObjectPtr<ASquare> Square;
+
+	UPROPERTY()
+	TArray<TObjectPtr<APiece>> Pieces;
+};
+
+/**
+ *
+ */
 UCLASS()
 class LUDO_API ASquare : public AActor
 {

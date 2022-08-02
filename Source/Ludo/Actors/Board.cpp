@@ -2,11 +2,16 @@
 
 
 #include "Actors/Board.h"
+#include "Net/UnrealNetwork.h"
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Actors/Square.h"
+#include "LudoLog.h"
+#include "Game/LudoGameState.h"
 #include "Actors/Yard.h"
+#include "Actors/PlayerSquare.h"
+
+#include "Common/PlayerCore.h"
 
 
 ABoard::ABoard()
@@ -18,6 +23,13 @@ ABoard::ABoard()
 
 	// Billboard sprite size
 	SpriteScale = 3.0f;
+}
+
+void ABoard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABoard, BoardData);
 }
 
 void ABoard::Tick(float DeltaTime)
@@ -39,10 +51,17 @@ void ABoard::BeginPlay()
 			if (TObjectPtr<ASquare> Square = Cast<ASquare>(Actor))
 			{
 				Squares.Add(Square);
+
+				FSquareData SquareData;
+				SquareData.Index = Square->Index;
+				SquareData.Square = Square;
+
+				BoardData.Add(SquareData);
 			}
 		}
 
 		Algo::SortBy(Squares, &ASquare::Index);
+		Algo::SortBy(BoardData, &FSquareData::Index);
 	}
 
 	// Find placed Yards
@@ -70,6 +89,32 @@ TObjectPtr<AYard> ABoard::GetYard(uint8 PlayerIndex)
 	if (Yards.IsEmpty()) return nullptr;
 
 	return Yards[PlayerIndex];
+}
+
+TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
+{
+	TArray<TObjectPtr<APlayerSquare>> SquareArray;
+
+	// Find PlayerCore used by player
+	TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
+	TObjectPtr<AGamerState> GamerState = GameState->GetGamerStateForIndex(PlayerIndex);
+	TObjectPtr<UPlayerCore> PlayerCore = GamerState->GetPlayerCore();
+	if (!PlayerCore) {
+		UE_LOG(LogLudo, Error, TEXT("Could not get player PlayerCore!"));
+		return SquareArray;
+	}
+
+	for (auto Square : Squares)
+	{
+		if (auto PlayerSquare = Cast<APlayerSquare>(Square))
+		{
+			if (PlayerSquare->GetPlayerCore() == PlayerCore)
+			{
+				SquareArray.Add(PlayerSquare);
+			}
+		}
+	}
+	return SquareArray;
 }
 
 void ABoard::Search(int StartIndex, int JumpLimit)
@@ -113,3 +158,7 @@ void ABoard::Search(int StartIndex, int JumpLimit)
 	}
 }
 
+void ABoard::OnRep_BoardData()
+{
+
+}

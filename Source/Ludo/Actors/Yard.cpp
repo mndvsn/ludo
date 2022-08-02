@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "LudoLog.h"
+#include "Actors/Gamer.h"
 #include "Actors/Piece.h"
 #include "Common/PlayerCore.h"
 
@@ -47,9 +48,13 @@ void AYard::SpawnPieces()
 			{
 				// Set playercore, owner etc
 				Piece->SetOwner(this);
-				//Piece->SetInstigator(GetOwner());
-
 				Piece->SetPlayerCore(this->PlayerCore);
+
+				if (Gamer)
+				{
+					Piece->SetInstigator(Gamer.Get());
+					Gamer->AddPiece(Piece);
+				}
 			}
 
 			ActorToSpawn->FinishSpawning(PieceTransform);
