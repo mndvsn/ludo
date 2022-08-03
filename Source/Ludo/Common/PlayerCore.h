@@ -6,16 +6,14 @@
 #include "Engine/DataAsset.h"
 #include "PlayerCore.generated.h"
 
+
 /**
- * 
+ *
  */
-UCLASS()
-class LUDO_API UPlayerCore : public UDataAsset
+USTRUCT(BlueprintType)
+struct FPlayerCore
 {
 	GENERATED_BODY()
-
-public:
-	UPlayerCore();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 Id;
@@ -26,4 +24,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FColor PrimaryColor;
 
+	FPlayerCore()
+	{
+		Id = 255;
+		DisplayName = "Color";
+		PrimaryColor = FColor::FromHex("FF00FF");
+	};
+};
+
+/**
+ * 
+ */
+UCLASS()
+class LUDO_API UPlayerCoreAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FPlayerCore> Cores;
 };

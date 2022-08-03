@@ -8,10 +8,11 @@
 #include "Game/LudoGameState.h"
 #include "Game/GameEventsInterface.h"
 #include "Game/LudoControllerInterface.h"
+#include "Common/PlayerCore.h"
 #include "LudoGameModeBase.generated.h"
 
 
-class ALudoPlayerStart;
+class APlayerSlot;
 class ALudoAIController;
 class ABoard;
 enum class EPlayState : uint8;
@@ -27,12 +28,17 @@ class LUDO_API ALudoGameModeBase : public AGameModeBase
 public:
 	ALudoGameModeBase();
 
-	// Number of players set to play the game, default 2
+	// Number of players set to play the game
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 NumPlayers = 2;
 
+	// Number of bots/cpu players
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 NumPlayersCPU = 0;
+	uint8 NumPlayersCPU = 1;
+
+	// Must be populated with FPlayerCores in BP
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPlayerCoreAsset* PlayerCores;
 
 	bool bShouldSpawnCPU = 0;
 
@@ -54,7 +60,7 @@ protected:
 
 	void SetupPlayer(AController* Player);
 
-	TArray<ALudoPlayerStart*> PlayerStarts;
+	TArray<APlayerSlot*> PlayerSlots;
 
 	TArray<ALudoAIController*> CPUPlayers;
 
@@ -72,7 +78,7 @@ private:
 	TObjectPtr<ABoard> TheBoard;
 	ILudoControllerInterface* PlayerInTurn;
 
-	void CreatePlayerStarts(uint8 PlayerCount);
+	void CreatePlayerSlots(uint8 PlayerCount);
 
 	void CreateCPUPlayers(uint8 NumCPUPlayers);
 

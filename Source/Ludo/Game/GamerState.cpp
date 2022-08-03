@@ -7,6 +7,7 @@
 #include "LudoLog.h"
 #include "LudoPlayerController.h"
 #include "Common/PlayerCore.h"
+#include "Actors/PlayerSlot.h"
 #include "Actors/Gamer.h"
 
 AGamerState::AGamerState()
@@ -24,7 +25,7 @@ void AGamerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 
 	DOREPLIFETIME(AGamerState, PlayerIndex);
 	DOREPLIFETIME(AGamerState, PlayState);
-	DOREPLIFETIME(AGamerState, PlayerCore);
+	DOREPLIFETIME(AGamerState, PlayerSlot);
 }
 
 /**
@@ -58,10 +59,10 @@ void AGamerState::SetPlayerIndex(int NewIndex)
 	PlayerIndex = NewIndex;
 }
 
-void AGamerState::SetPlayerCore(TObjectPtr<UPlayerCore> NewCore)
+void AGamerState::SetPlayerSlot(TObjectPtr<APlayerSlot> NewSlot)
 {
-	UE_LOG(LogLudoGS, Verbose, TEXT("SetPlayerCore: %s > %d (Auth)"), *GetPlayerName(), *NewCore->DisplayName);
-	PlayerCore = NewCore;
+	UE_LOG(LogLudoGS, Verbose, TEXT("SetPlayerSlot: %s > %d"), *GetPlayerName(), *NewSlot->GetName());
+	PlayerSlot = NewSlot;
 }
 
 void AGamerState::CopyProperties(APlayerState* PlayerState)
@@ -72,7 +73,7 @@ void AGamerState::CopyProperties(APlayerState* PlayerState)
 	{
 		GamerState->SetPlayerIndex(GetPlayerIndex());
 		GamerState->SetPlayState(PlayState);
-		GamerState->SetPlayerCore(PlayerCore);
+		GamerState->SetPlayerSlot(PlayerSlot);
 	}
 }
 
@@ -82,8 +83,8 @@ void AGamerState::OverrideWith(APlayerState* PlayerState)
 
 	if (AGamerState* GamerState = CastChecked<AGamerState>(PlayerState))
 	{
-		SetPlayState(GamerState->PlayState);
 		SetPlayerIndex(GamerState->PlayerIndex);
-		SetPlayerCore(GamerState->PlayerCore);
+		SetPlayState(GamerState->PlayState);
+		SetPlayerSlot(GamerState->PlayerSlot);
 	}
 }

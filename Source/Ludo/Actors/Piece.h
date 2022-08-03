@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Common/PlayerCore.h"
 #include "Piece.generated.h"
 
-
-class UPlayerCore;
 
 UCLASS()
 class LUDO_API APiece : public AActor
@@ -28,7 +27,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
-	TObjectPtr<UPlayerCore> PlayerCore;
+	FPlayerCore PlayerCore;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRep_PlayerCore();
@@ -36,6 +35,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SetPlayerCore(TObjectPtr<UPlayerCore> InPlayerCore);
+	void SetPlayerCore(FPlayerCore InPlayerCore);
 
 };

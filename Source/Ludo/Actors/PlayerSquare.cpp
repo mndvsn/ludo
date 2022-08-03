@@ -3,3 +3,8 @@
 
 #include "Actors/PlayerSquare.h"
 
+
+void APlayerSquare::SetPlayerCore_Implementation(FPlayerCore NewPlayerCore)
+{
+	PlayerCore = NewPlayerCore;
+}

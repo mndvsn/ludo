@@ -4,7 +4,6 @@
 #include "Piece.h"
 #include "LudoLog.h"
 #include "Net/UnrealNetwork.h"
-#include "Common/PlayerCore.h"
 
 
 APiece::APiece()
@@ -38,7 +37,7 @@ void APiece::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APiece::SetPlayerCore(TObjectPtr<UPlayerCore> InPlayerCore)
+void APiece::SetPlayerCore(FPlayerCore InPlayerCore)
 {
 	PlayerCore = InPlayerCore;
 }

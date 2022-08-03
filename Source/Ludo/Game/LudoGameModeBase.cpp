@@ -12,7 +12,7 @@
 #include "UI/GameHUD.h"
 #include "GamerState.h"
 #include "Actors/Gamer.h"
-#include "Actors/LudoPlayerStart.h"
+#include "Actors/PlayerSlot.h"
 #include "Actors/Board.h"
 #include "Actors/Yard.h"
 #include "Actors/Piece.h"
@@ -47,7 +47,7 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 	NumPlayersCPU = UGameplayStatics::GetIntOption(Options, TEXT("CPU"), NumPlayersCPU);
 	bShouldSpawnCPU = NumPlayersCPU > 0;
 
-	CreatePlayerStarts(NumPlayers);
+	CreatePlayerSlots(NumPlayers);
 }
 
 void ALudoGameModeBase::InitGameState()
@@ -185,27 +185,19 @@ void ALudoGameModeBase::SetupPlayer(AController* Player)
 	const int& NumCurrentPlayers = GetNumPlayersTotal();
 
 	AGamerState* PlayerState = Player->GetPlayerState<AGamerState>();
-	ALudoPlayerStart* StartSpot = Cast<ALudoPlayerStart>(Player->StartSpot.Get());
-	if (StartSpot)
+	TObjectPtr<APlayerSlot> Slot = Cast<APlayerSlot>(Player->StartSpot);
+	if (Slot)
 	{
-		PlayerState->SetPlayerIndex(StartSpot->GetPlayerSlot());
-		ChangeName(Player, FString::Printf(TEXT("Player %d"), StartSpot->GetPlayerSlot()+1), false);
+		PlayerState->SetPlayerIndex(Slot->GetIndex());
+		ChangeName(Player, FString::Printf(TEXT("Player %d"), Slot->GetIndex()+1), false);
+		
+		Slot->SetPlayerOrder(Slot->GetIndex());
 
-		/*UPlayerCore* PlayerCore;
-		switch (StartSpot->GetPlayerSlot())
+		if (PlayerCores && !PlayerCores->Cores.IsEmpty())
 		{
-		case 0:
-		default:
-			
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
+			// Set PlayerCore to index of array for now
+			Slot->PlayerCore = PlayerCores->Cores[Slot->GetIndex()];
 		}
-		PlayerState->SetPlayerCore(PlayerCore);*/
 	}
 	else
 	{
@@ -213,35 +205,41 @@ void ALudoGameModeBase::SetupPlayer(AController* Player)
 		ChangeName(Player, FString::Printf(TEXT("Player %d"), NumCurrentPlayers), false);
 	}
 
-	if (AGamer* Gamer = Player->GetPawn<AGamer>())
+	if (TObjectPtr<AGamer> Gamer = Player->GetPawn<AGamer>())
 	{
 		Gamer->UpdatePlayerLabel();
+
+		if (Slot)
+		{
+			Slot->SetGamer(Gamer);
+			Gamer->SetPlayerSlot(Slot);
+		}
 	}
 }
 
 AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
 	UE_LOG(LogLudoGM, Verbose, TEXT("ChoosePlayerStart: %s"), *Player->GetName());
-	ALudoPlayerStart* StartSpot = nullptr;
+	APlayerSlot* Slot = nullptr;
 
-	if (!PlayerStarts.IsEmpty())
+	if (!PlayerSlots.IsEmpty())
 	{
-		auto UnclaimedPlayerStart = PlayerStarts.FindByPredicate([](ALudoPlayerStart* PlayerStart) {
-			return !PlayerStart->IsClaimed();
+		auto UnclaimedSlot = PlayerSlots.FindByPredicate([](APlayerSlot* PlayerSlot) {
+			return !PlayerSlot->IsClaimed();
 		});
-		if (UnclaimedPlayerStart)
+		if (UnclaimedSlot)
 		{
-			StartSpot = *UnclaimedPlayerStart;
-			StartSpot->TryClaim(Player);
+			Slot = *UnclaimedSlot;
+			Slot->TryClaim(Player);
 		}
 	}
 
-	Player->StartSpot = StartSpot;
+	Player->StartSpot = Slot;
 
-	return StartSpot;
+	return Slot;
 }
 
-void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
+void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount)
 {
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
@@ -250,9 +248,9 @@ void ALudoGameModeBase::CreatePlayerStarts(uint8 PlayerCount)
 	{
 		const FRotator StartRotation = FRotator(0, i * (360.0f / 4), 0); // 4 sides of board, PlayerCount can be used but is bugged
 
-		ALudoPlayerStart* PlayerStart = World->SpawnActor<ALudoPlayerStart>(FVector::ZeroVector, StartRotation);
-		PlayerStart->SetPlayerSlot(i);
-		PlayerStarts.Add(PlayerStart);
+		APlayerSlot* Slot = World->SpawnActor<APlayerSlot>(FVector::ZeroVector, StartRotation);
+		Slot->SetIndex(i);
+		PlayerSlots.Add(Slot);
 	}
 }
 

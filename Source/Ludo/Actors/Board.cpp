@@ -10,6 +10,7 @@
 #include "Game/LudoGameState.h"
 #include "Actors/Yard.h"
 #include "Actors/PlayerSquare.h"
+#include "Actors/PlayerSlot.h"
 
 #include "Common/PlayerCore.h"
 
@@ -98,17 +99,18 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 	// Find PlayerCore used by player
 	TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
 	TObjectPtr<AGamerState> GamerState = GameState->GetGamerStateForIndex(PlayerIndex);
-	TObjectPtr<UPlayerCore> PlayerCore = GamerState->GetPlayerCore();
-	if (!PlayerCore) {
-		UE_LOG(LogLudo, Error, TEXT("Could not get player PlayerCore!"));
+	if (!GamerState || !GamerState->GetPlayerSlot())
+	{
 		return SquareArray;
 	}
+
+	FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->PlayerCore;
 
 	for (auto Square : Squares)
 	{
 		if (auto PlayerSquare = Cast<APlayerSquare>(Square))
 		{
-			if (PlayerSquare->GetPlayerCore() == PlayerCore)
+			if (PlayerSquare->GetPlayerCore().Id == PlayerCore.Id)
 			{
 				SquareArray.Add(PlayerSquare);
 			}

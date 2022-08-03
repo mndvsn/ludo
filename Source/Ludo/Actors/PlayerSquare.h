@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Square.h"
+#include "Common/PlayerCore.h"
 #include "PlayerSquare.generated.h"
 
-
-class UPlayerCore;
 
 /**
  * 
@@ -19,7 +18,7 @@ class LUDO_API APlayerSquare : public ASquare
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetPlayerCore, Category="Square")
-	TObjectPtr<UPlayerCore> PlayerCore;
+	FPlayerCore PlayerCore;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Square")
 	bool bIsHome;
@@ -29,5 +28,8 @@ public:
 	bool IsHome() const { return bIsHome; };
 
 	UFUNCTION(BlueprintPure)
-	UPlayerCore* GetPlayerCore() { return PlayerCore; };
+	FPlayerCore GetPlayerCore() { return PlayerCore; };
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SetPlayerCore(FPlayerCore NewPlayerCore);
 };

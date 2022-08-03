@@ -16,8 +16,8 @@ enum class EPlayState : uint8
 	Waiting  UMETA(DisplayName = "Waiting"),
 };
 
-class UPlayerCore;
 class APlayerState;
+class APlayerSlot;
 
 /**
  * 
@@ -45,14 +45,14 @@ private:
 	EPlayState PlayState;
 
 	UPROPERTY(Replicated)
-	TObjectPtr<UPlayerCore> PlayerCore;
+	TObjectPtr<APlayerSlot> PlayerSlot;
 
 public:
 	int8 GetPlayerIndex() const { return PlayerIndex; }
 	void SetPlayerIndex(int NewIndex);
 
-	TObjectPtr<UPlayerCore> GetPlayerCore() const { return PlayerCore; }
-	void SetPlayerCore(TObjectPtr<UPlayerCore> NewCore);
+	TObjectPtr<APlayerSlot> GetPlayerSlot() const { return PlayerSlot; }
+	void SetPlayerSlot(TObjectPtr<APlayerSlot> NewSlot);
 
 	EPlayState GetPlayState() const { return PlayState; }
 	void SetPlayState(EPlayState State) { PlayState = State; };

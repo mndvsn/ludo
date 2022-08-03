@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Common/PlayerCore.h"
 #include "Yard.generated.h"
 
 
-class UPlayerCore;
 class APiece;
 class AGamer;
+class APlayerSquare;
 
 UCLASS()
 class LUDO_API AYard : public AActor
@@ -32,14 +33,17 @@ public:
 	void SpawnPieces();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Yard")
-	TObjectPtr<UPlayerCore> PlayerCore;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_PlayerCore, Category="Yard")
+	FPlayerCore PlayerCore;
 
 	UPROPERTY(EditDefaultsOnly, Category="Yard")
 	TSoftClassPtr<APiece> PieceClass;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRep_PlayerCore();
 
 private:
 	UPROPERTY(BlueprintGetter=GetGamer)
@@ -52,5 +56,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	AGamer* GetGamer() { return Gamer; };
 
-	void SetGamer(TObjectPtr<AGamer> NewGamer) { Gamer = NewGamer; };
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<APlayerSquare*> PlayerSquares;
+
+	void SetGamer(TObjectPtr<AGamer> NewGamer);
 };

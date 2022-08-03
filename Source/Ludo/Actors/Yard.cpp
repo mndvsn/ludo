@@ -3,11 +3,13 @@
 
 #include "Actors/Yard.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 #include "LudoLog.h"
 #include "Actors/Gamer.h"
+#include "Actors/PlayerSlot.h"
+#include "Actors/PlayerSquare.h"
 #include "Actors/Piece.h"
-#include "Common/PlayerCore.h"
 
 
 AYard::AYard()
@@ -23,6 +25,27 @@ AYard::AYard()
 	StaticMesh->SetupAttachment(Scene);
 
 	PieceClass = APiece::StaticClass();
+}
+
+void AYard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AYard, PlayerCore);
+}
+
+void AYard::SetGamer(TObjectPtr<AGamer> NewGamer)
+{
+	if (!NewGamer) return;
+
+	Gamer = NewGamer;
+
+	if (TObjectPtr<APlayerSlot> PlayerSlot = NewGamer->GetPlayerSlot())
+	{
+		PlayerCore = PlayerSlot->PlayerCore;
+
+		OnRep_PlayerCore();
+	}
 }
 
 void AYard::SpawnPieces()
@@ -64,8 +87,18 @@ void AYard::SpawnPieces()
 	}
 }
 
-// Called when the game starts or when spawned
 void AYard::BeginPlay()
 {
 	Super::BeginPlay();	
+}
+
+void AYard::OnRep_PlayerCore_Implementation()
+{
+	if (!PlayerSquares.IsEmpty())
+	{
+		for (APlayerSquare* Square : PlayerSquares)
+		{
+			Square->SetPlayerCore(PlayerCore);
+		}
+	}
 }

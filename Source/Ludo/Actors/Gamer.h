@@ -9,6 +9,7 @@
 
 struct FDieThrow;
 class APiece;
+class APlayerSlot;
 
 UCLASS()
 class LUDO_API AGamer : public APawn
@@ -35,6 +36,9 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<APiece>> Pieces;
+
+	UPROPERTY()
+	TObjectPtr<APlayerSlot> PlayerSlot;
 
 public:
 	// Sets default values for this pawn's properties
@@ -75,6 +79,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	APiece* GetPiece(uint8 AtIndex);
+
+	UFUNCTION(BlueprintCallable)
+	APlayerSlot* GetPlayerSlot() { return PlayerSlot.Get(); };
+
+	void SetPlayerSlot(TObjectPtr<APlayerSlot> Slot) { PlayerSlot = Slot; };
 
 	//~=============================================================================
 	// Player gameplay actions
