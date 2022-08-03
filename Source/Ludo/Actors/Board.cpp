@@ -110,7 +110,7 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 	{
 		if (auto PlayerSquare = Cast<APlayerSquare>(Square))
 		{
-			if (PlayerSquare->GetPlayerCore().Id == PlayerCore.Id)
+			if (PlayerSquare->GetPlayerCore() == PlayerCore)
 			{
 				SquareArray.Add(PlayerSquare);
 			}

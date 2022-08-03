@@ -30,6 +30,11 @@ struct FPlayerCore
 		DisplayName = "Color";
 		PrimaryColor = FColor::FromHex("FF00FF");
 	};
+
+	inline bool operator==(const FPlayerCore& rhs) const
+	{
+		return Id == rhs.Id;
+	}
 };
 
 /**
