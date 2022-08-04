@@ -27,27 +27,38 @@ public:
 
 	TArray<TObjectPtr<APlayerSquare>> GetPlayerSquares(uint8 PlayerIndex);
 
+	bool PlayerHasPieceOnBoard(int8 PlayerIndex);
+
+	// Returns ASquare where Piece is currently located, nullptr if not found
+	TObjectPtr<ASquare> LocationOfPiece(TObjectPtr<APiece> Piece);
+
+	// Find Piece located in Yard for player
+	TObjectPtr<APiece> GetFirstPieceInYard(TObjectPtr<AYard> InYard);
+
 	void Search(int StartIndex, int JumpLimit);
 
+	UFUNCTION(Server, Reliable)
+	void MovePiece(APiece* Piece, ASquare* TargetSquare);
+
 	FGE_OnBoardFoundYards OnFoundYards;
-
 	bool bYardsFound;
-
-	UPROPERTY(ReplicatedUsing=OnRep_BoardData)
-	TArray<FSquareData> BoardData;
 
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UPROPERTY(EditDefaultsOnly)
-	TSoftClassPtr<ASquare> SquareClass;
+	// BoardData manipulation
+	bool AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare);
+	bool RemovePieceFromBoardData(TObjectPtr<APiece> Piece);
 
+private:
 	UPROPERTY()
 	TArray<TObjectPtr<ASquare>> Squares;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AYard>> Yards;
+
+	UPROPERTY(ReplicatedUsing=OnRep_BoardData)
+	TArray<FSquareData> BoardData;
 
 	UFUNCTION()
 	void OnRep_BoardData();

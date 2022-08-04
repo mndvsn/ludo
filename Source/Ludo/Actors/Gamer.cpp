@@ -15,7 +15,10 @@
 #include "Game/LudoGameState.h"
 #include "Game/LudoPlayerController.h"
 #include "Game/GamerState.h"
+#include "Actors/Board.h"
 #include "Actors/Piece.h"
+#include "Actors/PlayerSquare.h"
+#include "Actors/Yard.h"
 #include "UI/GameHUD.h"
 
 // Sets default values
@@ -236,24 +239,34 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
 	if (!bIsRelevant) return;
 	
-	// Get the result of die thrown
-	const bool bCanMovePiece = GameState->PlayerHasPieceOnBoard(PlayerIndex);
-	//UE_LOG(LogLudo, Verbose, TEXT("%s: PlayerIndex %d rolled %d"), *GetName(), Throw.PlayerIndex, Throw.Result);
+	// Check if player has piece on board
+	ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
+	if (!PlayerController) return;
 
+	TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
+	const bool bCanMovePiece = TheBoard->PlayerHasPieceOnBoard(Throw.PlayerIndex);
+
+	bool bMadeMove = false;
+
+	// Get the result of die thrown
 	if (Throw.Result == 1 || Throw.Result == 6)
 	{
-		UE_LOG(LogLudo, Verbose, TEXT("PlayerIndex %d can move a piece from Yard"), Throw.PlayerIndex);
-
-		if (APiece* Piece = GetPiece(0))
+		if (APiece* Piece = TheBoard->GetFirstPieceInYard(GetYard()))
 		{
-			UE_LOG(LogLudo, Warning, TEXT("Piece: %s"), *Piece->GetName());
+			UE_LOG(LogLudo, Verbose, TEXT("Player %d can move a piece from their yard"), Throw.PlayerIndex);
+
+			// Try to move Piece to player home square
+			APlayerSquare* HomeSquare = GetYard()->GetHomeSquare();
+			TheBoard->MovePiece(Piece, HomeSquare);
+			bMadeMove = true;
 		}
 	}
 
-	/*if (bCanMovePiece)
+	if (bCanMovePiece && !bMadeMove)
 	{
 		// move a piece with Throw.Result
-	}*/
+		
+	}
 
 	if (HasAuthority())
 	{

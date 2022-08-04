@@ -10,6 +10,7 @@
 struct FDieThrow;
 class APiece;
 class APlayerSlot;
+class AYard;
 
 UCLASS()
 class LUDO_API AGamer : public APawn
@@ -34,11 +35,14 @@ private:
 	float CameraZoomMax = 10000.f;
 	float CameraRotationStep;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintGetter=GetPieces)
 	TArray<TObjectPtr<APiece>> Pieces;
 
 	UPROPERTY()
 	TObjectPtr<APlayerSlot> PlayerSlot;
+
+	UPROPERTY()
+	TObjectPtr<AYard> PlayerYard;
 
 public:
 	// Sets default values for this pawn's properties
@@ -80,10 +84,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	APiece* GetPiece(uint8 AtIndex);
 
+	UFUNCTION(BlueprintPure)
+	TArray<APiece*> GetPieces() { return Pieces; };
+
 	UFUNCTION(BlueprintCallable)
 	APlayerSlot* GetPlayerSlot() { return PlayerSlot.Get(); };
-
 	void SetPlayerSlot(TObjectPtr<APlayerSlot> Slot) { PlayerSlot = Slot; };
+
+	UFUNCTION(BlueprintCallable)
+	AYard* GetYard() { return PlayerYard.Get(); };
+	void SetYard(TObjectPtr<AYard> NewYard) { PlayerYard = NewYard; };
 
 	//~=============================================================================
 	// Player gameplay actions

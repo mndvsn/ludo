@@ -25,6 +25,7 @@ void APiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(APiece, PlayerCore);
+	DOREPLIFETIME(APiece, bInYard);
 }
 
 void APiece::OnRep_PlayerCore_Implementation()

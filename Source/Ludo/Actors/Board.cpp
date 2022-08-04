@@ -8,6 +8,8 @@
 
 #include "LudoLog.h"
 #include "Game/LudoGameState.h"
+#include "Actors/Gamer.h"
+#include "Actors/Piece.h"
 #include "Actors/Yard.h"
 #include "Actors/PlayerSquare.h"
 #include "Actors/PlayerSlot.h"
@@ -18,7 +20,6 @@
 ABoard::ABoard()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	SquareClass = ASquare::StaticClass();
 
 	bReplicates = true;
 
@@ -47,7 +48,7 @@ void ABoard::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(this, ASquare::StaticClass(), FoundSquares);
 	if (FoundSquares.Num() > 0)
 	{
-		for (TObjectPtr<AActor> Actor : FoundSquares)
+		for (TObjectPtr<AActor>& Actor : FoundSquares)
 		{
 			if (TObjectPtr<ASquare> Square = Cast<ASquare>(Actor))
 			{
@@ -70,7 +71,7 @@ void ABoard::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClass(this, AYard::StaticClass(), FoundYards);
 	if (FoundYards.Num() > 0)
 	{
-		for (TObjectPtr<AActor> Actor : FoundYards)
+		for (TObjectPtr<AActor>& Actor : FoundYards)
 		{
 			if (TObjectPtr<AYard> Yard = Cast<AYard>(Actor))
 			{
@@ -106,7 +107,7 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 
 	FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->PlayerCore;
 
-	for (auto Square : Squares)
+	for (auto& Square : Squares)
 	{
 		if (auto PlayerSquare = Cast<APlayerSquare>(Square))
 		{
@@ -119,9 +120,59 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 	return SquareArray;
 }
 
+bool ABoard::PlayerHasPieceOnBoard(int8 PlayerIndex)
+{
+	bool bHasPiece = false;
+	TObjectPtr<AYard> PlayerYard = GetYard(PlayerIndex);
+
+	for (FSquareData& Square : BoardData)
+	{
+		if (Square.Pieces.IsEmpty()) continue;
+
+		bHasPiece = Square.Pieces.ContainsByPredicate([PlayerYard](const TObjectPtr<APiece> Piece)
+		{
+			return (Piece->GetOwner() == PlayerYard);
+		});
+
+		if (bHasPiece) break;
+	}
+
+	return bHasPiece;
+}
+
+TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece)
+{
+	TObjectPtr<ASquare> Square = nullptr;
+
+	for (FSquareData& Data : BoardData)
+	{
+		if (Data.Pieces.IsEmpty()) continue;
+
+		if (Data.Pieces.Contains(Piece))
+		{
+			Square = Data.Square;
+			break;
+		}
+	}
+
+	return Square;
+}
+
+TObjectPtr<APiece> ABoard::GetFirstPieceInYard(TObjectPtr<AYard> InYard)
+{
+	if (!InYard) return nullptr;
+	auto Pieces = InYard->GetGamer()->GetPieces();
+	auto* Piece = Pieces.FindByPredicate([&](const APiece* Piece)
+	{
+		return Piece->IsInYard();
+	});
+
+	return Piece ? *Piece : nullptr;
+}
+
 void ABoard::Search(int StartIndex, int JumpLimit)
 {
-	for (TObjectPtr<ASquare> Sq : Squares)
+	for (TObjectPtr<ASquare>& Sq : Squares)
 	{
 		Sq->SetHighlight(false);
 	}
@@ -146,7 +197,7 @@ void ABoard::Search(int StartIndex, int JumpLimit)
 		TObjectPtr<ASquare> Current;
 		Near.Dequeue(Current);
 
-		for (TObjectPtr<ASquare> Next : Current->GetNext())
+		for (TObjectPtr<ASquare>& Next : Current->GetNext())
 		{
 			if (!Reachable.Contains(Next))
 			{
@@ -158,6 +209,63 @@ void ABoard::Search(int StartIndex, int JumpLimit)
 			}
 		}
 	}
+}
+
+void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
+{
+	// Fail if null pointers or Piece is at target location already
+	if (!Piece || !TargetSquare || LocationOfPiece(Piece) == TargetSquare) return;
+
+	RemovePieceFromBoardData(Piece);
+
+	if (AddPieceToBoardData(Piece, TargetSquare))
+	{
+		if (Piece->IsInYard())
+		{
+			Piece->SetInYard(false);
+		}
+		Piece->SetActorLocation(TargetSquare->GetActorLocation());
+	}
+}
+
+bool ABoard::AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare)
+{
+	bool bSuccess = false;
+	if (!Piece || !TargetSquare) return bSuccess;
+
+	UE_LOG(LogLudo, Verbose, TEXT("Moving %s (%s) to %s"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName, *TargetSquare->GetName());
+
+	int32 ArrayIndex = BoardData.IndexOfByPredicate([TargetSquare](const FSquareData& Data)
+	{
+		return (Data.Square == TargetSquare);
+	});
+
+	if (ArrayIndex > INDEX_NONE)
+	{
+		BoardData[ArrayIndex].Pieces.Add(Piece);
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+bool ABoard::RemovePieceFromBoardData(TObjectPtr<APiece> Piece)
+{
+	bool bSuccess = false;
+	if (!Piece) return bSuccess;
+
+	int32 ArrayIndex = BoardData.IndexOfByPredicate([Piece](const FSquareData& Data)
+	{
+		return (Data.Pieces.Contains(Piece));
+	});
+
+	if (ArrayIndex > INDEX_NONE)
+	{
+		BoardData[ArrayIndex].Pieces.RemoveSingle(Piece);
+		bSuccess = true;
+	}
+
+	return bSuccess;
 }
 
 void ABoard::OnRep_BoardData()

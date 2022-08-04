@@ -39,6 +39,7 @@ void AYard::SetGamer(TObjectPtr<AGamer> NewGamer)
 	if (!NewGamer) return;
 
 	Gamer = NewGamer;
+	Gamer->SetYard(this);
 
 	if (TObjectPtr<APlayerSlot> PlayerSlot = NewGamer->GetPlayerSlot())
 	{
@@ -72,6 +73,7 @@ void AYard::SpawnPieces()
 				// Set playercore, owner etc
 				Piece->SetOwner(this);
 				Piece->SetPlayerCore(this->PlayerCore);
+				Piece->SetInYard(true);
 
 				if (Gamer)
 				{

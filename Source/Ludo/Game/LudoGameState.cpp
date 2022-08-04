@@ -37,18 +37,18 @@ TObjectPtr<AGamerState> ALudoGameState::GetGamerStateInTurn() const
 	return GetGamerStateForIndex(CurrentPlayerIndex);
 }
 
-bool ALudoGameState::IsPlayerTurn(TObjectPtr<APlayerController> Player)
+bool ALudoGameState::IsPlayerTurn(TObjectPtr<APlayerController> Player) const
 {
 	auto GamerState = Player->GetPlayerState<AGamerState>();
 	return (GamerState->GetPlayerIndex() == CurrentPlayerIndex);
 }
 
-bool ALudoGameState::PlayerHasPieceOnBoard(int8 PlayerIndex)
+bool ALudoGameState::PlayerHasPieceOnBoard(int8 PlayerIndex) const
 {
 	return false;
 }
 
-uint8 ALudoGameState::GetNumPlayersReady()
+uint8 ALudoGameState::GetNumPlayersReady() const
 {
 	uint8 ReadyCount = 0;
 	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
@@ -64,7 +64,7 @@ uint8 ALudoGameState::GetNumPlayersReady()
 	return ReadyCount;
 }
 
-uint8 ALudoGameState::GetNumPlayersReplicated()
+uint8 ALudoGameState::GetNumPlayersReplicated() const
 {
 	uint8 PlayerCount = 0;
 	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)

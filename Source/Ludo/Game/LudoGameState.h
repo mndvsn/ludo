@@ -38,12 +38,12 @@ public:
 
 	TObjectPtr<AGamerState> GetGamerStateInTurn() const;
 
-	bool IsPlayerTurn(TObjectPtr<APlayerController> Player);
+	bool IsPlayerTurn(TObjectPtr<APlayerController> Player) const;
 
-	bool PlayerHasPieceOnBoard(int8 PlayerIndex);
+	bool PlayerHasPieceOnBoard(int8 PlayerIndex) const;
 
-	uint8 GetNumPlayersReady();
-	uint8 GetNumPlayersReplicated();
+	uint8 GetNumPlayersReady() const;
+	uint8 GetNumPlayersReplicated() const;
 
 	void AdvanceTurn();
 
@@ -68,13 +68,13 @@ private:
 	void OnRep_DieThrowList();
 
 public:
-	int8 GetCurrentPlayerIndex() { return CurrentPlayerIndex; };
+	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
 
-	uint8 GetPlayerCountForGame() { return PlayerCountForGame; };
+	uint8 GetPlayerCountForGame() const { return PlayerCountForGame; };
 	void SetPlayerCountForGame(uint8 Count) { PlayerCountForGame = Count; };
 
-	TArray<FDieThrow> GetThrows() { return DieThrowList; };
-	FDieThrow GetLastThrow() { return GetThrows().Last(); };
+	TArray<FDieThrow> GetThrows() const { return DieThrowList; };
+	FDieThrow GetLastThrow() const { return GetThrows().Last(); };
 	void AddDieThrow(FDieThrow Throw);
 
 	virtual FGE_OnTurnChangedNative& GetTurnChangedDelegate() override { return OnTurnChangedNative; };

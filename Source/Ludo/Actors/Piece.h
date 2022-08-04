@@ -29,12 +29,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
 	FPlayerCore PlayerCore;
 
+	UPROPERTY(Replicated)
+	bool bInYard;
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRep_PlayerCore();
 
 	virtual void BeginPlay() override;
 
 public:
+	FPlayerCore GetPlayerCore() const { return PlayerCore; };
 	void SetPlayerCore(FPlayerCore InPlayerCore);
 
+	bool IsInYard() const { return bInYard; };
+	void SetInYard(bool bIn) { bInYard = bIn; };
 };

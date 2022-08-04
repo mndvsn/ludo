@@ -54,7 +54,10 @@ public:
 	int32 Index = -1;
 
 	UFUNCTION(BlueprintPure)
-	AGamer* GetGamer() { return Gamer; };
+	AGamer* GetGamer() const { return Gamer; };
+
+	UFUNCTION(BlueprintPure)
+	APlayerSquare* GetHomeSquare() const { return PlayerSquares[0]; };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<APlayerSquare*> PlayerSquares;
