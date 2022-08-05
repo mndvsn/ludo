@@ -273,17 +273,32 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 		}
 	}
 
+	// Move piece on board
 	if (bCanMovePiece && !bMadeMove)
 	{
-		if (APiece* Piece = GetPiecesOnBoard(TheBoard)[0])
+		short Attempt = 0;
+		TArray<APiece*> MovablePieces = GetPiecesOnBoard(TheBoard);
+
+		while (!bMadeMove)
 		{
-			const uint8 StartIndex = TheBoard->IndexOfSquare(TheBoard->LocationOfPiece(Piece));
-
-			TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
-
-			if (SquaresAhead.Num() == Throw.Result)
+			if (MovablePieces.IsValidIndex(Attempt))
 			{
-				TheBoard->MovePiece(Piece, SquaresAhead.Last());
+				APiece* Piece = MovablePieces[Attempt];
+				const uint8 StartIndex = TheBoard->IndexOfSquare(TheBoard->LocationOfPiece(Piece));
+
+				TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
+
+				// If squares are fewer than throw it means we are moving a piece beyond goal, choose next piece
+				if (SquaresAhead.Num() == Throw.Result)
+				{
+					TheBoard->MovePiece(Piece, SquaresAhead.Last());
+					bMadeMove = true;
+				}
+				Attempt++;
+			}
+			else
+			{
+				// Ran out of moves
 				bMadeMove = true;
 			}
 		}

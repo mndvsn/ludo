@@ -58,6 +58,9 @@ protected:
 
 private:
 	UPROPERTY()
+	TObjectPtr<ASquare> GoalSquare;
+
+	UPROPERTY()
 	TArray<TObjectPtr<ASquare>> Squares;
 
 	UPROPERTY()

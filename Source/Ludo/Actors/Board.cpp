@@ -59,6 +59,11 @@ void ABoard::BeginPlay()
 				SquareData.Square = Square;
 
 				BoardData.Add(SquareData);
+
+				if (Square->Tags.Contains(TEXT("goal")))
+				{
+					GoalSquare = Square;
+				}
 			}
 		}
 
@@ -227,6 +232,14 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 
 	RemovePieceFromBoardData(Piece);
 
+	if (TargetSquare == GoalSquare)
+	{
+		UE_LOG(LogLudo, Warning, TEXT("%s (%s) reached goal"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
+		
+		Piece->SetInGoal(true);
+		Piece->SetActorHiddenInGame(true);
+	}
+	
 	if (AddPieceToBoardData(Piece, TargetSquare))
 	{
 		if (Piece->IsInYard())
