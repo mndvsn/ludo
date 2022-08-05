@@ -86,14 +86,14 @@ void ABoard::BeginPlay()
 	}
 }
 
-TObjectPtr<AYard> ABoard::GetYard(uint8 PlayerIndex)
+TObjectPtr<AYard> ABoard::GetYard(uint8 PlayerIndex) const
 {
 	if (Yards.IsEmpty()) return nullptr;
 
 	return Yards[PlayerIndex];
 }
 
-TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
+TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex) const
 {
 	TArray<TObjectPtr<APlayerSquare>> SquareArray;
 
@@ -120,19 +120,26 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 	return SquareArray;
 }
 
-bool ABoard::PlayerHasPieceOnBoard(int8 PlayerIndex)
+uint8 ABoard::IndexOfSquare(ASquare* Square) const
 {
-	TObjectPtr<AGamer> Gamer = GetYard(PlayerIndex)->GetGamer();
+	if (!Square) return INDEX_NONE;
+
+	return Squares.Find(Square);
+}
+
+bool ABoard::PlayerHasPieceOnBoard(const int8 PlayerIndex) const
+{
+	const TObjectPtr<AGamer> Gamer = GetYard(PlayerIndex)->GetGamer();
 	if (!Gamer) return false;
 
 	return (Gamer->GetPiecesOnBoard(this).Num() > 0);
 }
 
-TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece)
+TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece) const
 {
 	TObjectPtr<ASquare> Square = nullptr;
 
-	for (FSquareData& Data : BoardData)
+	for (const FSquareData& Data : BoardData)
 	{
 		if (Data.Pieces.IsEmpty()) continue;
 
@@ -146,7 +153,7 @@ TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece)
 	return Square;
 }
 
-TObjectPtr<APiece> ABoard::GetFirstPieceInYard(TObjectPtr<AYard> InYard)
+TObjectPtr<APiece> ABoard::GetFirstPieceInYard(const TObjectPtr<AYard> InYard) const
 {
 	if (!InYard) return nullptr;
 	auto Pieces = InYard->GetGamer()->GetPieces();
@@ -158,7 +165,7 @@ TObjectPtr<APiece> ABoard::GetFirstPieceInYard(TObjectPtr<AYard> InYard)
 	return Piece ? *Piece : nullptr;
 }
 
-TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(int StartIndex, int StepLimit, uint8 ForPlayerIndex)
+TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const
 {
 	TArray<TObjectPtr<ASquare>> Reachable;
 
@@ -167,21 +174,19 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(int StartIndex, int Step
 		return Reachable;
 	}
 
-	// Get PlayerCore.Id of Player
+	// Get PlayerCore.Id of player
 	ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>();
-	uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->PlayerCore.Id;
+	const uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->PlayerCore.Id;
 
 	TQueue<TObjectPtr<ASquare>> Near;
-	TObjectPtr<ASquare> Current = Squares[StartIndex];
-	Near.Enqueue(Current);
-
 	TMap<TObjectPtr<ASquare>, short> StepMap;
+	TObjectPtr<ASquare> Current = Squares[StartIndex];
+
+	Near.Enqueue(Current);
 	StepMap.Add(Current, 0);
 
-	while (!Near.IsEmpty())
-	{
-		Near.Dequeue(Current);
-		
+	while (Near.Dequeue(Current))
+	{	
 		if (StepMap[Current] >= StepLimit) break;
 
 		// Process squares connected to current

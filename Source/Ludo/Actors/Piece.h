@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(Replicated)
 	bool bInYard;
 
+	UPROPERTY(Replicated)
+	bool bInGoal;
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRep_PlayerCore();
 
@@ -43,4 +46,7 @@ public:
 
 	bool IsInYard() const { return bInYard; };
 	void SetInYard(bool bIn) { bInYard = bIn; };
+
+	bool IsInGoal() const { return bInGoal; };
+	void SetInGoal(bool bIn) { bInGoal = bIn; };
 };

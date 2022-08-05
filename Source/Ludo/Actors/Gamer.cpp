@@ -204,32 +204,19 @@ void AGamer::AddPiece(TObjectPtr<APiece> Piece)
 	Pieces.Add(Piece);
 }
 
-APiece* AGamer::GetPiece(uint8 AtIndex)
+APiece* AGamer::GetPiece(const uint8 AtIndex) const
 {
 	if (!Pieces.IsValidIndex(AtIndex)) return nullptr;
 
 	return Pieces[AtIndex];
 }
 
-TArray<APiece*> AGamer::GetPiecesOnBoard(ABoard* TheBoard)
+TArray<APiece*> AGamer::GetPiecesOnBoard(const ABoard* TheBoard) const
 {
-	TArray<APiece*> PiecesOnBoard;
-	if (!TheBoard) return PiecesOnBoard;
-
-	for (FSquareData& Square : TheBoard->GetBoardData())
+	TArray<APiece*> PiecesOnBoard = Pieces.FilterByPredicate([&](const TObjectPtr<APiece> Piece)
 	{
-		if (Square.Pieces.IsEmpty()) continue;
-
-		auto PiecesOnSquare = Square.Pieces.FilterByPredicate([&](const TObjectPtr<APiece> Piece)
-		{
-			return Pieces.Contains(Piece);
-		});
-
-		if (!PiecesOnSquare.IsEmpty())
-		{
-			PiecesOnBoard += PiecesOnSquare;
-		}
-	}
+		return !Piece->IsInGoal() && !Piece->IsInYard();
+	});
 
 	return PiecesOnBoard;
 }
@@ -288,9 +275,9 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 
 	if (bCanMovePiece && !bMadeMove)
 	{
-		if (APiece* Piece = GetPiecesOnBoard(TheBoard).Last())
+		if (APiece* Piece = GetPiecesOnBoard(TheBoard)[0])
 		{
-			uint8 StartIndex = TheBoard->LocationOfPiece(Piece)->Index;
+			const uint8 StartIndex = TheBoard->IndexOfSquare(TheBoard->LocationOfPiece(Piece));
 
 			TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
 

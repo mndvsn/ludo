@@ -26,19 +26,22 @@ public:
 	UFUNCTION(BlueprintPure)
 	TArray<FSquareData> GetBoardData() const { return BoardData; };
 
-	TObjectPtr<AYard> GetYard(uint8 PlayerIndex);
+	TObjectPtr<AYard> GetYard(uint8 PlayerIndex) const;
 
-	TArray<TObjectPtr<APlayerSquare>> GetPlayerSquares(uint8 PlayerIndex);
+	TArray<TObjectPtr<APlayerSquare>> GetPlayerSquares(uint8 PlayerIndex) const;
 
-	bool PlayerHasPieceOnBoard(int8 PlayerIndex);
+	// Returns index of Square in array
+	uint8 IndexOfSquare(ASquare* Square) const;
+
+	bool PlayerHasPieceOnBoard(const int8 PlayerIndex) const;
 
 	// Returns ASquare where Piece is currently located, nullptr if not found
-	TObjectPtr<ASquare> LocationOfPiece(TObjectPtr<APiece> Piece);
+	TObjectPtr<ASquare> LocationOfPiece(TObjectPtr<APiece> Piece) const;
 
 	// Find Piece located in Yard for player
-	TObjectPtr<APiece> GetFirstPieceInYard(TObjectPtr<AYard> InYard);
+	TObjectPtr<APiece> GetFirstPieceInYard(const TObjectPtr<AYard> InYard) const;
 
-	TArray<TObjectPtr<ASquare>> GetReachableSquares(int StartIndex, int StepLimit, uint8 ForPlayerIndex);
+	TArray<TObjectPtr<ASquare>> GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const;
 
 	UFUNCTION(Server, Reliable)
 	void MovePiece(APiece* Piece, ASquare* TargetSquare);

@@ -82,20 +82,20 @@ public:
 	void AddPiece(TObjectPtr<APiece> Piece);
 
 	UFUNCTION(BlueprintCallable)
-	APiece* GetPiece(uint8 AtIndex);
+	APiece* GetPiece(const uint8 AtIndex) const;
 
 	UFUNCTION(BlueprintPure)
-	TArray<APiece*> GetPieces() { return Pieces; };
+	TArray<APiece*> GetPieces() const { return Pieces; };
 
 	UFUNCTION(BlueprintPure)
-	TArray<APiece*> GetPiecesOnBoard(ABoard* TheBoard);
+	TArray<APiece*> GetPiecesOnBoard(const ABoard* TheBoard) const;
 
 	UFUNCTION(BlueprintCallable)
-	APlayerSlot* GetPlayerSlot() { return PlayerSlot.Get(); };
+	APlayerSlot* GetPlayerSlot() const { return PlayerSlot.Get(); };
 	void SetPlayerSlot(TObjectPtr<APlayerSlot> Slot) { PlayerSlot = Slot; };
 
 	UFUNCTION(BlueprintCallable)
-	AYard* GetYard() { return PlayerYard.Get(); };
+	AYard* GetYard() const { return PlayerYard.Get(); };
 	void SetYard(TObjectPtr<AYard> NewYard) { PlayerYard = NewYard; };
 
 	//~=============================================================================
