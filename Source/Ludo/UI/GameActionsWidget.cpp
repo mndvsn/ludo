@@ -55,8 +55,6 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 		{
 			PC->ThrowDie();
 		}
-
-		//PC->TheBoard->Search(FMath::RandRange(0,39), FMath::RandRange(0, 20));
 	}
 }
 

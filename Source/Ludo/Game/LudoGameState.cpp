@@ -15,6 +15,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
+	DOREPLIFETIME(ALudoGameState, PlayerSlots);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
 	DOREPLIFETIME(ALudoGameState, DieThrowList);
 }
@@ -99,6 +100,13 @@ void ALudoGameState::AdvanceTurn()
 void ALudoGameState::OnRep_CurrentPlayerIndex()
 {
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
+}
+
+APlayerSlot* ALudoGameState::GetPlayerSlot(uint8 PlayerIndex)
+{
+	if (!PlayerSlots.IsValidIndex(PlayerIndex)) return nullptr;
+
+	return PlayerSlots[PlayerIndex];
 }
 
 void ALudoGameState::AddDieThrow(FDieThrow Throw)

@@ -122,22 +122,10 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex)
 
 bool ABoard::PlayerHasPieceOnBoard(int8 PlayerIndex)
 {
-	bool bHasPiece = false;
-	TObjectPtr<AYard> PlayerYard = GetYard(PlayerIndex);
+	TObjectPtr<AGamer> Gamer = GetYard(PlayerIndex)->GetGamer();
+	if (!Gamer) return false;
 
-	for (FSquareData& Square : BoardData)
-	{
-		if (Square.Pieces.IsEmpty()) continue;
-
-		bHasPiece = Square.Pieces.ContainsByPredicate([PlayerYard](const TObjectPtr<APiece> Piece)
-		{
-			return (Piece->GetOwner() == PlayerYard);
-		});
-
-		if (bHasPiece) break;
-	}
-
-	return bHasPiece;
+	return (Gamer->GetPiecesOnBoard(this).Num() > 0);
 }
 
 TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece)
@@ -170,45 +158,61 @@ TObjectPtr<APiece> ABoard::GetFirstPieceInYard(TObjectPtr<AYard> InYard)
 	return Piece ? *Piece : nullptr;
 }
 
-void ABoard::Search(int StartIndex, int JumpLimit)
+TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(int StartIndex, int StepLimit, uint8 ForPlayerIndex)
 {
-	for (TObjectPtr<ASquare>& Sq : Squares)
+	TArray<TObjectPtr<ASquare>> Reachable;
+
+	if (!Squares.IsValidIndex(StartIndex) || Squares[StartIndex] == nullptr)
 	{
-		Sq->SetHighlight(false);
+		return Reachable;
 	}
-	///
 
-	if (!Squares.IsValidIndex(StartIndex) || Squares[StartIndex] == nullptr) return;
-
-	ASquare* StartSquare = Squares[StartIndex];
-	StartSquare->SetHighlight(true);
+	// Get PlayerCore.Id of Player
+	ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>();
+	uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->PlayerCore.Id;
 
 	TQueue<TObjectPtr<ASquare>> Near;
-	Near.Enqueue(StartSquare);
+	TObjectPtr<ASquare> Current = Squares[StartIndex];
+	Near.Enqueue(Current);
 
-	TSet<TObjectPtr<ASquare>> Reachable;
-	Reachable.Add(StartSquare);
+	TMap<TObjectPtr<ASquare>, short> StepMap;
+	StepMap.Add(Current, 0);
 
-	short Jumps = 0;
 	while (!Near.IsEmpty())
 	{
-		if (Jumps >= JumpLimit) break;
-
-		TObjectPtr<ASquare> Current;
 		Near.Dequeue(Current);
+		
+		if (StepMap[Current] >= StepLimit) break;
 
+		// Process squares connected to current
 		for (TObjectPtr<ASquare>& Next : Current->GetNext())
 		{
-			if (!Reachable.Contains(Next))
-			{
-				Near.Enqueue(Next);
-				Reachable.Add(Next);
+			if (Reachable.Contains(Next)) continue;
 
-				Next->SetHighlight(true);
-				Jumps++;
+			// Skip if the next square is an unreachable PlayerSquare
+			if (TObjectPtr<APlayerSquare> PlayerSquare = Cast<APlayerSquare>(Next))
+			{
+				// Square is player color
+				if (PlayerSquare->GetPlayerCore().Id == PlayerCoreId)
+				{
+					// Skip home; go toward goal
+					if (PlayerSquare->IsHome())
+					{
+						continue;
+					}
+				}
+				// Square is not players color, but ignore the not home squares
+				else if (!PlayerSquare->IsHome())
+				{
+					continue;
+				}
 			}
+			Near.Enqueue(Next);
+			Reachable.Add(Next);
+			StepMap.Add(Next, StepMap[Current]+1);
 		}
 	}
+	return Reachable;
 }
 
 void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)

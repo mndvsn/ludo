@@ -34,7 +34,7 @@ void ASquare::Tick(float DeltaTime)
 	//DrawDebugString(GetWorld(), FVector(0, 0, 50), GetDebugText(), this, FColor::Red);
 }
 
-FString ASquare::GetDebugText()
+FString ASquare::GetDebugText() const
 {
 	FString Debug = FString::Printf(TEXT("%d"), Index);
 	if (!GetNext().IsEmpty())

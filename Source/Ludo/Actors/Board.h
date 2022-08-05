@@ -23,6 +23,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintPure)
+	TArray<FSquareData> GetBoardData() const { return BoardData; };
+
 	TObjectPtr<AYard> GetYard(uint8 PlayerIndex);
 
 	TArray<TObjectPtr<APlayerSquare>> GetPlayerSquares(uint8 PlayerIndex);
@@ -35,7 +38,7 @@ public:
 	// Find Piece located in Yard for player
 	TObjectPtr<APiece> GetFirstPieceInYard(TObjectPtr<AYard> InYard);
 
-	void Search(int StartIndex, int JumpLimit);
+	TArray<TObjectPtr<ASquare>> GetReachableSquares(int StartIndex, int StepLimit, uint8 ForPlayerIndex);
 
 	UFUNCTION(Server, Reliable)
 	void MovePiece(APiece* Piece, ASquare* TargetSquare);

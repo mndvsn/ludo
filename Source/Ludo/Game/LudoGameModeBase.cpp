@@ -46,8 +46,6 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 	NumPlayers = UGameplayStatics::GetIntOption(Options, TEXT("Players"), NumPlayers);
 	NumPlayersCPU = UGameplayStatics::GetIntOption(Options, TEXT("CPU"), NumPlayersCPU);
 	bShouldSpawnCPU = NumPlayersCPU > 0;
-
-	CreatePlayerSlots(NumPlayers);
 }
 
 void ALudoGameModeBase::InitGameState()
@@ -64,6 +62,8 @@ void ALudoGameModeBase::InitGameState()
 			PlayStateChangedHandle = GameEventsInterface->GetPlayStateChangedDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayStateChanged);
 		}
 	}
+
+	CreatePlayerSlots(NumPlayers);
 }
 
 void ALudoGameModeBase::PostLogin(APlayerController* NewPlayer)
@@ -222,6 +222,9 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	UE_LOG(LogLudoGM, Verbose, TEXT("ChoosePlayerStart: %s"), *Player->GetName());
 	APlayerSlot* Slot = nullptr;
 
+	ALudoGameState* LudoGameState = Cast<ALudoGameState>(GameState);
+	TArray<APlayerSlot*> PlayerSlots = LudoGameState->GetPlayerSlots();
+
 	if (!PlayerSlots.IsEmpty())
 	{
 		auto UnclaimedSlot = PlayerSlots.FindByPredicate([](APlayerSlot* PlayerSlot) {
@@ -244,6 +247,7 @@ void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount)
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
 
+	TArray<APlayerSlot*> PlayerSlots;
 	for (uint8 i=0; i < PlayerCount; i++)
 	{
 		const FRotator StartRotation = FRotator(0, i * (360.0f / 4), 0); // 4 sides of board, PlayerCount can be used but is bugged
@@ -251,6 +255,11 @@ void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount)
 		APlayerSlot* Slot = World->SpawnActor<APlayerSlot>(FVector::ZeroVector, StartRotation);
 		Slot->SetIndex(i);
 		PlayerSlots.Add(Slot);
+	}
+
+	if (TObjectPtr<ALudoGameState> LudoGameState = Cast<ALudoGameState>(GameState))
+	{
+		LudoGameState->SetPlayerSlots(PlayerSlots);
 	}
 }
 

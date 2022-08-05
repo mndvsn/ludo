@@ -48,7 +48,7 @@ public:
 	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 	
 	void AddNext(TObjectPtr<ASquare> NewSquare);
-	TArray<TObjectPtr<ASquare>> GetNext() { return Next; };
+	TArray<TObjectPtr<ASquare>> GetNext() const { return Next; };
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,7 +62,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetHighlight(bool Highlighted);
 
-	FString GetDebugText();
+	FString GetDebugText() const;
 
 	UPROPERTY(EditAnywhere)
 	int32 Index = -1;

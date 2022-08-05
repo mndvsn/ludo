@@ -87,6 +87,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	TArray<APiece*> GetPieces() { return Pieces; };
 
+	UFUNCTION(BlueprintPure)
+	TArray<APiece*> GetPiecesOnBoard(ABoard* TheBoard);
+
 	UFUNCTION(BlueprintCallable)
 	APlayerSlot* GetPlayerSlot() { return PlayerSlot.Get(); };
 	void SetPlayerSlot(TObjectPtr<APlayerSlot> Slot) { PlayerSlot = Slot; };

@@ -60,8 +60,6 @@ protected:
 
 	void SetupPlayer(AController* Player);
 
-	TArray<APlayerSlot*> PlayerSlots;
-
 	TArray<ALudoAIController*> CPUPlayers;
 
 	ILudoControllerInterface* GetPlayerInTurn() { return PlayerInTurn; };

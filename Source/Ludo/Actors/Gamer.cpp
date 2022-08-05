@@ -211,6 +211,29 @@ APiece* AGamer::GetPiece(uint8 AtIndex)
 	return Pieces[AtIndex];
 }
 
+TArray<APiece*> AGamer::GetPiecesOnBoard(ABoard* TheBoard)
+{
+	TArray<APiece*> PiecesOnBoard;
+	if (!TheBoard) return PiecesOnBoard;
+
+	for (FSquareData& Square : TheBoard->GetBoardData())
+	{
+		if (Square.Pieces.IsEmpty()) continue;
+
+		auto PiecesOnSquare = Square.Pieces.FilterByPredicate([&](const TObjectPtr<APiece> Piece)
+		{
+			return Pieces.Contains(Piece);
+		});
+
+		if (!PiecesOnSquare.IsEmpty())
+		{
+			PiecesOnBoard += PiecesOnSquare;
+		}
+	}
+
+	return PiecesOnBoard;
+}
+
 void AGamer::Server_ThrowDie_Implementation()
 {
 	//TODO: Check if this player is actually in turn
@@ -239,12 +262,13 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
 	if (!bIsRelevant) return;
 	
-	// Check if player has piece on board
 	ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
 	if (!PlayerController) return;
 
 	TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
-	const bool bCanMovePiece = TheBoard->PlayerHasPieceOnBoard(Throw.PlayerIndex);
+	
+	// Check if player has piece on board
+	const bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
 
 	bool bMadeMove = false;
 
@@ -264,8 +288,18 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 
 	if (bCanMovePiece && !bMadeMove)
 	{
-		// move a piece with Throw.Result
-		
+		if (APiece* Piece = GetPiecesOnBoard(TheBoard).Last())
+		{
+			uint8 StartIndex = TheBoard->LocationOfPiece(Piece)->Index;
+
+			TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
+
+			if (SquaresAhead.Num() == Throw.Result)
+			{
+				TheBoard->MovePiece(Piece, SquaresAhead.Last());
+				bMadeMove = true;
+			}
+		}
 	}
 
 	if (HasAuthority())

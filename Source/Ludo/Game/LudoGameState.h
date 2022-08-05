@@ -52,6 +52,9 @@ private:
 	FGE_OnPlayStateChangedNative OnPlayStateChangedNative;
 	FGE_OnDieThrowNative OnDieThrowNative;
 
+	UPROPERTY(Replicated)
+	TArray<APlayerSlot*> PlayerSlots;
+
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerIndex)
 	int8 CurrentPlayerIndex = -1;
 
@@ -68,6 +71,11 @@ private:
 	void OnRep_DieThrowList();
 
 public:
+	TArray<APlayerSlot*> GetPlayerSlots() const { return PlayerSlots; };
+	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots) { PlayerSlots = InPlayerSlots; };
+
+	APlayerSlot* GetPlayerSlot(uint8 PlayerIndex);
+
 	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
 
 	uint8 GetPlayerCountForGame() const { return PlayerCountForGame; };
