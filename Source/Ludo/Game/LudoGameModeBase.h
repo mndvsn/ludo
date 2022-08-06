@@ -15,6 +15,7 @@
 class APlayerSlot;
 class ALudoAIController;
 class ABoard;
+class APiece;
 enum class EPlayState : uint8;
 
 /**
@@ -71,6 +72,7 @@ protected:
 	TScriptInterface<IGameEventsInterface> GameEventsInterface;
 
 	FDelegateHandle PlayStateChangedHandle;
+	FDelegateHandle PlayerReachedGoalHandle;
 
 private:
 	TObjectPtr<ABoard> TheBoard;
@@ -86,19 +88,25 @@ private:
 
 	void SetupBoard();
 
-	bool CheckGameReady();
+	bool CheckGameReady() const;
+
+	bool CheckGameFinished() const;
 
 	void UpdateCurrentControllerState(bool bIsStartingTurn = true);
+	
+	void OnPlayerReachedGoal(const uint8 Player, const uint8 InGoalTotal);
 
 	virtual void BeginDestroy() override;
 
 public:
-	TObjectPtr<ABoard> GetBoard() { return TheBoard; };
+	TObjectPtr<ABoard> GetBoard() const { return TheBoard; };
 	void SetBoard(TObjectPtr<ABoard> BoardActor);
 
 	void StartGame();
 
 	void AddPlayerThrow(FDieThrow Throw);
+
+	void PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece);
 
 	void NextTurn();
 

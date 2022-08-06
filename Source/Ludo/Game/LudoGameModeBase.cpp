@@ -18,7 +18,6 @@
 #include "Actors/Piece.h"
 
 
-
 ALudoGameModeBase::ALudoGameModeBase()
 {
 	// set default pawn class to our Blueprinted character
@@ -60,6 +59,7 @@ void ALudoGameModeBase::InitGameState()
 		if (GameEventsInterface)
 		{
 			PlayStateChangedHandle = GameEventsInterface->GetPlayStateChangedDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayStateChanged);
+			PlayerReachedGoalHandle = GameEventsInterface->GetPlayerReachedGoalDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayerReachedGoal);
 		}
 	}
 
@@ -85,18 +85,30 @@ void ALudoGameModeBase::GenericPlayerInitialization(AController* C)
 	Super::GenericPlayerInitialization(C);
 }
 
-bool ALudoGameModeBase::CheckGameReady()
+bool ALudoGameModeBase::CheckGameReady() const
 {
 	// Check if all players are ready
-	bool Ready = false;	
+	bool bReady = false;	
 	
 	if (ALudoGameState* State = GetGameState<ALudoGameState>())
 	{
 		// Game is ready if expected number of players is in
-		Ready = (State->GetNumPlayersReady() == State->GetPlayerCountForGame());
+		bReady = (State->GetNumPlayersReady() == State->GetPlayerCountForGame());
 	}
 
-	return Ready;
+	return bReady;
+}
+
+bool ALudoGameModeBase::CheckGameFinished() const
+{
+	bool bFinished = false;
+	
+	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+	{
+		bFinished = State->HasMatchEnded();
+	}
+
+	return bFinished;
 }
 
 void ALudoGameModeBase::StartGame()
@@ -114,6 +126,19 @@ void ALudoGameModeBase::AddPlayerThrow(FDieThrow Throw)
 	State->AddDieThrow(Throw);
 }
 
+void ALudoGameModeBase::PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece)
+{
+	FPlayerCore PlayerCore = Piece->GetPlayerCore();
+	UE_LOG(LogLudo, Warning, TEXT("%s (%s) reached goal"), *Piece->GetName(), *PlayerCore.DisplayName);
+
+	Piece->SetInGoal(true);
+	Piece->SetActorHiddenInGame(true);
+
+	ALudoGameState* State = GetGameState<ALudoGameState>();
+	uint8 PlayerIndex = State->GetPlayerSlot(PlayerCore)->GetIndex();
+	State->AddPlayerPieceInGoal(PlayerIndex);
+}
+
 void ALudoGameModeBase::NextTurn()
 {
 	ALudoGameState* State = GetGameState<ALudoGameState>();
@@ -124,6 +149,8 @@ void ALudoGameModeBase::NextTurn()
 		UpdateCurrentControllerState(false);
 	}
 	
+	if (CheckGameFinished()) return;
+
 	// Set next turn
 	State->AdvanceTurn();
 
@@ -157,6 +184,14 @@ void ALudoGameModeBase::UpdateCurrentControllerState(bool bIsStartingTurn /*= tr
 	{
 		UE_LOG(LogLudoGM, Verbose, TEXT("End turn: P%d"), GamerState->GetPlayerIndex() + 1);
 		PlayerInTurn->Client_EndTurn();
+	}
+}
+
+void ALudoGameModeBase::OnPlayerReachedGoal(const uint8 Player, const uint8 InGoalTotal)
+{
+	if (InGoalTotal == 4)
+	{
+		UE_LOG(LogLudoGM, Display, TEXT("Player index %d won!"), Player);
 	}
 }
 
@@ -389,8 +424,11 @@ void ALudoGameModeBase::BeginDestroy()
 	if (GameEventsInterface && PlayStateChangedHandle.IsValid())
 	{
 		GameEventsInterface->GetPlayStateChangedDelegate().Remove(PlayStateChangedHandle);
-
 		PlayStateChangedHandle.Reset();
+
+		GameEventsInterface->GetPlayerReachedGoalDelegate().Remove(PlayerReachedGoalHandle);
+		PlayerReachedGoalHandle.Reset();
+
 		GameEventsInterface = nullptr;
 	}
 }

@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
 #include "Game/GameEventsInterface.h"
+#include "Common/PlayerCore.h"
 #include "LudoGameState.generated.h"
 
 
 class AGamerState;
+class APlayerSlot;
 
 /**
  *
@@ -49,6 +51,7 @@ public:
 
 private:
 	FGE_OnTurnChangedNative OnTurnChangedNative;
+	FGE_OnPlayerReachedGoalNative OnPlayerReachedGoalNative;
 	FGE_OnPlayStateChangedNative OnPlayStateChangedNative;
 	FGE_OnDieThrowNative OnDieThrowNative;
 
@@ -64,6 +67,9 @@ private:
 	UPROPERTY(ReplicatedUsing=OnRep_DieThrowList)
 	TArray<FDieThrow> DieThrowList;
 	
+	UPROPERTY(Replicated)
+	TArray<uint8> PlayerPiecesInGoal;
+
 	UFUNCTION()
 	void OnRep_CurrentPlayerIndex();
 
@@ -72,11 +78,14 @@ private:
 
 public:
 	TArray<APlayerSlot*> GetPlayerSlots() const { return PlayerSlots; };
-	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots) { PlayerSlots = InPlayerSlots; };
+	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots);
 
-	APlayerSlot* GetPlayerSlot(uint8 PlayerIndex);
+	APlayerSlot* GetPlayerSlot(uint8 PlayerIndex) const;
+	APlayerSlot* GetPlayerSlot(FPlayerCore PlayerCore) const;
 
 	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
+
+	virtual bool HasMatchEnded() const override;
 
 	uint8 GetPlayerCountForGame() const { return PlayerCountForGame; };
 	void SetPlayerCountForGame(uint8 Count) { PlayerCountForGame = Count; };
@@ -85,7 +94,10 @@ public:
 	FDieThrow GetLastThrow() const { return GetThrows().Last(); };
 	void AddDieThrow(FDieThrow Throw);
 
+	void AddPlayerPieceInGoal(uint8 PlayerIndex);
+
 	virtual FGE_OnTurnChangedNative& GetTurnChangedDelegate() override { return OnTurnChangedNative; };
+	virtual FGE_OnPlayerReachedGoalNative& GetPlayerReachedGoalDelegate() override { return OnPlayerReachedGoalNative; };
 	virtual FGE_OnPlayStateChangedNative& GetPlayStateChangedDelegate() override { return OnPlayStateChangedNative; };
 	virtual FGE_OnDieThrowNative& GetDieThrowDelegate() override { return OnDieThrowNative; };
 };

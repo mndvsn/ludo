@@ -7,6 +7,7 @@
 #include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/GamerState.h"
+#include "Actors/PlayerSlot.h"
 #include "Actors/Piece.h"
 
 
@@ -16,6 +17,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
 	DOREPLIFETIME(ALudoGameState, PlayerSlots);
+	DOREPLIFETIME(ALudoGameState, PlayerPiecesInGoal);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
 	DOREPLIFETIME(ALudoGameState, DieThrowList);
 }
@@ -102,11 +104,53 @@ void ALudoGameState::OnRep_CurrentPlayerIndex()
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }
 
-APlayerSlot* ALudoGameState::GetPlayerSlot(uint8 PlayerIndex)
+
+void ALudoGameState::SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots)
+{
+	if (!HasAuthority()) return;
+
+	if (InPlayerSlots.Num() > 0)
+	{
+		PlayerSlots = InPlayerSlots;
+
+		short SlotNum = PlayerSlots.Num();
+		while (SlotNum--)
+		{
+			PlayerPiecesInGoal.Add(0);
+		}
+	}
+}
+
+APlayerSlot* ALudoGameState::GetPlayerSlot(uint8 PlayerIndex) const
 {
 	if (!PlayerSlots.IsValidIndex(PlayerIndex)) return nullptr;
 
 	return PlayerSlots[PlayerIndex];
+}
+
+APlayerSlot* ALudoGameState::GetPlayerSlot(FPlayerCore PlayerCore) const
+{
+	auto* PlayerSlot = PlayerSlots.FindByPredicate([&, PlayerCore](const APlayerSlot* Slot)
+	{
+		return Slot->PlayerCore == PlayerCore;
+	});
+
+	return PlayerSlot ? *PlayerSlot : nullptr;
+}
+
+bool ALudoGameState::HasMatchEnded() const
+{
+	bool bEnded = false;
+
+	for (const uint8 PlayerTotal : PlayerPiecesInGoal)
+	{
+		if (PlayerTotal == 4)
+		{
+			bEnded = true;
+		}
+	}
+
+	return bEnded;
 }
 
 void ALudoGameState::AddDieThrow(FDieThrow Throw)
@@ -116,6 +160,18 @@ void ALudoGameState::AddDieThrow(FDieThrow Throw)
 	DieThrowList.Add(Throw);
 
 	OnRep_DieThrowList();
+}
+
+void ALudoGameState::AddPlayerPieceInGoal(uint8 PlayerIndex)
+{
+	if (!HasAuthority()) return;
+
+	if (PlayerPiecesInGoal.IsValidIndex(PlayerIndex) && PlayerPiecesInGoal[PlayerIndex] < 4)
+	{
+		PlayerPiecesInGoal[PlayerIndex]++;
+
+		OnPlayerReachedGoalNative.Broadcast(PlayerIndex, PlayerPiecesInGoal[PlayerIndex]);
+	}
 }
 
 void ALudoGameState::OnRep_DieThrowList()

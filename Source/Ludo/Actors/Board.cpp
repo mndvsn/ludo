@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "LudoLog.h"
+#include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Actors/Gamer.h"
 #include "Actors/Piece.h"
@@ -234,10 +235,8 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 
 	if (TargetSquare == GoalSquare)
 	{
-		UE_LOG(LogLudo, Warning, TEXT("%s (%s) reached goal"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
-		
-		Piece->SetInGoal(true);
-		Piece->SetActorHiddenInGame(true);
+		TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+		GameMode->PlayerPieceReachedGoal(Piece);
 	}
 	
 	if (AddPieceToBoardData(Piece, TargetSquare))

@@ -10,7 +10,9 @@
 
 struct FDieThrow;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FGE_OnTurnChangedNative, uint8);
+DECLARE_MULTICAST_DELEGATE_OneParam(FGE_OnTurnChangedNative,/* PlayerIndex */ uint8);
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FGE_OnPlayerReachedGoalNative,/* PlayerIndex */ uint8,/* InGoalTotal */ uint8);
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FGE_OnPlayStateChangedNative, AGamerState*, EPlayState);
 
@@ -31,6 +33,8 @@ class LUDO_API IGameEventsInterface
 
 public:
 	virtual FGE_OnTurnChangedNative& GetTurnChangedDelegate() = 0;
+
+	virtual FGE_OnPlayerReachedGoalNative& GetPlayerReachedGoalDelegate() = 0;
 
 	virtual FGE_OnPlayStateChangedNative& GetPlayStateChangedDelegate() = 0;
 	
