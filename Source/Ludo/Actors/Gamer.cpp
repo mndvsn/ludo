@@ -3,6 +3,7 @@
 
 #include "Gamer.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -51,6 +52,15 @@ AGamer::AGamer()
 	
 	PlayerLabel = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PlayerLabel"));
 	PlayerLabel->SetupAttachment(RootComponent);
+}
+
+void AGamer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGamer, PlayerSlot);
+	DOREPLIFETIME(AGamer, PlayerYard);
+	DOREPLIFETIME(AGamer, Pieces);
 }
 
 // Called when the game starts or when spawned
@@ -198,7 +208,7 @@ void AGamer::UpdatePlayerLabel()
 
 void AGamer::AddPiece(TObjectPtr<APiece> Piece)
 {
-	if (!Piece) return;
+	if (!Piece || !HasAuthority()) return;
 
 	Pieces.Add(Piece);
 }
@@ -212,7 +222,7 @@ APiece* AGamer::GetPiece(const uint8 AtIndex) const
 
 TArray<APiece*> AGamer::GetPiecesOnBoard(const ABoard* TheBoard) const
 {
-	TArray<APiece*> PiecesOnBoard = Pieces.FilterByPredicate([&](const TObjectPtr<APiece> Piece)
+	TArray<APiece*> PiecesOnBoard = Pieces.FilterByPredicate([&](const APiece* Piece)
 	{
 		return !Piece->IsInGoal() && !Piece->IsInYard();
 	});
@@ -241,8 +251,9 @@ bool AGamer::Server_ThrowDie_Validate()
 
 void AGamer::OnDieThrow(FDieThrow Throw)
 {
-	TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
-
+	// Ignore for client, for now
+	if (!HasAuthority()) return;
+	
 	// check if this Gamer is relevant for the throw
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
 	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
@@ -309,5 +320,16 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 		{
 			ControllerInterface->Server_RequestEndTurn();
 		}
+	}
+}
+
+void AGamer::Client_ShowEndScreen_Implementation(APlayerSlot* WinnerSlot) const
+{
+	const TObjectPtr<ALudoPlayerController> LudoPC = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
+	if (!LudoPC || !WinnerSlot) return;
+	
+	if (const TObjectPtr<AGameHUD> GameHUD = LudoPC->GetHUD<AGameHUD>())
+	{
+		GameHUD->ShowEndScreen(WinnerSlot);
 	}
 }

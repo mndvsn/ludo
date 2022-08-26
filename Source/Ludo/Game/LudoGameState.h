@@ -62,6 +62,9 @@ private:
 	int8 CurrentPlayerIndex = -1;
 
 	UPROPERTY(Replicated)
+	int8 WinnerPlayerIndex = -1;
+
+	UPROPERTY(Replicated)
 	uint8 PlayerCountForGame = 0;
 
 	UPROPERTY(ReplicatedUsing=OnRep_DieThrowList)
@@ -85,7 +88,9 @@ public:
 
 	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
 
-	virtual bool HasMatchEnded() const override;
+	uint8 GetWinner() const { return WinnerPlayerIndex; };
+
+	bool HasGameEnded();
 
 	uint8 GetPlayerCountForGame() const { return PlayerCountForGame; };
 	void SetPlayerCountForGame(uint8 Count) { PlayerCountForGame = Count; };

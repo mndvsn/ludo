@@ -46,7 +46,7 @@ protected:
 	void OnRep_PlayerCore();
 
 private:
-	UPROPERTY(BlueprintGetter=GetGamer)
+	UPROPERTY(Replicated, BlueprintGetter=GetGamer)
 	TObjectPtr<AGamer> Gamer;
 
 public:	

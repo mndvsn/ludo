@@ -3,8 +3,11 @@
 
 #include "GameHUD.h"
 
-#include "GameOverlayWidget.h"
+#include "LudoLog.h"
 #include "Game/LudoGameInstance.h"
+#include "UI/GameOverlayWidget.h"
+#include "UI/GameEndWidget.h"
+#include "Actors/PlayerSlot.h"
 
 
 AGameHUD::AGameHUD()
@@ -49,4 +52,14 @@ void AGameHUD::ShowInGameMenu()
 	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
 	if (GameInstance == nullptr) return;
 	GameInstance->EndGame();
+}
+
+void AGameHUD::ShowEndScreen(APlayerSlot* WinnerSlot)
+{
+	if (GameEndWidgetClass)
+	{
+		EndScreenWidget = CreateWidget<UGameEndWidget>(GetOwner<APlayerController>(), GameEndWidgetClass);
+		EndScreenWidget->SetValues(WinnerSlot);
+		EndScreenWidget->AddToViewport();
+	}
 }

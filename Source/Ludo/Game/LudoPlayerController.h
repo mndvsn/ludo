@@ -48,6 +48,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_NotifyOnReady(APlayerState* PlayerStateReady);
 
+	UFUNCTION(Server, Reliable)
+	void Server_ShowEndScreen();
+
 	void CheckPlayerStates();
 
 	virtual TObjectPtr<AGamerState> GetGamerState() override;

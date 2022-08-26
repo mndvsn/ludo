@@ -110,6 +110,8 @@ public:
 
 	void NextTurn();
 
+	void EndGame();
+
 	virtual void BeginPlay() override;
 
 };

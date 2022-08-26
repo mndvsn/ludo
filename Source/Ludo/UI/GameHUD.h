@@ -9,6 +9,10 @@
 
 DECLARE_DELEGATE(FUIE_OnGameHUDReady);
 
+class UGameOverlayWidget;
+class UGameEndWidget;
+class APlayerSlot;
+
 /**
  * 
  */
@@ -28,8 +32,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Hide();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ShowInGameMenu();
+
+	UFUNCTION()
+	void ShowEndScreen(APlayerSlot* WinnerSlot);
 
 	FUIE_OnGameHUDReady OnGameHUDReady;
 
@@ -42,8 +49,14 @@ protected:
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class UGameOverlayWidget> GameWidgetClass;
+	TSubclassOf<UGameOverlayWidget> GameWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameEndWidget> GameEndWidgetClass;
 
 	UPROPERTY()
-	class UGameOverlayWidget* GameWidget;
+	TObjectPtr<UGameOverlayWidget> GameWidget;
+
+	UPROPERTY()
+	TObjectPtr<UGameEndWidget> EndScreenWidget;
 };

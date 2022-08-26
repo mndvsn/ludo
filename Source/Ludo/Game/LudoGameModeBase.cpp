@@ -105,7 +105,7 @@ bool ALudoGameModeBase::CheckGameFinished() const
 	
 	if (ALudoGameState* State = GetGameState<ALudoGameState>())
 	{
-		bFinished = State->HasMatchEnded();
+		bFinished = State->HasGameEnded();
 	}
 
 	return bFinished;
@@ -129,7 +129,7 @@ void ALudoGameModeBase::AddPlayerThrow(FDieThrow Throw)
 void ALudoGameModeBase::PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece)
 {
 	FPlayerCore PlayerCore = Piece->GetPlayerCore();
-	UE_LOG(LogLudo, Warning, TEXT("%s (%s) reached goal"), *Piece->GetName(), *PlayerCore.DisplayName);
+	UE_LOG(LogLudoGM, Verbose, TEXT("%s (%s) reached goal"), *Piece->GetName(), *PlayerCore.DisplayName);
 
 	Piece->SetInGoal(true);
 	Piece->SetActorHiddenInGame(true);
@@ -149,7 +149,10 @@ void ALudoGameModeBase::NextTurn()
 		UpdateCurrentControllerState(false);
 	}
 	
-	if (CheckGameFinished()) return;
+	if (CheckGameFinished())
+	{
+		return EndGame();
+	}
 
 	// Set next turn
 	State->AdvanceTurn();
@@ -158,6 +161,14 @@ void ALudoGameModeBase::NextTurn()
 	PlayerInTurn = CastChecked<ILudoControllerInterface>(State->GetGamerStateInTurn()->GetOwningController());
 
 	UpdateCurrentControllerState(true);
+}
+
+void ALudoGameModeBase::EndGame()
+{
+	if (TObjectPtr<ALudoPlayerController> PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>())
+	{
+		PlayerController->Server_ShowEndScreen();
+	}
 }
 
 void ALudoGameModeBase::BeginPlay()

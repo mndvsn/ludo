@@ -32,6 +32,7 @@ void AYard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AYard, PlayerCore);
+	DOREPLIFETIME(AYard, Gamer);
 }
 
 void AYard::SetGamer(TObjectPtr<AGamer> NewGamer)

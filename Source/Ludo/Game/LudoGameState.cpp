@@ -19,6 +19,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ALudoGameState, PlayerSlots);
 	DOREPLIFETIME(ALudoGameState, PlayerPiecesInGoal);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
+	DOREPLIFETIME(ALudoGameState, WinnerPlayerIndex);
 	DOREPLIFETIME(ALudoGameState, DieThrowList);
 }
 
@@ -138,15 +139,19 @@ APlayerSlot* ALudoGameState::GetPlayerSlot(FPlayerCore PlayerCore) const
 	return PlayerSlot ? *PlayerSlot : nullptr;
 }
 
-bool ALudoGameState::HasMatchEnded() const
+bool ALudoGameState::HasGameEnded()
 {
 	bool bEnded = false;
 
-	for (const uint8 PlayerTotal : PlayerPiecesInGoal)
+	for (uint8 i=0; i < PlayerPiecesInGoal.Num(); i++)
 	{
+		const uint8 PlayerTotal = PlayerPiecesInGoal[i];
+		
 		if (PlayerTotal == 4)
 		{
 			bEnded = true;
+			WinnerPlayerIndex = i;
+			ForceNetUpdate();
 		}
 	}
 

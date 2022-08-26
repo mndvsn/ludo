@@ -79,6 +79,15 @@ void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* Pl
 	}
 }
 
+void ALudoPlayerController::Server_ShowEndScreen_Implementation()
+{
+	if (const TObjectPtr<ALudoGameState> State = GetWorld()->GetGameState<ALudoGameState>())
+	{
+		const TObjectPtr<APlayerSlot> WinnerSlot = State->GetPlayerSlot(State->GetWinner());
+		GetGamer()->Client_ShowEndScreen(WinnerSlot.Get());
+	}
+}
+
 void ALudoPlayerController::CheckPlayerStates()
 {
 	if (!PlayerState) return; // PlayerState not replicated yet, wait

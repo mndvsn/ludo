@@ -33,7 +33,7 @@ public:
 
 	void UpdatePlayerName();
 
-	void OnRep_PlayerName();
+	void OnRep_PlayerName() override;
 	UFUNCTION()
 	void OnRep_PlayerIndex();
 
@@ -61,9 +61,8 @@ public:
 
 protected:
 	// Used to copy properties from the current PlayerState to the passed one
-	virtual void CopyProperties(APlayerState* PlayerState);
+	virtual void CopyProperties(APlayerState* PlayerState) override;
 	
 	// Used to override the current PlayerState with the properties of the passed one
-	virtual void OverrideWith(APlayerState* PlayerState);
-
+	virtual void OverrideWith(APlayerState* PlayerState) override;
 };

@@ -8,9 +8,10 @@
 
 
 struct FDieThrow;
-class APiece;
 class APlayerSlot;
+class ABoard;
 class AYard;
+class APiece;
 
 UCLASS()
 class LUDO_API AGamer : public APawn
@@ -35,13 +36,13 @@ private:
 	float CameraZoomMax = 10000.f;
 	float CameraRotationStep;
 
-	UPROPERTY(BlueprintGetter=GetPieces)
-	TArray<TObjectPtr<APiece>> Pieces;
+	UPROPERTY(Replicated, BlueprintGetter=GetPieces)
+	TArray<APiece*> Pieces;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TObjectPtr<APlayerSlot> PlayerSlot;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TObjectPtr<AYard> PlayerYard;
 
 public:
@@ -105,4 +106,7 @@ public:
 	void Server_ThrowDie();
 
 	void OnDieThrow(FDieThrow Throw);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Client_ShowEndScreen(APlayerSlot* WinnerSlot) const;
 };
