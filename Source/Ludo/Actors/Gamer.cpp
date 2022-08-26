@@ -10,7 +10,6 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "LudoLog.h"
-#include "Game/LudoGameInstance.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/LudoGameState.h"
 #include "Game/LudoPlayerController.h"
@@ -61,7 +60,7 @@ void AGamer::BeginPlay()
 
 	CameraRotationStep = (360.0f / 4);// / PC->InputYawScale; // 90
 
-	if (TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>())
+	if (const TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>())
 	{
 		GameState->GetDieThrowDelegate().AddUObject(this, &AGamer::OnDieThrow);
 	}
@@ -80,7 +79,7 @@ void AGamer::Tick(float DeltaTime)
 			CameraArmComp->TargetArmLength = CameraZoomCurrent;
 		}
 
-		FRotator CameraRotation = UKismetMathLibrary::FindLookAtRotation(CameraComp->GetComponentLocation(), FVector::ZeroVector);
+		const FRotator CameraRotation = UKismetMathLibrary::FindLookAtRotation(CameraComp->GetComponentLocation(), FVector::ZeroVector);
 		CameraComp->SetWorldRotation(CameraRotation);
 	}
 }
@@ -115,7 +114,7 @@ void AGamer::PushCameraUp(float AxisValue)
 {
 	if (AxisValue == 0) return;
 
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	const APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (!PC->IsLookInputIgnored())
 	{
 		// get current arm pitch
@@ -133,12 +132,12 @@ void AGamer::PushCameraUp(float AxisValue)
 
 void AGamer::PushCameraRight(float AxisValue)
 {
-	
+	//TODO: PushCamerRight
 }
 
 void AGamer::TurnCamera(float AxisValue)
 {
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	const APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
 	if (!bZoomToggled && !PC->IsLookInputIgnored())
 	{
@@ -190,7 +189,7 @@ void AGamer::MenuKeyPressed()
 
 void AGamer::UpdatePlayerLabel()
 {
-	AGamerState* GamerState = GetPlayerState<AGamerState>();
+	const AGamerState* GamerState = GetPlayerState<AGamerState>();
 	if (GamerState && PlayerLabel)
 	{
 		PlayerLabel->SetText(FText::FromString(GamerState->GetPlayerName()));
@@ -248,11 +247,11 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
 	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
 	if (!bIsRelevant) return;
-	
-	ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
+
+	const ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
 	if (!PlayerController) return;
 
-	TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
+	const TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
 	
 	// Check if player has piece on board
 	const bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
@@ -306,7 +305,7 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 
 	if (HasAuthority())
 	{
-		if (TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
+		if (const TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
 		{
 			ControllerInterface->Server_RequestEndTurn();
 		}

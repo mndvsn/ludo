@@ -62,7 +62,7 @@ void ALudoPlayerController::ThrowDie()
 {
 	//TODO: Check if this player is actually in turn
 
-	TObjectPtr<AGamer> Gamer = GetGamer();
+	const TObjectPtr<AGamer> Gamer = GetGamer();
 	Gamer->Server_ThrowDie();
 }
 
@@ -70,7 +70,7 @@ void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* Pl
 {
 	UE_LOG(LogLudo, Verbose, TEXT("Server_NotifyOnReady: %s"), *GetName());
 
-	TObjectPtr<AGamerState> StateTyped = Cast<AGamerState>(PlayerStateReady);
+	const TObjectPtr<AGamerState> StateTyped = Cast<AGamerState>(PlayerStateReady);
 	StateTyped->SetPlayState(EPlayState::Ready);
 
 	if (GameEventsInterface)
@@ -83,7 +83,7 @@ void ALudoPlayerController::CheckPlayerStates()
 {
 	if (!PlayerState) return; // PlayerState not replicated yet, wait
 
-	if (ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>())
+	if (const ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>())
 	{
 		// Check if we have received an updated (+PlayerIndex) PlayerState for all (expected) other clients
 		if (GameState->GetNumPlayersReplicated() == GameState->GetPlayerCountForGame())
