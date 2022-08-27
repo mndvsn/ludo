@@ -20,10 +20,10 @@ struct FDieThrow
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	uint8 PlayerIndex;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	uint8 Result;
 };
 

@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Game/LudoGameState.h"
 #include "Gamer.generated.h"
 
 
-struct FDieThrow;
 class APlayerSlot;
 class ABoard;
 class AYard;
@@ -27,6 +27,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Player, meta = (AllowPrivateAccess = "true"))
 	class UTextRenderComponent* PlayerLabel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Player, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* ThrowWidget;
 
 	bool bZoomToggled;
 	float CameraZoomCurrent;
@@ -109,4 +112,10 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Client_ShowEndScreen(APlayerSlot* WinnerSlot) const;
+	
+	// //~=============================================================================
+	// Visual
+
+	UFUNCTION(BlueprintNativeEvent)
+	void RunThrowUI(FDieThrow Throw) const;
 };

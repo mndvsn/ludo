@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
@@ -52,6 +53,9 @@ AGamer::AGamer()
 	
 	PlayerLabel = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PlayerLabel"));
 	PlayerLabel->SetupAttachment(RootComponent);
+
+	ThrowWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("ThrowWidget"));
+	ThrowWidget->SetupAttachment(PlayerLabel);
 }
 
 void AGamer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -251,13 +255,16 @@ bool AGamer::Server_ThrowDie_Validate()
 
 void AGamer::OnDieThrow(FDieThrow Throw)
 {
-	// Ignore for client, for now
-	if (!HasAuthority()) return;
-	
 	// check if this Gamer is relevant for the throw
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
 	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
 	if (!bIsRelevant) return;
+
+	// Display number
+	RunThrowUI(Throw);
+	
+	// Stop client here, for now
+	if (!HasAuthority()) return;
 
 	const ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
 	if (!PlayerController) return;
@@ -321,6 +328,17 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 			ControllerInterface->Server_RequestEndTurn();
 		}
 	}
+}
+
+void AGamer::RunThrowUI_Implementation(FDieThrow Throw) const
+{
+	// const TObjectPtr<ALudoPlayerController> LudoPC = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
+	// if (!LudoPC) return;
+	//
+	// if (const TObjectPtr<AGameHUD> GameHUD = LudoPC->GetHUD<AGameHUD>())
+	// {
+	// 	GameHUD->ShowThrow();
+	// }
 }
 
 void AGamer::Client_ShowEndScreen_Implementation(APlayerSlot* WinnerSlot) const
