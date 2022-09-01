@@ -29,6 +29,11 @@ struct FPlayerCore
 	{
 		return Id == rhs.Id;
 	}
+
+	inline bool operator!=(const FPlayerCore& rhs) const
+	{
+		return Id != rhs.Id;
+	}
 };
 
 /**

@@ -109,7 +109,7 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ThrowDie();
 
-	void OnDieThrow(FDieThrow Throw);
+	void OnDieThrow(FDieThrow Throw) const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Client_ShowEndScreen(APlayerSlot* WinnerSlot) const;

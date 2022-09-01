@@ -30,19 +30,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
 	FPlayerCore PlayerCore;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRep_PlayerCore();
+	
 	UPROPERTY(Replicated)
 	bool bInYard;
 
 	UPROPERTY(Replicated)
 	bool bInGoal;
-
-	UFUNCTION(BlueprintNativeEvent)
-	void OnRep_PlayerCore();
+	
+	FVector InitialLocation;
 
 	virtual void BeginPlay() override;
 
 public:
-	FPlayerCore GetPlayerCore() const { return PlayerCore; };
+	FPlayerCore GetPlayerCore() const { return PlayerCore; }
 	void SetPlayerCore(FPlayerCore InPlayerCore);
 
 	bool IsInYard() const { return bInYard; };
@@ -50,4 +52,7 @@ public:
 
 	bool IsInGoal() const { return bInGoal; };
 	void SetInGoal(bool bIn) { bInGoal = bIn; };
+
+	FVector GetInitialLocation() const { return InitialLocation; }
+	void SetInitialLocation(const FVector& InLocation) { InitialLocation = InLocation; }
 };

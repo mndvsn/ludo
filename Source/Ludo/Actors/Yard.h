@@ -33,6 +33,9 @@ public:
 
 	void SpawnPieces();
 
+	// Find first Piece located in Yard
+	TObjectPtr<APiece> GetPiece() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_PlayerCore, Category="Yard")
 	FPlayerCore PlayerCore;

@@ -76,6 +76,7 @@ void AYard::SpawnPieces()
 				Piece->SetOwner(this);
 				Piece->SetPlayerCore(this->PlayerCore);
 				Piece->SetInYard(true);
+				Piece->SetInitialLocation(PieceTransform.GetLocation());
 
 				if (Gamer)
 				{
@@ -89,6 +90,17 @@ void AYard::SpawnPieces()
 			PieceIndex++;
 		}
 	}
+}
+
+TObjectPtr<APiece> AYard::GetPiece() const
+{
+	auto Pieces = GetGamer()->GetPieces();
+	auto* FoundPiece = Pieces.FindByPredicate([&](const APiece* Piece)
+	{
+		return Piece->IsInYard();
+	});
+
+	return FoundPiece ? *FoundPiece : nullptr;
 }
 
 void AYard::BeginPlay()

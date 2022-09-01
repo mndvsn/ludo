@@ -40,6 +40,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UPlayerCoreAsset* PlayerCores;
 
+	// Knock off opponents pieces
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bKnockPieces = true;
+	
 	bool bShouldSpawnCPU = 0;
 
 	int32 GetNumPlayersTotal();

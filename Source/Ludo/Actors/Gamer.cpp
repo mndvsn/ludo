@@ -280,7 +280,7 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	// Get the result of die thrown
 	if (Throw.Result == 1 || Throw.Result == 6)
 	{
-		if (APiece* Piece = TheBoard->GetFirstPieceInYard(GetYard()))
+		if (APiece* Piece = GetYard()->GetPiece())
 		{
 			UE_LOG(LogLudo, Verbose, TEXT("Player %d can move a piece from their yard"), Throw.PlayerIndex);
 

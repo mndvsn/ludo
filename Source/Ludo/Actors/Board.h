@@ -40,13 +40,15 @@ public:
 	// Returns ASquare where Piece is currently located, nullptr if not found
 	TObjectPtr<ASquare> LocationOfPiece(TObjectPtr<APiece> Piece) const;
 
-	// Find Piece located in Yard for player
-	TObjectPtr<APiece> GetFirstPieceInYard(const TObjectPtr<AYard> InYard) const;
-
+	// Get Pieces at specific Square
+	bool GetPiecesAtSquare(const TObjectPtr<ASquare> TargetSquare, TArray<APiece*>& ResultArray);
+	
 	TArray<TObjectPtr<ASquare>> GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const;
 
 	UFUNCTION(Server, Reliable)
 	void MovePiece(APiece* Piece, ASquare* TargetSquare);
+	
+	void KnockPiece(const TObjectPtr<APiece> Piece);
 
 	FGE_OnBoardFoundYards OnFoundYards;
 	bool bYardsFound;

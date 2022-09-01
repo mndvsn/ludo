@@ -23,10 +23,15 @@ struct FSquareData
 	uint8 Index = 0;
 
 	UPROPERTY()
-	TObjectPtr<ASquare> Square = nullptr;
+	TWeakObjectPtr<ASquare> Square = nullptr;
 
 	UPROPERTY()
 	TArray<TObjectPtr<APiece>> Pieces = {};
+
+	inline bool operator==(const FSquareData& rhs) const
+	{
+		return Index == rhs.Index;
+	}
 };
 
 /**

@@ -148,9 +148,9 @@ TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece) const
 	{
 		if (Data.Pieces.IsEmpty()) continue;
 
-		if (Data.Pieces.Contains(Piece))
+		if (Data.Pieces.Contains(Piece) && Data.Square.IsValid())
 		{
-			Square = Data.Square;
+			Square = Data.Square.Get();
 			break;
 		}
 	}
@@ -158,16 +158,25 @@ TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece) const
 	return Square;
 }
 
-TObjectPtr<APiece> ABoard::GetFirstPieceInYard(const TObjectPtr<AYard> InYard) const
+bool ABoard::GetPiecesAtSquare(const TObjectPtr<ASquare> TargetSquare, TArray<APiece*>& ResultArray)
 {
-	if (!InYard) return nullptr;
-	auto Pieces = InYard->GetGamer()->GetPieces();
-	auto* FoundPiece = Pieces.FindByPredicate([&](const APiece* Piece)
-	{
-		return Piece->IsInYard();
-	});
+	bool bSuccess = false;
+	if (!TargetSquare) return bSuccess;
 
-	return FoundPiece ? *FoundPiece : nullptr;
+	const uint8 TargetSquareIndex = IndexOfSquare(TargetSquare);
+	if (const auto FoundData = BoardData.FindByPredicate([TargetSquareIndex](const FSquareData& Data)
+	{
+		return Data.Index == TargetSquareIndex;
+	}))
+	{
+		if (!FoundData->Pieces.IsEmpty())
+		{
+			ResultArray.Append(FoundData->Pieces);
+			bSuccess = true;
+		}
+	}
+	
+	return bSuccess;
 }
 
 TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const
@@ -225,17 +234,59 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 	return Reachable;
 }
 
+void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
+{
+	if (!HasAuthority()) return;
+	
+	// Reset Piece back to initial location in Yard
+	if (RemovePieceFromBoardData(Piece))
+	{
+		UE_LOG(LogLudo, Verbose, TEXT("KNOCK! %s (%s) moved back to yard"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
+		Piece->SetInYard(true);
+		const FVector InitialLocation = Piece->GetInitialLocation();
+		Piece->SetActorLocation(InitialLocation);
+	}
+}
+
 void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 {
 	// Fail if null pointers or Piece is at target location already
 	if (!Piece || !TargetSquare || LocationOfPiece(Piece) == TargetSquare) return;
 
+	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+	
+	// Check if knock-out is enabled
+	const bool bKnock = GameMode->bKnockPieces;
+
 	RemovePieceFromBoardData(Piece);
 
 	if (TargetSquare == GoalSquare)
 	{
-		TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
 		GameMode->PlayerPieceReachedGoal(Piece);
+	}
+
+	// Check if target is occupied with other Pieces
+	TArray<APiece*> PiecesAtTarget;
+	if (GetPiecesAtSquare(TargetSquare, PiecesAtTarget))
+	{
+		FString NamesOfPieces;
+		TObjectPtr<APiece> OpponentPiece = nullptr;
+		for (const auto& OccupyingPiece : PiecesAtTarget)
+		{
+			NamesOfPieces += OccupyingPiece->GetName();
+			NamesOfPieces += TEXT(", ");
+			if (Piece->GetPlayerCore() != OccupyingPiece->GetPlayerCore())
+			{
+				OpponentPiece = OccupyingPiece;
+			}
+		}
+		UE_LOG(LogLudo, Verbose, TEXT("Pieces already on %s: %s"), *TargetSquare->GetName(), *NamesOfPieces);
+
+		// Knock-out is enabled
+		if (bKnock && OpponentPiece)
+		{
+			KnockPiece(OpponentPiece);
+		}
 	}
 	
 	if (AddPieceToBoardData(Piece, TargetSquare))
