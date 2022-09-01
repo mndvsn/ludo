@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include <CoreMinimal.h>
+#include <Blueprint/UserWidget.h>
+
 #include "Actors/PlayerEventsInterface.h"
 #include "GameActionsWidget.generated.h"
 

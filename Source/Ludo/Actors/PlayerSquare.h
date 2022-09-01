@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include <CoreMinimal.h>
+
 #include "Actors/Square.h"
 #include "Common/PlayerCore.h"
 #include "PlayerSquare.generated.h"

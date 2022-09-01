@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/Interface.h"
+#include <CoreMinimal.h>
+#include <UObject/Interface.h>
+
 #include "PlayerEventsInterface.generated.h"
 
 

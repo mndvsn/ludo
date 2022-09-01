@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include <CoreMinimal.h>
+#include <GameFramework/Actor.h>
+
 #include "Common/PlayerCore.h"
 #include "Yard.generated.h"
 

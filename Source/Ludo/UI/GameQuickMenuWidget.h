@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "Actors/PlayerEventsInterface.h"
+#include <CoreMinimal.h>
+#include <Blueprint/UserWidget.h>
+
 #include "Game/GameEventsInterface.h"
+#include "Actors/PlayerEventsInterface.h"
 #include "GameQuickMenuWidget.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowMenuSignature);

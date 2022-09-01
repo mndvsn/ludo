@@ -2,11 +2,10 @@
 
 
 #include "GameActionsWidget.h"
-#include "Components/Button.h"
 
-#include "Game/GamerState.h"
+#include <Components/Button.h>
+
 #include "Game/LudoPlayerController.h"
-#include "Actors/Board.h"
 
 
 void UGameActionsWidget::NativeOnInitialized()

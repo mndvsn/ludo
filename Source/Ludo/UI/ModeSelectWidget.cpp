@@ -2,7 +2,8 @@
 
 
 #include "ModeSelectWidget.h"
-#include "Components/Button.h"
+
+#include <Components/Button.h>
 
 
 UModeSelectWidget::UModeSelectWidget(const FObjectInitializer& ObjectInitializer) : UMainMenuSubWidget(ObjectInitializer)

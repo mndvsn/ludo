@@ -2,9 +2,11 @@
 
 
 #include "MainMenuGameMode.h"
-#include "GameFramework/DefaultPawn.h"
+
+#include <GameFramework/DefaultPawn.h>
 
 #include "UI/MenuHUD.h"
+
 
 AMainMenuGameMode::AMainMenuGameMode()
 {

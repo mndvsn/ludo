@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include <CoreMinimal.h>
+#include <GameFramework/Pawn.h>
+
 #include "Game/LudoGameState.h"
 #include "Gamer.generated.h"
 

@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include <CoreMinimal.h>
+#include <Engine/DataAsset.h>
+
 #include "PlayerCore.generated.h"
 
 

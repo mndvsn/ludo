@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/GameStateBase.h"
+#include <CoreMinimal.h>
+#include <GameFramework/GameStateBase.h>
+
 #include "Game/GameEventsInterface.h"
 #include "Common/PlayerCore.h"
 #include "LudoGameState.generated.h"

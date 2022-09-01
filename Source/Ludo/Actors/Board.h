@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include <CoreMinimal.h>
+#include <GameFramework/Actor.h>
+
 #include "Actors/Square.h"
 #include "Board.generated.h"
 

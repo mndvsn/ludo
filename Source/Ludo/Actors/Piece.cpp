@@ -2,8 +2,10 @@
 
 
 #include "Piece.h"
+
+#include <Net/UnrealNetwork.h>
+
 #include "LudoLog.h"
-#include "Net/UnrealNetwork.h"
 
 
 APiece::APiece()

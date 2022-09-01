@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "MainMenuSubWidget.h"
+#include <CoreMinimal.h>
+
+#include "UI/MainMenuSubWidget.h"
 #include "ModeSelectWidget.generated.h"
 
 /**

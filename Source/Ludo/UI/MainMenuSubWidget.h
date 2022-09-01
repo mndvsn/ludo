@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "MainMenuInterface.h"
+#include <CoreMinimal.h>
+#include <Blueprint/UserWidget.h>
+
+#include "UI/MainMenuInterface.h"
 #include "MainMenuSubWidget.generated.h"
 
 /**

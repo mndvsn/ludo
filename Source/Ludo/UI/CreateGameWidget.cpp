@@ -2,10 +2,11 @@
 
 
 #include "CreateGameWidget.h"
-#include "Game/LudoGameInstance.h"
 
-#include "Components/Button.h"
-#include "Components/Slider.h"
+#include <Components/Button.h>
+#include <Components/Slider.h>
+
+#include "Game/LudoGameInstance.h"
 
 
 UCreateGameWidget::UCreateGameWidget(const FObjectInitializer& ObjectInitializer) : UMainMenuSubWidget(ObjectInitializer)

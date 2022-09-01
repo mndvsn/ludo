@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/PlayerStart.h"
+#include <CoreMinimal.h>
+#include <GameFramework/PlayerStart.h>
+
 #include "Common/PlayerCore.h"
 #include "PlayerSlot.generated.h"
 

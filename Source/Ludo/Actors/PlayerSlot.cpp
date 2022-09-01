@@ -2,7 +2,9 @@
 
 
 #include "Actors/PlayerSlot.h"
-#include "Net/UnrealNetwork.h"
+
+#include <Net/UnrealNetwork.h>
+
 #include "Actors/Gamer.h"
 #include "Game/GamerState.h"
 

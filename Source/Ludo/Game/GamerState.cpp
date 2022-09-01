@@ -2,11 +2,11 @@
 
 
 #include "GamerState.h"
-#include "Net/UnrealNetwork.h"
+
+#include <Net/UnrealNetwork.h>
 
 #include "LudoLog.h"
 #include "LudoPlayerController.h"
-#include "Common/PlayerCore.h"
 #include "Actors/PlayerSlot.h"
 #include "Actors/Gamer.h"
 

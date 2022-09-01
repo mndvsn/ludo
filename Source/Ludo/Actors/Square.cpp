@@ -2,7 +2,8 @@
 
 
 #include "Actors/Square.h"
-#include "Components/SphereComponent.h"
+
+#include <Components/SphereComponent.h>
 
 
 ASquare::ASquare()

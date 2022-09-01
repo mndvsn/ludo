@@ -3,13 +3,13 @@
 
 #include "UI/GameEndWidget.h"
 
-#include "LudoLog.h"
-#include "Actors/Gamer.h"
-#include "Components/Button.h"
-#include "Components/TextBlock.h"
+#include <Components/Button.h>
+#include <Components/TextBlock.h>
+
 #include "Game/GamerState.h"
-#include "Actors/PlayerSlot.h"
 #include "Game/LudoPlayerController.h"
+#include "Actors/Gamer.h"
+#include "Actors/PlayerSlot.h"
 
 
 void UGameEndWidget::SetValues(APlayerSlot* WinnerSlot)

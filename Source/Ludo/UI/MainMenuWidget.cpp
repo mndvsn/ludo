@@ -3,14 +3,14 @@
 
 #include "MainMenuWidget.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-#include "Components/NamedSlot.h"
-#include "Components/Button.h"
+#include <Components/Button.h>
+#include <Components/NamedSlot.h>
+#include <Kismet/KismetSystemLibrary.h>
 
 #include "LudoLog.h"
-#include "MainMenuSubWidget.h"
-#include "ModeSelectWidget.h"
-#include "CreateGameWidget.h"
+#include "UI/CreateGameWidget.h"
+#include "UI/MainMenuSubWidget.h"
+#include "UI/ModeSelectWidget.h"
 
 
 UMainMenuWidget::UMainMenuWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)

@@ -2,8 +2,8 @@
 
 
 #include "LudoPlayerController.h"
-#include "GameFramework/GameStateBase.h"
-#include "Kismet/GameplayStatics.h"
+
+#include <Kismet/GameplayStatics.h>
 
 #include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"

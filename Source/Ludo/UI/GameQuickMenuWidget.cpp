@@ -3,8 +3,7 @@
 
 #include "GameQuickMenuWidget.h"
 
-#include "Components/TextBlock.h"
-#include "Components/Image.h"
+#include <Components/Image.h>
 
 #include "LudoLog.h"
 #include "Game/LudoPlayerController.h"

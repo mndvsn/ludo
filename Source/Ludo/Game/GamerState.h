@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/PlayerState.h"
+#include <CoreMinimal.h>
+#include <GameFramework/PlayerState.h>
+
 #include "GamerState.generated.h"
 
 
