@@ -13,7 +13,7 @@ DECLARE_DELEGATE(FGE_OnBoardFoundYards);
 class AYard;
 class APlayerSquare;
 
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API ABoard : public AActor
 {
 	GENERATED_BODY()

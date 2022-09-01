@@ -11,7 +11,7 @@ class UTextBlock;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UThrowWidget : public UUserWidget
 {
 	GENERATED_BODY()

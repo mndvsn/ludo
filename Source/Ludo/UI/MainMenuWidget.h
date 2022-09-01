@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UMainMenuWidget : public UUserWidget, public IMainMenuInterface
 {
 	GENERATED_BODY()

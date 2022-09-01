@@ -13,7 +13,7 @@ class ABoard;
 class AYard;
 class APiece;
 
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API AGamer : public APawn
 {
 	GENERATED_BODY()

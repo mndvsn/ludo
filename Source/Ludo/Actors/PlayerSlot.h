@@ -14,7 +14,7 @@ class AGamerState;
 /**
  * 
  */
-UCLASS()
+UCLASS(NotPlaceable)
 class LUDO_API APlayerSlot : public APlayerStart
 {
 	GENERATED_BODY()
@@ -48,14 +48,14 @@ private:
 	TObjectPtr<AGamer> Gamer;
 
 public:
-	const int8 GetIndex() const { return Index; };
-	void SetIndex(int8 NewIndex) { Index = NewIndex; };
+	const int8 GetIndex() const { return Index; }
+	void SetIndex(int8 NewIndex) { Index = NewIndex; }
 
-	const int8 GetPlayerOrder() const { return PlayOrder; };
-	void SetPlayerOrder(int8 NewOrder) { PlayOrder = NewOrder; };
+	const int8 GetPlayerOrder() const { return PlayOrder; }
+	void SetPlayerOrder(int8 NewOrder) { PlayOrder = NewOrder; }
 
-	AGamer* GetGamer() { return Gamer; };
-	void SetGamer(AGamer* NewGamer) { Gamer = NewGamer; };
+	AGamer* GetGamer() const { return Gamer; }
+	void SetGamer(AGamer* NewGamer) { Gamer = NewGamer; }
 
-	AGamerState* GetGamerState();
+	AGamerState* GetGamerState() const;
 };

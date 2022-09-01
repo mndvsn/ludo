@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UModeSelectWidget : public UMainMenuSubWidget
 {
 	GENERATED_BODY()

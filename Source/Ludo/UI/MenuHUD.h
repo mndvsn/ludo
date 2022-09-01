@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API AMenuHUD : public AHUD
 {
 	GENERATED_BODY()

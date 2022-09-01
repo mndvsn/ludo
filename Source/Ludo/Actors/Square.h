@@ -7,6 +7,7 @@
 #include "Square.generated.h"
 
 
+class ASquare;
 class APiece;
 
 /**
@@ -18,19 +19,19 @@ struct FSquareData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	uint8 Index;
+	uint8 Index = 0;
 
 	UPROPERTY()
-	TObjectPtr<ASquare> Square;
+	TObjectPtr<ASquare> Square = nullptr;
 
 	UPROPERTY()
-	TArray<TObjectPtr<APiece>> Pieces;
+	TArray<TObjectPtr<APiece>> Pieces = {};
 };
 
 /**
  *
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API ASquare : public AActor
 {
 	GENERATED_BODY()

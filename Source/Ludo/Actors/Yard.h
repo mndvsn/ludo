@@ -12,7 +12,7 @@ class APiece;
 class AGamer;
 class APlayerSquare;
 
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API AYard : public AActor
 {
 	GENERATED_BODY()

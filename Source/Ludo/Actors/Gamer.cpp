@@ -20,6 +20,7 @@
 #include "Actors/Piece.h"
 #include "Actors/PlayerSquare.h"
 #include "Actors/Yard.h"
+#include "Actors/PlayerSlot.h"
 #include "UI/GameHUD.h"
 
 // Sets default values

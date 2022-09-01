@@ -18,7 +18,7 @@ class UTextBlock;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UGameQuickMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()

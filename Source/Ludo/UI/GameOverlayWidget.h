@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UGameOverlayWidget : public UUserWidget
 {
 	GENERATED_BODY()

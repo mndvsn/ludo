@@ -16,20 +16,13 @@ struct FPlayerCore
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 Id;
+	uint8 Id = 255;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(TitleProperty=DisplayName))
-	FString DisplayName;
+	FString DisplayName = "Color";
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FColor PrimaryColor;
-
-	FPlayerCore()
-	{
-		Id = 255;
-		DisplayName = "Color";
-		PrimaryColor = FColor::FromHex("FF00FF");
-	};
+	FColor PrimaryColor = FColor::Magenta;
 
 	inline bool operator==(const FPlayerCore& rhs) const
 	{
@@ -40,7 +33,7 @@ struct FPlayerCore
 /**
  * 
  */
-UCLASS()
+UCLASS(NotPlaceable)
 class LUDO_API UPlayerCoreAsset : public UDataAsset
 {
 	GENERATED_BODY()

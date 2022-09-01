@@ -8,7 +8,7 @@
 #include "Piece.generated.h"
 
 
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API APiece : public AActor
 {
 	GENERATED_BODY()

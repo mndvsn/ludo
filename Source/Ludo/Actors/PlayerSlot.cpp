@@ -45,10 +45,10 @@ bool APlayerSlot::IsClaimed() const
 	return bClaimed;
 }
 
-AGamerState* APlayerSlot::GetGamerState()
+AGamerState* APlayerSlot::GetGamerState() const
 {
 	AGamerState* GamerState = nullptr;
-	if (Gamer)
+	if (Gamer != nullptr)
 	{
 		GamerState = Gamer->GetPlayerState<AGamerState>();
 	}

@@ -16,7 +16,7 @@ class APlayerSlot;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API AGameHUD : public AHUD
 {
 	GENERATED_BODY()

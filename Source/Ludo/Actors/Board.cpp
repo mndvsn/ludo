@@ -162,12 +162,12 @@ TObjectPtr<APiece> ABoard::GetFirstPieceInYard(const TObjectPtr<AYard> InYard) c
 {
 	if (!InYard) return nullptr;
 	auto Pieces = InYard->GetGamer()->GetPieces();
-	auto* Piece = Pieces.FindByPredicate([&](const APiece* Piece)
+	auto* FoundPiece = Pieces.FindByPredicate([&](const APiece* Piece)
 	{
 		return Piece->IsInYard();
 	});
 
-	return Piece ? *Piece : nullptr;
+	return FoundPiece ? *FoundPiece : nullptr;
 }
 
 TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const

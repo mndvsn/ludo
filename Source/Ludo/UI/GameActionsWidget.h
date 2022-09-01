@@ -13,7 +13,7 @@ class UButton;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API UGameActionsWidget : public UUserWidget
 {
 	GENERATED_BODY()

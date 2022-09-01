@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LUDO_API APlayerSquare : public ASquare
 {
 	GENERATED_BODY()
