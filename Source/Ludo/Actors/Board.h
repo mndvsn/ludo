@@ -25,7 +25,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintPure)
-	TArray<FSquareData> GetBoardData() const { return BoardData; };
+	TArray<FSquareData> GetBoardData() const { return BoardData; }
+
 
 	TObjectPtr<AYard> GetYard(uint8 PlayerIndex) const;
 

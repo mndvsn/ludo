@@ -254,7 +254,7 @@ bool AGamer::Server_ThrowDie_Validate()
 	return true;
 }
 
-void AGamer::OnDieThrow(FDieThrow Throw)
+void AGamer::OnDieThrow(FDieThrow Throw) const
 {
 	// check if this Gamer is relevant for the throw
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();

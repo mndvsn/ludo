@@ -7,9 +7,10 @@
 #include "UI/MainMenuSubWidget.h"
 #include "CreateGameWidget.generated.h"
 
-/**
- * 
- */
+
+class UButton;
+class USlider;
+
 UCLASS(Abstract)
 class LUDO_API UCreateGameWidget : public UMainMenuSubWidget
 {
@@ -21,7 +22,7 @@ public:
 	virtual EMainMenu GetEnum() override { return EMainMenu::MM_CreateGame; };
 
 protected:
-	void NativeOnInitialized() override;
+	virtual void NativeOnInitialized() override;
 
 	UFUNCTION()
 	void ButtonCreateGameReleased();
@@ -31,11 +32,11 @@ protected:
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ButtonCreateGame;
+	UButton* ButtonCreateGame;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* ButtonBack;
+	UButton* ButtonBack;
 
 	UPROPERTY(meta = (BindWidget))
-	class USlider* SliderPlayersCPU;
+	USlider* SliderPlayersCPU;
 };

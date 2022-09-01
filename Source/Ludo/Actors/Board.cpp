@@ -103,14 +103,14 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex) co
 	TArray<TObjectPtr<APlayerSquare>> SquareArray;
 
 	// Find PlayerCore used by player
-	TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
-	TObjectPtr<AGamerState> GamerState = GameState->GetGamerStateForIndex(PlayerIndex);
+	const TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
+	const TObjectPtr<AGamerState> GamerState = GameState->GetGamerStateForIndex(PlayerIndex);
 	if (!GamerState || !GamerState->GetPlayerSlot())
 	{
 		return SquareArray;
 	}
 
-	FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->PlayerCore;
+	const FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->PlayerCore;
 
 	for (auto& Square : Squares)
 	{
@@ -180,7 +180,7 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 	}
 
 	// Get PlayerCore.Id of player
-	ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>();
+	const ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>();
 	const uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->PlayerCore.Id;
 
 	TQueue<TObjectPtr<ASquare>> Near;
@@ -200,7 +200,7 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 			if (Reachable.Contains(Next)) continue;
 
 			// Skip if the next square is an unreachable PlayerSquare
-			if (TObjectPtr<APlayerSquare> PlayerSquare = Cast<APlayerSquare>(Next))
+			if (const TObjectPtr<APlayerSquare> PlayerSquare = Cast<APlayerSquare>(Next))
 			{
 				// Square is player color
 				if (PlayerSquare->GetPlayerCore().Id == PlayerCoreId)
@@ -255,7 +255,7 @@ bool ABoard::AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> T
 
 	UE_LOG(LogLudo, Verbose, TEXT("Moving %s (%s) to %s"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName, *TargetSquare->GetName());
 
-	int32 ArrayIndex = BoardData.IndexOfByPredicate([TargetSquare](const FSquareData& Data)
+	const int32 ArrayIndex = BoardData.IndexOfByPredicate([TargetSquare](const FSquareData& Data)
 	{
 		return (Data.Square == TargetSquare);
 	});
@@ -274,7 +274,7 @@ bool ABoard::RemovePieceFromBoardData(TObjectPtr<APiece> Piece)
 	bool bSuccess = false;
 	if (!Piece) return bSuccess;
 
-	int32 ArrayIndex = BoardData.IndexOfByPredicate([Piece](const FSquareData& Data)
+	const int32 ArrayIndex = BoardData.IndexOfByPredicate([Piece](const FSquareData& Data)
 	{
 		return (Data.Pieces.Contains(Piece));
 	});
