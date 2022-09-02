@@ -383,6 +383,26 @@ void ALudoGameModeBase::SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState)
 	}
 }
 
+TArray<uint8> ALudoGameModeBase::GetEntryRolls(EEntryRollMask EntryRollMask) const
+{
+	TArray<uint8> Numbers;
+	switch (EntryRollMask)
+	{
+	case EEntryRollMask::ER_Low:
+		Numbers.Append(EntryRollsLow);
+		break;
+	case EEntryRollMask::ER_High:
+		Numbers.Append(EntryRollsHigh);
+		break;
+	default:
+	case EEntryRollMask::ER_All:
+		Numbers.Append(EntryRollsLow);
+		Numbers.Append(EntryRollsHigh);
+		break;
+	}
+	return Numbers;
+}
+
 int32 ALudoGameModeBase::GetNumPlayersTotal()
 {
 	/*int32 PlayerCount = GetNumPlayers();

@@ -273,12 +273,14 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	const TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
 	
 	// Check if player has piece on board
-	const bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
-
+	bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
 	bool bMadeMove = false;
 
-	// Get the result of die thrown
-	if (Throw.Result == 1 || Throw.Result == 6)
+	// Get game rules
+	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+	
+	// Get the result of dice roll
+	if (GameMode->GetEntryRolls(EEntryRollMask::ER_All).Contains(Throw.Result))
 	{
 		if (APiece* Piece = GetYard()->GetPiece())
 		{
@@ -287,7 +289,18 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 			// Try to move Piece to player home square
 			APlayerSquare* HomeSquare = GetYard()->GetHomeSquare();
 			TheBoard->MovePiece(Piece, HomeSquare);
-			bMadeMove = true;
+
+			// Immediately move on a high roll?
+			if (GameMode->bMoveOnHighEntryRoll && GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
+			{
+				bCanMovePiece = true;
+				// Subtract movement to home
+				Throw.Result -= 1;
+			}
+			else
+			{
+				bMadeMove = true;
+			}
 		}
 	}
 

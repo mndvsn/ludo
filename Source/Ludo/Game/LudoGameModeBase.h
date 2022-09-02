@@ -17,6 +17,14 @@ class ABoard;
 class APiece;
 enum class EPlayState : uint8;
 
+// Entry roll mask
+UENUM(BlueprintType)
+enum class EEntryRollMask : uint8 {
+	ER_Low  UMETA(DisplayName = "Low"),
+	ER_High UMETA(DisplayName = "High"),
+	ER_All  UMETA(DisplayName = "All"),
+};
+
 /**
  * 
  */
@@ -43,8 +51,20 @@ public:
 	// Knock off opponents pieces
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bKnockPieces = true;
+
+	// Entry + move on high roll
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bMoveOnHighEntryRoll = true;
 	
 	bool bShouldSpawnCPU = 0;
+
+protected:
+	// Entry roll numbers
+	TArray<uint8> EntryRollsLow = { 1 };
+	TArray<uint8> EntryRollsHigh = { 6 };
+
+public:
+	TArray<uint8> GetEntryRolls(EEntryRollMask EntryRollMask) const;
 
 	int32 GetNumPlayersTotal();
 
