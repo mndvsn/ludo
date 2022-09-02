@@ -275,6 +275,7 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	// Check if player has piece on board
 	bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
 	bool bMadeMove = false;
+	TObjectPtr<APiece> PieceMoveSpecific = nullptr;
 
 	// Get game rules
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
@@ -294,6 +295,8 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 			if (GameMode->bMoveOnHighEntryRoll && GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
 			{
 				bCanMovePiece = true;
+				PieceMoveSpecific = Piece;
+
 				// Subtract movement to home
 				Throw.Result -= 1;
 			}
@@ -308,7 +311,16 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	if (bCanMovePiece && !bMadeMove)
 	{
 		short Attempt = 0;
-		TArray<APiece*> MovablePieces = GetPiecesOnBoard(TheBoard);
+		
+		TArray<APiece*> MovablePieces;
+		if (PieceMoveSpecific)
+		{
+			MovablePieces.Add(PieceMoveSpecific);
+		}
+		else
+		{
+			MovablePieces = GetPiecesOnBoard(TheBoard);
+		}
 
 		while (!bMadeMove)
 		{
@@ -335,12 +347,9 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 		}
 	}
 
-	if (HasAuthority())
+	if (const TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
 	{
-		if (const TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
-		{
-			ControllerInterface->Server_RequestEndTurn();
-		}
+		ControllerInterface->Server_RequestEndTurn();
 	}
 }
 
