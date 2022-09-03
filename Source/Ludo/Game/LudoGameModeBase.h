@@ -52,6 +52,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bKnockPieces = true;
 
+	// Knock off multiple opponent pieces
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bKnockMultiple = true;
+
 	// Entry + move on high roll
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bMoveOnHighEntryRoll = true;

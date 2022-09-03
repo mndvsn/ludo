@@ -258,6 +258,7 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 	// Get game rules
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
 	const bool bKnock = GameMode->bKnockPieces; // knock-out opponent pieces
+	const bool bKnockMultiple = GameMode->bKnockMultiple; // multiple
 
 	RemovePieceFromBoardData(Piece);
 
@@ -271,22 +272,26 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 	if (GetPiecesAtSquare(TargetSquare, PiecesAtTarget))
 	{
 		FString NamesOfPieces;
-		TObjectPtr<APiece> OpponentPiece = nullptr;
+		TArray<TObjectPtr<APiece>> OpponentPieces;
 		for (const auto& OccupyingPiece : PiecesAtTarget)
 		{
 			NamesOfPieces += OccupyingPiece->GetName();
 			NamesOfPieces += TEXT(", ");
 			if (Piece->GetPlayerCore() != OccupyingPiece->GetPlayerCore())
 			{
-				OpponentPiece = OccupyingPiece;
+				OpponentPieces.Add(OccupyingPiece);
+				if (!bKnockMultiple) break;
 			}
 		}
 		UE_LOG(LogLudo, Verbose, TEXT("Pieces already on %s: %s"), *TargetSquare->GetName(), *NamesOfPieces);
 
 		// Knock-out is enabled
-		if (bKnock && OpponentPiece)
+		if (bKnock && !OpponentPieces.IsEmpty())
 		{
-			KnockPiece(OpponentPiece);
+			for (const auto& OpponentPiece : OpponentPieces)
+			{
+				KnockPiece(OpponentPiece);
+			}
 		}
 	}
 	
