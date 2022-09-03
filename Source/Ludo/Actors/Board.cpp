@@ -160,7 +160,7 @@ TObjectPtr<ASquare> ABoard::LocationOfPiece(TObjectPtr<APiece> Piece) const
 	return Square;
 }
 
-bool ABoard::GetPiecesAtSquare(const TObjectPtr<ASquare> TargetSquare, TArray<APiece*>& ResultArray)
+bool ABoard::GetPiecesAtSquare(const TObjectPtr<const ASquare> TargetSquare, TArray<APiece*>& ResultArray) const
 {
 	bool bSuccess = false;
 	if (!TargetSquare) return bSuccess;
@@ -253,7 +253,9 @@ void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
 void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 {
 	// Fail if null pointers or Piece is at target location already
-	if (!Piece || !TargetSquare || LocationOfPiece(Piece) == TargetSquare) return;
+	if (!Piece || !TargetSquare) return;
+	const TObjectPtr<ASquare> StartSquare = LocationOfPiece(Piece);
+	if (!StartSquare || StartSquare == TargetSquare) return;
 
 	// Get game rules
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
@@ -302,6 +304,10 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 			Piece->SetInYard(false);
 		}
 		Piece->SetActorLocation(TargetSquare->GetActorLocation());
+
+		// Tidy up squares
+		StartSquare->DistributePieces(this);
+		TargetSquare->DistributePieces(this);
 	}
 }
 

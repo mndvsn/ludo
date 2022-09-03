@@ -109,3 +109,8 @@ TObjectPtr<APiece> AYard::GetPiece() const
 
 	return FoundPiece ? *FoundPiece : nullptr;
 }
+
+void AYard::DistributePieces(const ABoard* GameBoard) const
+{
+	// Do nothing
+}

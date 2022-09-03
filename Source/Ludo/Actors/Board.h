@@ -41,7 +41,7 @@ public:
 	TObjectPtr<ASquare> LocationOfPiece(TObjectPtr<APiece> Piece) const;
 
 	// Get Pieces at specific Square
-	bool GetPiecesAtSquare(const TObjectPtr<ASquare> TargetSquare, TArray<APiece*>& ResultArray);
+	bool GetPiecesAtSquare(const TObjectPtr<const ASquare> TargetSquare, TArray<APiece*>& ResultArray) const;
 	
 	TArray<TObjectPtr<ASquare>> GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const;
 

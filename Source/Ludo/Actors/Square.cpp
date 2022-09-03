@@ -3,7 +3,9 @@
 
 #include "Actors/Square.h"
 
-#include <Components/SphereComponent.h>
+#include "Yard.h"
+#include "Actors/Board.h" 
+#include "Actors/Piece.h"
 
 
 ASquare::ASquare()
@@ -21,6 +23,36 @@ ASquare::ASquare()
 void ASquare::AddNext(TObjectPtr<ASquare> NewSquare)
 {
 	Next.Add(NewSquare);
+}
+
+void ASquare::DistributePieces(const ABoard* GameBoard) const
+{
+	if (!GameBoard) return;
+	
+	TArray<TObjectPtr<APiece>> Pieces;
+	if (GameBoard->GetPiecesAtSquare(this, Pieces))
+	{
+		const FVector Origin = GetActorLocation();
+		double Radius = 0;
+		
+		const char Items = Pieces.Num();
+		if (Items > 1)
+		{
+			// 70% of Square radius
+			Radius = 0.7 * StaticMesh->GetStaticMesh()->GetBoundingBox().GetExtent().Size();
+		}
+
+		const float Slice = PI*2 / Items;
+		for (short i = 0; i < Pieces.Num(); i++)
+		{
+			const TObjectPtr<APiece>& Piece = Pieces[i];
+			FVector NewLocation = Origin;
+			NewLocation.X += Radius * FMath::Cos(Slice * i);
+			NewLocation.Y += Radius * FMath::Sin(Slice * i);
+
+			Piece->SetActorLocation(NewLocation);
+		}
+	}
 }
 
 void ASquare::BeginPlay()

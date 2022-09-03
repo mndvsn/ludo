@@ -8,6 +8,7 @@
 #include "Square.generated.h"
 
 
+class ABoard;
 class ASquare;
 class APiece;
 
@@ -55,7 +56,11 @@ public:
 	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 	
 	void AddNext(TObjectPtr<ASquare> NewSquare);
-	TArray<TObjectPtr<ASquare>> GetNext() const { return Next; };
+	TArray<TObjectPtr<ASquare>> GetNext() const { return Next; }
+
+	// Line up occupying Pieces
+	UFUNCTION(BlueprintCallable)
+	virtual void DistributePieces(const ABoard* GameBoard) const;
 
 protected:
 	virtual void BeginPlay() override;

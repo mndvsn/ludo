@@ -25,6 +25,9 @@ public:
 	// Find first Piece located in Yard
 	TObjectPtr<APiece> GetPiece() const;
 
+	// Line up occupying Pieces
+	virtual void DistributePieces(const ABoard* GameBoard) const override;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Yard")
 	TSoftClassPtr<APiece> PieceClass;
