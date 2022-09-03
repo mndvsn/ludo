@@ -93,7 +93,7 @@ public:
 	TArray<APiece*> GetPieces() const { return Pieces; };
 
 	UFUNCTION(BlueprintPure)
-	TArray<APiece*> GetPiecesOnBoard(const ABoard* TheBoard) const;
+	TArray<APiece*> GetPiecesOnBoard(const ABoard* TheBoard, const bool bIncludeYard = false) const;
 
 	UFUNCTION(BlueprintCallable)
 	APlayerSlot* GetPlayerSlot() const { return PlayerSlot.Get(); };

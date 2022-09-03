@@ -3,8 +3,28 @@
 
 #include "Actors/PlayerSquare.h"
 
+#include <Net/UnrealNetwork.h>
 
-void APlayerSquare::SetPlayerCore_Implementation(FPlayerCore NewPlayerCore)
+
+APlayerSquare::APlayerSquare()
+{
+	bReplicates = true;
+}
+
+void APlayerSquare::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerSquare, PlayerCore);
+}
+
+void APlayerSquare::SetPlayerCore(FPlayerCore NewPlayerCore)
 {
 	PlayerCore = NewPlayerCore;
+	OnRep_PlayerCore();
+}
+
+void APlayerSquare::OnRep_PlayerCore()
+{
+	UpdatePlayerCore();
 }

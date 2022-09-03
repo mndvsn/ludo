@@ -16,14 +16,23 @@ UCLASS(Abstract)
 class LUDO_API APlayerSquare : public ASquare
 {
 	GENERATED_BODY()
+	
+public:
+	APlayerSquare();
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetPlayerCore, Category="Square")
-	FPlayerCore PlayerCore;
-
+protected:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Square")
 	bool bIsHome;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetPlayerCore, ReplicatedUsing=OnRep_PlayerCore, Category="Player")
+	FPlayerCore PlayerCore;
 
+	UFUNCTION()
+	virtual void OnRep_PlayerCore();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdatePlayerCore();
+	
 public:
 	UFUNCTION(BlueprintPure)
 	bool IsHome() const { return bIsHome; };
@@ -31,6 +40,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	FPlayerCore GetPlayerCore() { return PlayerCore; };
 
-	UFUNCTION(BlueprintNativeEvent)
-	void SetPlayerCore(FPlayerCore NewPlayerCore);
+	UFUNCTION()
+	virtual void SetPlayerCore(FPlayerCore NewPlayerCore);
 };

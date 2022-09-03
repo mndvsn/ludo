@@ -43,8 +43,6 @@ public:
 
 	bool IsPlayerTurn(TObjectPtr<APlayerController> Player) const;
 
-	bool PlayerHasPieceOnBoard(int8 PlayerIndex) const;
-
 	uint8 GetNumPlayersReady() const;
 	uint8 GetNumPlayersReplicated() const;
 

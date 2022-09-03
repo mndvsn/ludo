@@ -9,6 +9,8 @@
 #include "Piece.generated.h"
 
 
+class AGamer;
+
 UCLASS(Abstract)
 class LUDO_API APiece : public AActor
 {
@@ -53,6 +55,9 @@ public:
 	bool IsInGoal() const { return bInGoal; };
 	void SetInGoal(bool bIn) { bInGoal = bIn; };
 
+	UFUNCTION(BlueprintPure)
+	AGamer* GetGamer() const;
+	
 	FVector GetInitialLocation() const { return InitialLocation; }
 	void SetInitialLocation(const FVector& InLocation) { InitialLocation = InLocation; }
 };

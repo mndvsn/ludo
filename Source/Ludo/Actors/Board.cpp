@@ -60,6 +60,8 @@ void ABoard::BeginPlay()
 
 				BoardData.Add(SquareData);
 
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *Square->GetName());
+
 				if (Square->Tags.Contains(TEXT("goal")))
 				{
 					GoalSquare = Square;
@@ -134,7 +136,8 @@ uint8 ABoard::IndexOfSquare(ASquare* Square) const
 
 bool ABoard::PlayerHasPieceOnBoard(const int8 PlayerIndex) const
 {
-	const TObjectPtr<AGamer> Gamer = GetYard(PlayerIndex)->GetGamer();
+	const TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
+	const TObjectPtr<AGamer> Gamer = GameState->GetPlayerSlot(PlayerIndex)->GetGamer();
 	if (!Gamer) return false;
 
 	return (Gamer->GetPiecesOnBoard(this).Num() > 0);
@@ -214,8 +217,8 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 				// Square is player color
 				if (PlayerSquare->GetPlayerCore().Id == PlayerCoreId)
 				{
-					// Skip home; go toward goal
-					if (PlayerSquare->IsHome())
+					// Skip home; go toward goal. But only if current square is not the Yard. 
+					if (PlayerSquare->IsHome() && !Cast<AYard>(Current))
 					{
 						continue;
 					}
@@ -245,6 +248,7 @@ void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
 		Piece->SetInYard(true);
 		const FVector InitialLocation = Piece->GetInitialLocation();
 		Piece->SetActorLocation(InitialLocation);
+		AddPieceToBoardData(Piece, Piece->GetOwner<ASquare>());
 	}
 }
 

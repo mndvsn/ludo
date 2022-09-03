@@ -3,28 +3,18 @@
 
 #include "Actors/Yard.h"
 
-#include <Kismet/GameplayStatics.h>
 #include <Net/UnrealNetwork.h>
+#include <Kismet/GameplayStatics.h>
 
-#include "LudoLog.h"
+#include "Game/LudoPlayerController.h"
 #include "Actors/Gamer.h"
 #include "Actors/PlayerSlot.h"
-#include "Actors/PlayerSquare.h"
+#include "Actors/Board.h"
 #include "Actors/Piece.h"
 
 
 AYard::AYard()
 {
-	PrimaryActorTick.bCanEverTick = false;
-
-	bReplicates = true;
-
-	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Scene;
-
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(Scene);
-
 	PieceClass = APiece::StaticClass();
 }
 
@@ -32,28 +22,37 @@ void AYard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePro
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AYard, PlayerCore);
 	DOREPLIFETIME(AYard, Gamer);
 }
 
 void AYard::SetGamer(TObjectPtr<AGamer> NewGamer)
 {
-	if (!NewGamer) return;
+	if (!HasAuthority() || !NewGamer) return;
 
 	Gamer = NewGamer;
 	Gamer->SetYard(this);
 
-	if (TObjectPtr<APlayerSlot> PlayerSlot = NewGamer->GetPlayerSlot())
+	if (const TObjectPtr<APlayerSlot> PlayerSlot = NewGamer->GetPlayerSlot())
 	{
-		PlayerCore = PlayerSlot->PlayerCore;
+		SetPlayerCore(PlayerSlot->PlayerCore);
+	}
+}
 
-		OnRep_PlayerCore();
+void AYard::OnRep_PlayerCore()
+{
+	Super::OnRep_PlayerCore();
+
+	if (!PlayerSquares.IsEmpty())
+	{
+		for (APlayerSquare* Square : PlayerSquares)
+		{
+			Square->SetPlayerCore(PlayerCore);
+		}
 	}
 }
 
 void AYard::SpawnPieces()
 {
-	constexpr float PieceGap = 150;
 	const FVector YardLocation = GetActorLocation();
 
 	char PieceIndex = 0;
@@ -61,6 +60,7 @@ void AYard::SpawnPieces()
 	{
 		for (char y = 0; y < 2; y++)
 		{
+			constexpr float PieceGap = 150;
 			FVector PieceTranslation;
 			PieceTranslation.X = x*PieceGap - PieceGap*0.5;
 			PieceTranslation.Y = y*PieceGap - PieceGap*0.5;
@@ -70,9 +70,9 @@ void AYard::SpawnPieces()
 
 			TObjectPtr<AActor> ActorToSpawn = UGameplayStatics::BeginDeferredActorSpawnFromClass(this, PieceClass.LoadSynchronous(), PieceTransform);
 
-			if (TObjectPtr<APiece> Piece = Cast<APiece>(ActorToSpawn))
+			if (const TObjectPtr<APiece> Piece = Cast<APiece>(ActorToSpawn))
 			{
-				// Set playercore, owner etc
+				// Set PlayerCore, owner etc
 				Piece->SetOwner(this);
 				Piece->SetPlayerCore(this->PlayerCore);
 				Piece->SetInYard(true);
@@ -82,6 +82,13 @@ void AYard::SpawnPieces()
 				{
 					Piece->SetInstigator(Gamer.Get());
 					Gamer->AddPiece(Piece);
+				}
+
+				// Add data to Board
+				if (const TObjectPtr<ALudoPlayerController> PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>())
+				{
+					const TObjectPtr<ABoard> TheBoard = PlayerController->GetBoard();
+					TheBoard->AddPieceToBoardData(Piece, this);
 				}
 			}
 
@@ -101,20 +108,4 @@ TObjectPtr<APiece> AYard::GetPiece() const
 	});
 
 	return FoundPiece ? *FoundPiece : nullptr;
-}
-
-void AYard::BeginPlay()
-{
-	Super::BeginPlay();	
-}
-
-void AYard::OnRep_PlayerCore_Implementation()
-{
-	if (!PlayerSquares.IsEmpty())
-	{
-		for (APlayerSquare* Square : PlayerSquares)
-		{
-			Square->SetPlayerCore(PlayerCore);
-		}
-	}
 }

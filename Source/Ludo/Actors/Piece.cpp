@@ -6,6 +6,7 @@
 #include <Net/UnrealNetwork.h>
 
 #include "LudoLog.h"
+#include "Actors/Gamer.h"
 
 
 APiece::APiece()
@@ -13,7 +14,7 @@ APiece::APiece()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
-	SetReplicateMovement(true);
+	Super::SetReplicateMovement(true);
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Scene;
@@ -44,4 +45,9 @@ void APiece::BeginPlay()
 void APiece::SetPlayerCore(FPlayerCore InPlayerCore)
 {
 	PlayerCore = InPlayerCore;
+}
+
+AGamer* APiece::GetGamer() const
+{
+	return GetInstigator<AGamer>();
 }

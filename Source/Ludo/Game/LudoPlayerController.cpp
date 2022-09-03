@@ -127,14 +127,14 @@ void ALudoPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (TObjectPtr<AActor> Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoard::StaticClass()))
+	if (const TObjectPtr<AActor> Actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoard::StaticClass()))
 	{
-		TheBoard = Cast<ABoard>(Actor);
+		GameBoard = Cast<ABoard>(Actor);
 
 		if (HasAuthority())
 		{
-			TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
-			GameMode->SetBoard(TheBoard);
+			const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+			GameMode->SetBoard(GameBoard);
 		}
 	}
 }
@@ -146,7 +146,7 @@ void ALudoPlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUD
 	if (!HasAuthority()) return;
 
 	// UI initialized callback for server controller
-	if (TObjectPtr<AGameHUD> PlayerHUD = GetHUD<AGameHUD>())
+	if (const TObjectPtr<AGameHUD> PlayerHUD = GetHUD<AGameHUD>())
 	{
 		PlayerHUD->OnGameHUDReady.BindLambda([this]()
 		{
@@ -157,7 +157,7 @@ void ALudoPlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUD
 
 void ALudoPlayerController::OnGameHUDReady()
 {
-
+	//TODO: Implement?
 }
 
 TObjectPtr<AGamer> ALudoPlayerController::GetGamer()

@@ -64,8 +64,9 @@ protected:
 	UFUNCTION()
 	void OnGameHUDReady();
 
+	TObjectPtr<ABoard> GameBoard;
+	
 	TScriptInterface<IGameEventsInterface> GameEventsInterface;
-
 	FDelegateHandle PlayStateChangedHandle;
 
 private:
@@ -76,13 +77,13 @@ private:
 	FPE_OnPlayerTurn OnPlayerTurn;
 
 public:
-	UPROPERTY()
-	TObjectPtr<ABoard> TheBoard;
+	UFUNCTION(BlueprintPure)
+	ABoard* GetBoard() const { return GameBoard; }
 
 	virtual TObjectPtr<AGamer> GetGamer() override;
 
 	UFUNCTION(BlueprintPure)
-	bool IsInTurn() { return bInTurn; };
+	bool IsInTurn() const { return bInTurn; };
 
 	void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
 

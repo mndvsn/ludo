@@ -44,13 +44,8 @@ TObjectPtr<AGamerState> ALudoGameState::GetGamerStateInTurn() const
 
 bool ALudoGameState::IsPlayerTurn(TObjectPtr<APlayerController> Player) const
 {
-	auto GamerState = Player->GetPlayerState<AGamerState>();
+	const auto GamerState = Player->GetPlayerState<AGamerState>();
 	return (GamerState->GetPlayerIndex() == CurrentPlayerIndex);
-}
-
-bool ALudoGameState::PlayerHasPieceOnBoard(int8 PlayerIndex) const
-{
-	return false;
 }
 
 uint8 ALudoGameState::GetNumPlayersReady() const
@@ -58,7 +53,7 @@ uint8 ALudoGameState::GetNumPlayersReady() const
 	uint8 ReadyCount = 0;
 	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
 	{
-		if (TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
+		if (const TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
 		{
 			if (GamerState->GetPlayState() == EPlayState::Ready)
 			{
@@ -74,7 +69,7 @@ uint8 ALudoGameState::GetNumPlayersReplicated() const
 	uint8 PlayerCount = 0;
 	for (auto p = PlayerArray.CreateConstIterator(); p; ++p)
 	{
-		if (TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
+		if (const TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(*p))
 		{
 			if (GamerState->GetPlayerIndex() > -1)
 			{
@@ -88,16 +83,13 @@ uint8 ALudoGameState::GetNumPlayersReplicated() const
 void ALudoGameState::AdvanceTurn()
 {
 	if (!HasAuthority()) return;
-
 	UE_LOG(LogLudoGS, Verbose, TEXT("AdvanceTurn"));
 
-	uint8 NumPlayers = PlayerArray.Num();
-
-	if (NumPlayers == ++CurrentPlayerIndex)
+	// Reset index if number of players is equal to current player +1
+	if (PlayerArray.Num() == ++CurrentPlayerIndex)
 	{
 		CurrentPlayerIndex = 0;
 	}
-
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }
 

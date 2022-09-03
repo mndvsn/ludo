@@ -8,7 +8,7 @@
 
 ASquare::ASquare()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	SetActorTickInterval(10.0);
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));

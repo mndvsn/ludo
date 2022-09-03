@@ -53,12 +53,12 @@ public:
 	FGE_OnBoardFoundYards OnFoundYards;
 	bool bYardsFound;
 
-protected:
-	virtual void BeginPlay() override;
-
 	// BoardData manipulation
 	bool AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare);
 	bool RemovePieceFromBoardData(TObjectPtr<APiece> Piece);
+
+protected:
+	virtual void BeginPlay() override;
 
 private:
 	UPROPERTY()

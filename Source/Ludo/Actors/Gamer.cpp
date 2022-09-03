@@ -225,11 +225,11 @@ APiece* AGamer::GetPiece(const uint8 AtIndex) const
 	return Pieces[AtIndex];
 }
 
-TArray<APiece*> AGamer::GetPiecesOnBoard(const ABoard* TheBoard) const
+TArray<APiece*> AGamer::GetPiecesOnBoard(const ABoard* TheBoard, const bool bIncludeYard /* = false */) const
 {
-	TArray<APiece*> PiecesOnBoard = Pieces.FilterByPredicate([&](const APiece* Piece)
+	TArray<APiece*> PiecesOnBoard = Pieces.FilterByPredicate([&, bIncludeYard](const APiece* Piece)
 	{
-		return !Piece->IsInGoal() && !Piece->IsInYard();
+		return !Piece->IsInGoal() && (!bIncludeYard && !Piece->IsInYard() || bIncludeYard && Piece->IsInYard());
 	});
 
 	return PiecesOnBoard;
@@ -267,62 +267,49 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	// Stop client here, for now
 	if (!HasAuthority()) return;
 
-	const ALudoPlayerController* PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
-	if (!PlayerController) return;
-
-	const TObjectPtr<ABoard> TheBoard = PlayerController->TheBoard;
-	
-	// Check if player has piece on board
-	bool bCanMovePiece = GetPiecesOnBoard(TheBoard).Num() > 0;
-	bool bMadeMove = false;
-	TObjectPtr<APiece> PieceMoveSpecific = nullptr;
-
-	// Get game rules
+	// Get game rules, player controller and the board
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
+	const TObjectPtr<ALudoPlayerController> PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>();
+	if (!PlayerController) return;
+	const TObjectPtr<ABoard> TheBoard = PlayerController->GetBoard();
+	if (!TheBoard) return;
 	
+	TObjectPtr<APiece> PieceToMove = nullptr;
+
 	// Get the result of dice roll
 	if (GameMode->GetEntryRolls(EEntryRollMask::ER_All).Contains(Throw.Result))
 	{
-		if (APiece* Piece = GetYard()->GetPiece())
+		if (APiece* PieceInYard = GetYard()->GetPiece())
 		{
 			UE_LOG(LogLudo, Verbose, TEXT("Player %d can move a piece from their yard"), Throw.PlayerIndex);
+			PieceToMove = PieceInYard;
 
-			// Try to move Piece to player home square
-			APlayerSquare* HomeSquare = GetYard()->GetHomeSquare();
-			TheBoard->MovePiece(Piece, HomeSquare);
-
-			// Immediately move on a high roll?
-			if (GameMode->bMoveOnHighEntryRoll && GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
+			// Just move one step from Yard if high roll movement is disabled or result is low
+			if (!GameMode->bMoveOnHighEntryRoll && !GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
 			{
-				bCanMovePiece = true;
-				PieceMoveSpecific = Piece;
-
-				// Subtract movement to home
-				Throw.Result -= 1;
-			}
-			else
-			{
-				bMadeMove = true;
+				Throw.Result = 1;
 			}
 		}
 	}
 
-	// Move piece on board
-	if (bCanMovePiece && !bMadeMove)
+	// Check if player can move a piece
+	if (PieceToMove || GetPiecesOnBoard(TheBoard, false).Num() > 0)
 	{
+		bool bHasMoved = false;
 		short Attempt = 0;
 		
 		TArray<APiece*> MovablePieces;
-		if (PieceMoveSpecific)
+		if (PieceToMove)
 		{
-			MovablePieces.Add(PieceMoveSpecific);
+			MovablePieces.Add(PieceToMove);
 		}
 		else
 		{
-			MovablePieces = GetPiecesOnBoard(TheBoard);
+			MovablePieces = GetPiecesOnBoard(TheBoard, false);
 		}
 
-		while (!bMadeMove)
+		// Try to move a piece
+		while (!bHasMoved)
 		{
 			if (MovablePieces.IsValidIndex(Attempt))
 			{
@@ -335,14 +322,14 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 				if (SquaresAhead.Num() == Throw.Result)
 				{
 					TheBoard->MovePiece(Piece, SquaresAhead.Last());
-					bMadeMove = true;
+					bHasMoved = true;
 				}
 				Attempt++;
 			}
 			else
 			{
-				// Ran out of moves
-				bMadeMove = true;
+				// Ran out of possible moves
+				bHasMoved = true;
 			}
 		}
 	}

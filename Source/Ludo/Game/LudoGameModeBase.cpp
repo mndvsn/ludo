@@ -361,7 +361,7 @@ void ALudoGameModeBase::SetupBoard()
 	// Spawn player pieces
 	for (auto& PlayerState : GetGameState<ALudoGameState>()->PlayerArray)
 	{
-		TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(PlayerState);
+		const TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(PlayerState);
 		SpawnPiecesForPlayer(GamerState);
 	}
 
