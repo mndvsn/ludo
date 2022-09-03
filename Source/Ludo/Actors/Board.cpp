@@ -60,8 +60,6 @@ void ABoard::BeginPlay()
 
 				BoardData.Add(SquareData);
 
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *Square->GetName());
-
 				if (Square->Tags.Contains(TEXT("goal")))
 				{
 					GoalSquare = Square;
@@ -127,6 +125,7 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex) co
 	return SquareArray;
 }
 
+//TODO: Currently returns index in array, not Square->Index
 uint8 ABoard::IndexOfSquare(ASquare* Square) const
 {
 	if (!Square) return INDEX_NONE;
@@ -166,10 +165,9 @@ bool ABoard::GetPiecesAtSquare(const TObjectPtr<ASquare> TargetSquare, TArray<AP
 	bool bSuccess = false;
 	if (!TargetSquare) return bSuccess;
 
-	const uint8 TargetSquareIndex = IndexOfSquare(TargetSquare);
-	if (const auto FoundData = BoardData.FindByPredicate([TargetSquareIndex](const FSquareData& Data)
+	if (const auto FoundData = BoardData.FindByPredicate([TargetSquare](const FSquareData& Data)
 	{
-		return Data.Index == TargetSquareIndex;
+		return Data.Square == TargetSquare;
 	}))
 	{
 		if (!FoundData->Pieces.IsEmpty())
@@ -257,10 +255,9 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 	// Fail if null pointers or Piece is at target location already
 	if (!Piece || !TargetSquare || LocationOfPiece(Piece) == TargetSquare) return;
 
+	// Get game rules
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
-	
-	// Check if knock-out is enabled
-	const bool bKnock = GameMode->bKnockPieces;
+	const bool bKnock = GameMode->bKnockPieces; // knock-out opponent pieces
 
 	RemovePieceFromBoardData(Piece);
 
