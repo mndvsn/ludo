@@ -44,6 +44,7 @@ void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options,
 	// Override settings from URL
 	NumPlayers = UGameplayStatics::GetIntOption(Options, TEXT("Players"), NumPlayers);
 	NumPlayersCPU = UGameplayStatics::GetIntOption(Options, TEXT("CPU"), NumPlayersCPU);
+	RandomSeed = UGameplayStatics::GetIntOption(Options, TEXT("Seed"), FDateTime::UtcNow().ToUnixTimestamp());
 	bShouldSpawnCPU = NumPlayersCPU > 0;
 }
 
@@ -53,6 +54,7 @@ void ALudoGameModeBase::InitGameState()
 
 	if (ALudoGameState* State = GetGameState<ALudoGameState>())
 	{
+		State->SetRandomSeed(RandomSeed);
 		State->SetPlayerCountForGame(NumPlayers);
 
 		GameEventsInterface = State;
@@ -422,10 +424,11 @@ int32 ALudoGameModeBase::GetNumPlayersTotal() const
 void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, const EPlayState State)
 {
 	if (State != EPlayState::Ready || !CheckGameReady()) return;
-	
+
 	if (!GetBoard())
 	{
 		UE_LOG(LogLudoGM, Error, TEXT("Board not loaded, can't spawn player Yards!"));
+		return;
 	}
 
 	// Check if BeginPlay has found all placed Yards 

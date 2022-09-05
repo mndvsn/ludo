@@ -5,6 +5,7 @@
 
 #include <Components/Button.h>
 #include <Components/Slider.h>
+#include <Components/EditableTextBox.h>
 
 #include "Game/LudoGameInstance.h"
 
@@ -20,17 +21,23 @@ void UCreateGameWidget::NativeOnInitialized()
 
 	ButtonCreateGame->OnReleased.AddDynamic(this, &UCreateGameWidget::ButtonCreateGameReleased);
 	ButtonBack->OnReleased.AddDynamic(this, &UCreateGameWidget::ButtonBackReleased);
+
+	const int64 Timestamp = FDateTime::UtcNow().ToUnixTimestamp();
+	FNumberFormattingOptions Options = FNumberFormattingOptions::DefaultNoGrouping();
+	Options.MaximumFractionalDigits = 0;
+	TextBoxSeed->SetText(FText::AsNumber(Timestamp, &Options));
 }
 
 void UCreateGameWidget::ButtonCreateGameReleased()
 {
 	if (SliderPlayersCPU == nullptr) return;
-	uint8 NumPlayersCPU = static_cast<uint8>(SliderPlayersCPU->GetValue());
+	const uint8 NumPlayersCPU = static_cast<uint8>(SliderPlayersCPU->GetValue());
+	const uint32 Seed = FCString::Atoi(*TextBoxSeed->GetText().ToString());
 
-	ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>();
-	if (GameInstance == nullptr) return;
-
-	GameInstance->CreateGameCPU(NumPlayersCPU + 1, NumPlayersCPU);
+	if (const ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>())
+	{
+		GameInstance->CreateGameCPU(Seed, NumPlayersCPU + 1, NumPlayersCPU);
+	}
 }
 
 void UCreateGameWidget::ButtonBackReleased()

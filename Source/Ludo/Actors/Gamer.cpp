@@ -73,12 +73,13 @@ void AGamer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CameraRotationStep = (360.0f / 4);// / PC->InputYawScale; // 90
-
-	if (const TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>())
+	if (const TObjectPtr<ALudoGameState> GS = GetWorld()->GetGameState<ALudoGameState>())
 	{
+		GameState = GS;
 		GameState->GetDieThrowDelegate().AddUObject(this, &AGamer::OnDieThrow);
 	}
+	
+	CameraRotationStep = 360.0f / 4;// / PC->InputYawScale; // 90
 }
 
 void AGamer::Tick(float DeltaTime)
@@ -241,7 +242,7 @@ void AGamer::Server_ThrowDie_Implementation()
 
 	FDieThrow Throw;
 	Throw.PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
-	Throw.Result = static_cast<uint8>(FMath::RandRange(1, 6));
+	Throw.Result = static_cast<uint8>(GameState->GetRandomStream().FRandRange(1, 6));
 
 	UE_LOG(LogLudo, Verbose, TEXT("Player index %d throws a %d!"), Throw.PlayerIndex, Throw.Result);
 

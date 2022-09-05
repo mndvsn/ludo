@@ -54,9 +54,12 @@ private:
 	FGE_OnPlayStateChangedNative OnPlayStateChangedNative;
 	FGE_OnDieThrowNative OnDieThrowNative;
 
+	UPROPERTY(Replicated, BlueprintGetter=GetRandomStream)
+	FRandomStream RandomStream;
+	
 	UPROPERTY(Replicated)
 	TArray<APlayerSlot*> PlayerSlots;
-
+	
 	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerIndex)
 	int8 CurrentPlayerIndex = -1;
 
@@ -79,6 +82,10 @@ private:
 	void OnRep_DieThrowList();
 
 public:
+	UFUNCTION(BlueprintPure)
+	const FRandomStream& GetRandomStream() const { return RandomStream; };
+	void SetRandomSeed(const int32 InSeed);
+	
 	TArray<APlayerSlot*> GetPlayerSlots() const { return PlayerSlots; };
 	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots);
 

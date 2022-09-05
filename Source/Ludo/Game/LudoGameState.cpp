@@ -16,6 +16,7 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ALudoGameState, RandomStream);
 	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
 	DOREPLIFETIME(ALudoGameState, PlayerSlots);
 	DOREPLIFETIME(ALudoGameState, PlayerPiecesInGoal);
@@ -174,6 +175,14 @@ void ALudoGameState::AddPlayerPieceInGoal(uint8 PlayerIndex)
 
 void ALudoGameState::OnRep_DieThrowList()
 {
-	FDieThrow Throw = GetLastThrow();
+	const FDieThrow Throw = GetLastThrow();
 	OnDieThrowNative.Broadcast(Throw);
+}
+
+void ALudoGameState::SetRandomSeed(const int32 InSeed)
+{
+	if (RandomStream.GetCurrentSeed() != InSeed)
+	{
+		RandomStream.Initialize(InSeed);
+	}
 }

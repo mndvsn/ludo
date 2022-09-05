@@ -62,6 +62,8 @@ public:
 	
 	bool bShouldSpawnCPU = true;
 
+	int32 RandomSeed; 
+
 protected:
 	// Entry roll numbers
 	TArray<uint8> EntryRollsLow = { 1 };
