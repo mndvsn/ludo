@@ -34,7 +34,7 @@ void AYard::SetGamer(TObjectPtr<AGamer> NewGamer)
 
 	if (const TObjectPtr<APlayerSlot> PlayerSlot = NewGamer->GetPlayerSlot())
 	{
-		SetPlayerCore(PlayerSlot->PlayerCore);
+		SetPlayerCore(PlayerSlot->GetPlayerCore());
 	}
 }
 

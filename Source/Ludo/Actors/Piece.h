@@ -46,8 +46,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	FPlayerCore GetPlayerCore() const { return PlayerCore; }
-	void SetPlayerCore(FPlayerCore InPlayerCore);
+	const FPlayerCore& GetPlayerCore() const { return PlayerCore; }
+	void SetPlayerCore(const FPlayerCore& InPlayerCore);
 
 	bool IsInYard() const { return bInYard; };
 	void SetInYard(bool bIn) { bInYard = bIn; };

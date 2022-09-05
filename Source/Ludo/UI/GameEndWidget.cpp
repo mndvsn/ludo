@@ -12,7 +12,7 @@
 #include "Actors/PlayerSlot.h"
 
 
-void UGameEndWidget::SetValues(APlayerSlot* WinnerSlot)
+void UGameEndWidget::SetValues(const APlayerSlot* WinnerSlot) const
 {
 	if (!WinnerSlot) return;
 
@@ -23,10 +23,10 @@ void UGameEndWidget::SetValues(APlayerSlot* WinnerSlot)
 	if (const APlayerSlot* PlayerSlot = PC->GetGamer()->GetPlayerSlot())
 	{
 		// Set result of game
-		const FString PlayerResult = (WinnerSlot->PlayerCore == PlayerSlot->PlayerCore) ? TEXT("Winner!") : TEXT("Lost!");
+		const FString PlayerResult = WinnerSlot->GetPlayerCore() == PlayerSlot->GetPlayerCore() ? TEXT("Winner!") : TEXT("Lost!");
 		PlayerWinLoseLabel->SetText(FText::FromString(PlayerResult));
 	}
 	
 	WinnerLabel->SetText(FText::FromString(PlayerName));
-	WinnerLabel->SetColorAndOpacity(WinnerSlot->PlayerCore.PrimaryColor);
+	WinnerLabel->SetColorAndOpacity(WinnerSlot->GetPlayerCore().PrimaryColor);
 }

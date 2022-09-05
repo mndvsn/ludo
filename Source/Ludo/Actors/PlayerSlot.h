@@ -27,12 +27,10 @@ public:
 
 	bool TryClaim(AController* InController);
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
-	FPlayerCore PlayerCore;
-
 private:
-	void CheckUnclaimed();
-
+	UPROPERTY(Replicated, BlueprintGetter=GetPlayerCore)
+	FPlayerCore PlayerCore;
+	
 	UPROPERTY(Transient)
 	TObjectPtr<AController> ClaimingController = nullptr;
 
@@ -47,13 +45,19 @@ private:
 
 	UPROPERTY(Replicated)
 	TObjectPtr<AGamer> Gamer;
+	
+	void CheckUnclaimed();
 
 public:
-	const int8 GetIndex() const { return Index; }
-	void SetIndex(int8 NewIndex) { Index = NewIndex; }
+	int8 GetIndex() const { return Index; }
+	void SetIndex(const int8 NewIndex) { Index = NewIndex; }
 
-	const int8 GetPlayerOrder() const { return PlayOrder; }
-	void SetPlayerOrder(int8 NewOrder) { PlayOrder = NewOrder; }
+	UFUNCTION(BlueprintPure)
+	const FPlayerCore& GetPlayerCore() const { return PlayerCore; }
+	void SetPlayerCore(const FPlayerCore& NewPlayerCore) { PlayerCore = NewPlayerCore; }
+
+	int8 GetPlayerOrder() const { return PlayOrder; }
+	void SetPlayerOrder(const int8 NewOrder) { PlayOrder = NewOrder; }
 
 	AGamer* GetGamer() const { return Gamer; }
 	void SetGamer(AGamer* NewGamer) { Gamer = NewGamer; }

@@ -42,7 +42,7 @@ void APiece::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APiece::SetPlayerCore(FPlayerCore InPlayerCore)
+void APiece::SetPlayerCore(const FPlayerCore& InPlayerCore)
 {
 	PlayerCore = InPlayerCore;
 }

@@ -126,17 +126,20 @@ void ALudoGameModeBase::AddPlayerThrow(FDieThrow Throw)
 	State->AddDieThrow(Throw);
 }
 
-void ALudoGameModeBase::PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece)
+void ALudoGameModeBase::PlayerPieceReachedGoal(TObjectPtr<APiece> Piece) const
 {
-	FPlayerCore PlayerCore = Piece->GetPlayerCore();
+	const FPlayerCore& PlayerCore = Piece->GetPlayerCore();
 	UE_LOG(LogLudoGM, Verbose, TEXT("%s (%s) reached goal"), *Piece->GetName(), *PlayerCore.DisplayName);
 
 	Piece->SetInGoal(true);
 	Piece->SetActorHiddenInGame(true);
 
 	ALudoGameState* State = GetGameState<ALudoGameState>();
-	uint8 PlayerIndex = State->GetPlayerSlot(PlayerCore)->GetIndex();
-	State->AddPlayerPieceInGoal(PlayerIndex);
+	if (const TObjectPtr<APlayerSlot> PlayerSlot = State->GetPlayerSlot(PlayerCore))
+	{
+		const uint8 PlayerIndex = PlayerSlot->GetIndex();
+		State->AddPlayerPieceInGoal(PlayerIndex);
+	}
 }
 
 void ALudoGameModeBase::NextTurn()
@@ -214,9 +217,9 @@ void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController
 
 	SetupPlayer(NewPlayer);
 
-	if (TObjectPtr<ALudoPlayerController> PC = Cast<ALudoPlayerController>(NewPlayer))
+	if (const TObjectPtr<ALudoPlayerController> PC = Cast<ALudoPlayerController>(NewPlayer))
 	{
-		PC->SetGameEventsInterface(GetWorld()->GetGameState<ALudoGameState>());
+		PC->SetGameEventsInterface(GetGameState<ALudoGameState>());
 
 		// Check if PlayerController is server controlled
 		if (bShouldSpawnCPU && NewPlayer->IsLocalPlayerController())
@@ -242,7 +245,7 @@ void ALudoGameModeBase::SetupPlayer(AController* Player)
 		if (PlayerCores && !PlayerCores->Cores.IsEmpty())
 		{
 			// Set PlayerCore to index of array for now
-			Slot->PlayerCore = PlayerCores->Cores[Slot->GetIndex()];
+			Slot->SetPlayerCore(PlayerCores->Cores[Slot->GetIndex()]);
 		}
 	}
 	else
@@ -268,15 +271,15 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	UE_LOG(LogLudoGM, Verbose, TEXT("ChoosePlayerStart: %s"), *Player->GetName());
 	APlayerSlot* Slot = nullptr;
 
-	ALudoGameState* LudoGameState = Cast<ALudoGameState>(GameState);
-	TArray<APlayerSlot*> PlayerSlots = LudoGameState->GetPlayerSlots();
+	const ALudoGameState* LudoGameState = GetGameState<ALudoGameState>();
 
-	if (!PlayerSlots.IsEmpty())
+	if (TArray<APlayerSlot*> PlayerSlots = LudoGameState->GetPlayerSlots(); !PlayerSlots.IsEmpty())
 	{
-		auto UnclaimedSlot = PlayerSlots.FindByPredicate([](APlayerSlot* PlayerSlot) {
+		auto IsUnclaimed = [](const APlayerSlot* PlayerSlot)
+		{
 			return !PlayerSlot->IsClaimed();
-		});
-		if (UnclaimedSlot)
+		};
+		if (const auto UnclaimedSlot = PlayerSlots.FindByPredicate(IsUnclaimed))
 		{
 			Slot = *UnclaimedSlot;
 			Slot->TryClaim(Player);
@@ -288,7 +291,7 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return Slot;
 }
 
-void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount)
+void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount) const
 {
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
@@ -303,7 +306,7 @@ void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount)
 		PlayerSlots.Add(Slot);
 	}
 
-	if (TObjectPtr<ALudoGameState> LudoGameState = Cast<ALudoGameState>(GameState))
+	if (const TObjectPtr<ALudoGameState> LudoGameState = GetGameState<ALudoGameState>())
 	{
 		LudoGameState->SetPlayerSlots(PlayerSlots);
 	}
@@ -368,22 +371,22 @@ void ALudoGameModeBase::SetupBoard()
 	StartGame();
 }
 
-void ALudoGameModeBase::SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState)
+void ALudoGameModeBase::SpawnPiecesForPlayer(const TObjectPtr<AGamerState> GamerState) const
 {
 	if (!GetBoard()) return;
 
 	const uint8 PlayerIndex = GamerState->GetPlayerIndex();
-	const TObjectPtr<AGamer> Gamer = Cast<AGamer>(GamerState->GetPawn());
+	const TObjectPtr<AGamer> Gamer = GamerState->GetPawn<AGamer>();
 
 	UE_LOG(LogLudoGM, Verbose, TEXT("Spawn Pieces for player index %d"), PlayerIndex);
-	if (TObjectPtr<AYard> Yard = GetBoard()->GetYard(PlayerIndex))
-	{	
+	if (const TObjectPtr<AYard> Yard = GetBoard()->GetYard(PlayerIndex))
+	{
 		Yard->SetGamer(Gamer);
 		Yard->SpawnPieces();
 	}
 }
 
-TArray<uint8> ALudoGameModeBase::GetEntryRolls(EEntryRollMask EntryRollMask) const
+TArray<uint8> ALudoGameModeBase::GetEntryRolls(const EEntryRollMask EntryRollMask) const
 {
 	TArray<uint8> Numbers;
 	switch (EntryRollMask)
@@ -403,18 +406,12 @@ TArray<uint8> ALudoGameModeBase::GetEntryRolls(EEntryRollMask EntryRollMask) con
 	return Numbers;
 }
 
-int32 ALudoGameModeBase::GetNumPlayersTotal()
+int32 ALudoGameModeBase::GetNumPlayersTotal() const
 {
-	/*int32 PlayerCount = GetNumPlayers();
-	int32 CPUPlayerCount = CPUPlayers.Num();
-
-	return PlayerCount + CPUPlayerCount;*/
-
 	int32 PlayerCount = 0;
 	for (FConstControllerIterator Iterator = GetWorld()->GetControllerIterator(); Iterator; ++Iterator)
 	{
-		AController* ControllerActor = Iterator->Get();
-		if (ControllerActor && ControllerActor->PlayerState)
+		if (const AController* OneController = Iterator->Get(); OneController->PlayerState)
 		{
 			PlayerCount++;
 		}
@@ -422,29 +419,27 @@ int32 ALudoGameModeBase::GetNumPlayersTotal()
 	return PlayerCount;
 }
 
-void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, EPlayState State)
+void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, const EPlayState State)
 {
-	if (State != EPlayState::Ready) return;
-
-	if (!CheckGameReady()) return;
+	if (State != EPlayState::Ready || !CheckGameReady()) return;
 	
-	if (GetBoard())
+	if (!GetBoard())
 	{
-		if (GetBoard()->bYardsFound)
-		{
-			SetupBoard();				
-		}
-		else
-		{
-			TheBoard->OnFoundYards.BindLambda([this]()
-			{
-				SetupBoard();
-			});
-		}
+		UE_LOG(LogLudoGM, Error, TEXT("Board not loaded, can't spawn player Yards!"));
+	}
+
+	// Check if BeginPlay has found all placed Yards 
+	if (GetBoard()->bYardsFound)
+	{
+		SetupBoard();
 	}
 	else
 	{
-		UE_LOG(LogLudoGM, Error, TEXT("Board not loaded, can't spawn player Yards!"));
+		// Wait for delegate exec
+		TheBoard->OnFoundYards.BindLambda([this]()
+		{
+			SetupBoard();
+		});
 	}
 }
 

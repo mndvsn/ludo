@@ -73,7 +73,7 @@ private:
 	TArray<uint8> PlayerPiecesInGoal;
 
 	UFUNCTION()
-	void OnRep_CurrentPlayerIndex();
+	void OnRep_CurrentPlayerIndex() const;
 
 	UFUNCTION()
 	void OnRep_DieThrowList();
@@ -83,7 +83,7 @@ public:
 	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots);
 
 	APlayerSlot* GetPlayerSlot(uint8 PlayerIndex) const;
-	APlayerSlot* GetPlayerSlot(FPlayerCore PlayerCore) const;
+	APlayerSlot* GetPlayerSlot(const FPlayerCore& PlayerCore) const;
 
 	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
 

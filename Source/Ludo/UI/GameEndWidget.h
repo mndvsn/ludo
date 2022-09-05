@@ -31,5 +31,5 @@ public:
 	TObjectPtr<UButton> ButtonReturn;
 
 	UFUNCTION()
-	void SetValues(APlayerSlot* WinnerSlot);
+	void SetValues(const APlayerSlot* WinnerSlot) const;
 };

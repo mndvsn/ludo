@@ -93,7 +93,7 @@ void ALudoGameState::AdvanceTurn()
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }
 
-void ALudoGameState::OnRep_CurrentPlayerIndex()
+void ALudoGameState::OnRep_CurrentPlayerIndex() const
 {
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
 }
@@ -122,11 +122,11 @@ APlayerSlot* ALudoGameState::GetPlayerSlot(uint8 PlayerIndex) const
 	return PlayerSlots[PlayerIndex];
 }
 
-APlayerSlot* ALudoGameState::GetPlayerSlot(FPlayerCore PlayerCore) const
+APlayerSlot* ALudoGameState::GetPlayerSlot(const FPlayerCore& PlayerCore) const
 {
-	auto* PlayerSlot = PlayerSlots.FindByPredicate([&, PlayerCore](const APlayerSlot* Slot)
+	const auto PlayerSlot = PlayerSlots.FindByPredicate([PlayerCore](const APlayerSlot* Slot)
 	{
-		return Slot->PlayerCore == PlayerCore;
+		return Slot->GetPlayerCore() == PlayerCore;
 	});
 
 	return PlayerSlot ? *PlayerSlot : nullptr;

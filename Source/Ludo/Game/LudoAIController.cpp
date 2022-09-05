@@ -63,7 +63,7 @@ TObjectPtr<AGamerState> ALudoAIController::GetGamerState()
 
 void ALudoAIController::Process()
 {
-	float RandomDelay = FMath::RandRange(0.5, 2.5);
+	const float RandomDelay = FMath::RandRange(0.5, 2.5);
 	GetWorld()->GetTimerManager().SetTimer(WaitTimer, this, &ALudoAIController::OnWaited, RandomDelay, false);
 }
 

@@ -24,7 +24,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Square")
 	bool bIsHome;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, BlueprintGetter=GetPlayerCore, ReplicatedUsing=OnRep_PlayerCore, Category="Player")
+	UPROPERTY(EditAnywhere, BlueprintGetter=GetPlayerCore, ReplicatedUsing=OnRep_PlayerCore, Category="Player")
 	FPlayerCore PlayerCore;
 
 	UFUNCTION()
@@ -38,8 +38,8 @@ public:
 	bool IsHome() const { return bIsHome; };
 
 	UFUNCTION(BlueprintPure)
-	FPlayerCore GetPlayerCore() { return PlayerCore; };
+	const FPlayerCore& GetPlayerCore() { return PlayerCore; };
 
 	UFUNCTION()
-	virtual void SetPlayerCore(FPlayerCore NewPlayerCore);
+	virtual void SetPlayerCore(const FPlayerCore& NewPlayerCore);
 };

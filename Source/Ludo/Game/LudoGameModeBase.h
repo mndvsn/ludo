@@ -60,7 +60,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bMoveOnHighEntryRoll = true;
 	
-	bool bShouldSpawnCPU = 0;
+	bool bShouldSpawnCPU = true;
 
 protected:
 	// Entry roll numbers
@@ -70,7 +70,7 @@ protected:
 public:
 	TArray<uint8> GetEntryRolls(EEntryRollMask EntryRollMask) const;
 
-	int32 GetNumPlayersTotal();
+	int32 GetNumPlayersTotal() const;
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
@@ -90,7 +90,7 @@ protected:
 
 	TArray<ALudoAIController*> CPUPlayers;
 
-	ILudoControllerInterface* GetPlayerInTurn() { return PlayerInTurn; };
+	ILudoControllerInterface* GetPlayerInTurn() const { return PlayerInTurn; }
 
 	UFUNCTION(Category = "Events")
 	void OnPlayStateChanged(AGamerState* GamerState, EPlayState State);
@@ -105,13 +105,13 @@ private:
 	TObjectPtr<ABoard> TheBoard;
 	ILudoControllerInterface* PlayerInTurn;
 
-	void CreatePlayerSlots(uint8 PlayerCount);
+	void CreatePlayerSlots(uint8 PlayerCount) const;
 
 	void CreateCPUPlayers(uint8 NumCPUPlayers);
 
 	void SpawnCPU();
 
-	void SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState);
+	void SpawnPiecesForPlayer(TObjectPtr<AGamerState> GamerState) const;
 
 	void SetupBoard();
 
@@ -126,19 +126,18 @@ private:
 	virtual void BeginDestroy() override;
 
 public:
-	TObjectPtr<ABoard> GetBoard() const { return TheBoard; };
+	TObjectPtr<ABoard> GetBoard() const { return TheBoard; }
 	void SetBoard(TObjectPtr<ABoard> BoardActor);
 
 	void StartGame();
 
 	void AddPlayerThrow(FDieThrow Throw);
 
-	void PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece);
+	void PlayerPieceReachedGoal(TObjectPtr<APiece> Piece) const;
 
 	void NextTurn();
 
 	void EndGame();
 
 	virtual void BeginPlay() override;
-
 };

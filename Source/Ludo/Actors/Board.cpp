@@ -110,7 +110,7 @@ TArray<TObjectPtr<APlayerSquare>> ABoard::GetPlayerSquares(uint8 PlayerIndex) co
 		return SquareArray;
 	}
 
-	const FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->PlayerCore;
+	const FPlayerCore PlayerCore = GamerState->GetPlayerSlot()->GetPlayerCore();
 
 	for (auto& Square : Squares)
 	{
@@ -191,7 +191,7 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 
 	// Get PlayerCore.Id of player
 	const ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>();
-	const uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->PlayerCore.Id;
+	const uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->GetPlayerCore().Id;
 
 	TQueue<TObjectPtr<ASquare>> Near;
 	TMap<TObjectPtr<ASquare>, short> StepMap;

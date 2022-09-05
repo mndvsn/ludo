@@ -18,7 +18,7 @@ void APlayerSquare::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(APlayerSquare, PlayerCore);
 }
 
-void APlayerSquare::SetPlayerCore(FPlayerCore NewPlayerCore)
+void APlayerSquare::SetPlayerCore(const FPlayerCore& NewPlayerCore)
 {
 	PlayerCore = NewPlayerCore;
 	OnRep_PlayerCore();
