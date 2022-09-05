@@ -46,10 +46,10 @@ void ASquare::DistributePieces(const ABoard* GameBoard) const
 		for (short i = 0; i < Pieces.Num(); i++)
 		{
 			const TObjectPtr<APiece>& Piece = Pieces[i];
+			constexpr float SliceOffset = 45.f;
 			FVector NewLocation = Origin;
-			NewLocation.X += Radius * FMath::Cos(Slice * i);
-			NewLocation.Y += Radius * FMath::Sin(Slice * i);
-
+			NewLocation.X += Radius * FMath::Cos(SliceOffset + Slice * i);
+			NewLocation.Y += Radius * FMath::Sin(SliceOffset + Slice * i);
 			Piece->SetActorLocation(NewLocation);
 		}
 	}
