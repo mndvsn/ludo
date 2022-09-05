@@ -257,10 +257,12 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 	const TObjectPtr<ASquare> StartSquare = LocationOfPiece(Piece);
 	if (!StartSquare || StartSquare == TargetSquare) return;
 
-	// Get game rules
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
-	const bool bKnock = GameMode->bKnockPieces; // knock-out opponent pieces
-	const bool bKnockMultiple = GameMode->bKnockMultiple; // multiple
+	
+	// Get game rules
+	const TObjectPtr<ALudoGameState> GameState = GetWorld()->GetGameState<ALudoGameState>();
+	const bool bKnock = GameState->GetSettings().bKnockPieces; // knock-out opponent pieces
+	const bool bKnockMultiple = GameState->GetSettings().bKnockMultiple; // multiple
 
 	RemovePieceFromBoardData(Piece);
 

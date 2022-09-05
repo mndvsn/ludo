@@ -5,6 +5,7 @@
 #include <CoreMinimal.h>
 #include <GameFramework/GameStateBase.h>
 
+#include "Game/LudoGameInstance.h"
 #include "Game/GameEventsInterface.h"
 #include "Common/PlayerCore.h"
 #include "LudoGameState.generated.h"
@@ -54,6 +55,9 @@ private:
 	FGE_OnPlayStateChangedNative OnPlayStateChangedNative;
 	FGE_OnDieThrowNative OnDieThrowNative;
 
+	UPROPERTY(Replicated, VisibleDefaultsOnly, BlueprintGetter=GetSettings)
+	FGameSettings GameSettings;
+	
 	UPROPERTY(Replicated, BlueprintGetter=GetRandomStream)
 	FRandomStream RandomStream;
 	
@@ -65,9 +69,6 @@ private:
 
 	UPROPERTY(Replicated)
 	int8 WinnerPlayerIndex = -1;
-
-	UPROPERTY(Replicated)
-	uint8 PlayerCountForGame = 0;
 
 	UPROPERTY(ReplicatedUsing=OnRep_DieThrowList)
 	TArray<FDieThrow> DieThrowList;
@@ -82,6 +83,10 @@ private:
 	void OnRep_DieThrowList();
 
 public:
+	UFUNCTION(BlueprintPure, Category=Game)
+	FGameSettings GetSettings() const { return GameSettings; }
+	void SetGameSettings(const FGameSettings& NewSettings);
+	
 	UFUNCTION(BlueprintPure)
 	const FRandomStream& GetRandomStream() const { return RandomStream; };
 	void SetRandomSeed(const int32 InSeed);
@@ -97,9 +102,6 @@ public:
 	uint8 GetWinner() const { return WinnerPlayerIndex; };
 
 	bool HasGameEnded();
-
-	uint8 GetPlayerCountForGame() const { return PlayerCountForGame; };
-	void SetPlayerCountForGame(uint8 Count) { PlayerCountForGame = Count; };
 
 	TArray<FDieThrow> GetThrows() const { return DieThrowList; };
 	FDieThrow GetLastThrow() const { return GetThrows().Last(); };

@@ -95,7 +95,7 @@ void ALudoPlayerController::CheckPlayerStates()
 	if (const ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>())
 	{
 		// Check if we have received an updated (+PlayerIndex) PlayerState for all (expected) other clients
-		if (GameState->GetNumPlayersReplicated() == GameState->GetPlayerCountForGame())
+		if (GameState->GetNumPlayersReplicated() == GameState->GetSettings().NumPlayers)
 		{
 			Server_NotifyOnReady(PlayerState);
 		}

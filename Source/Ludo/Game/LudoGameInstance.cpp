@@ -14,25 +14,20 @@ void ULudoGameInstance::Init()
 	Engine->OnTravelFailure().AddUObject(this, &ULudoGameInstance::HandleTravelFailure);
 }
 
-void ULudoGameInstance::CreateGameCPU(const uint32 InRandomSeed, const uint8 InPlayers, const uint8 InCPU) const
-{
-	if (UEngine* Engine = GetEngine())
-	{
-		Engine->AddOnScreenDebugMessage(0, 4, FColor::Red, FString::Printf(TEXT("Creating game with %d players, %d CPU"), InPlayers, InCPU));
-
-		CreateGame(InRandomSeed, InPlayers, InCPU);
-	}
-}
-
-void ULudoGameInstance::CreateGame(const uint32 InRandomSeed, const uint8 InPlayers, const uint8 InCPU) const
+void ULudoGameInstance::CreateGame(const uint32 InRandomSeed, const uint8 InPlayers, const uint8 InCPU)
 {
 	if (UWorld* World = GetWorld())
 	{
-		FString TravelURL = TEXT("/Game/Maps/L_Standard");
-		TravelURL += FString::Printf(TEXT("?Seed=%ld"), InRandomSeed);
-		TravelURL += FString::Printf(TEXT("?Players=%d"), InPlayers);
-		TravelURL += FString::Printf(TEXT("?CPU=%d"), InCPU);
+		FGameSettings Settings;
+		Settings.Seed = InRandomSeed;
+		Settings.NumPlayers = InPlayers;
+		Settings.NumPlayersCPU = InCPU;
 
+		StoreTempGameSettings(Settings);
+		
+		GetEngine()->AddOnScreenDebugMessage(0, 4, FColor::Red, FString::Printf(TEXT("Creating game with %d players (%d CPU) and seed %ld"), InPlayers, InCPU, InRandomSeed));
+
+		const FString TravelURL = TEXT("/Game/Maps/L_Standard");
 		World->ServerTravel(TravelURL);
 	}
 }

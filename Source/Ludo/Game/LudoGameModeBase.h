@@ -5,6 +5,7 @@
 #include <CoreMinimal.h>
 #include <GameFramework/GameModeBase.h>
 
+#include "LudoGameState.h"
 #include "Game/GameEventsInterface.h"
 #include "Game/LudoControllerInterface.h"
 #include "Common/PlayerCore.h"
@@ -36,33 +37,9 @@ class LUDO_API ALudoGameModeBase : public AGameModeBase
 public:
 	ALudoGameModeBase();
 
-	// Number of players set to play the game
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 NumPlayers = 2;
-
-	// Number of bots/cpu players
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	uint8 NumPlayersCPU = 1;
-
 	// Must be populated with FPlayerCores in BP
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UPlayerCoreAsset* PlayerCores;
-
-	// Knock off opponents pieces
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bKnockPieces = true;
-
-	// Knock off multiple opponent pieces
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bKnockMultiple = true;
-
-	// Entry + move on high roll
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bMoveOnHighEntryRoll = true;
-	
-	bool bShouldSpawnCPU = true;
-
-	int32 RandomSeed; 
 
 protected:
 	// Entry roll numbers
@@ -90,13 +67,17 @@ protected:
 
 	void SetupPlayer(AController* Player);
 
+	bool bShouldSpawnCPU = true;
 	TArray<ALudoAIController*> CPUPlayers;
 
 	ILudoControllerInterface* GetPlayerInTurn() const { return PlayerInTurn; }
 
 	UFUNCTION(Category = "Events")
-	void OnPlayStateChanged(AGamerState* GamerState, EPlayState State);
+	void OnPlayStateChanged(AGamerState* GamerState, EPlayState PlayState);
 
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<ALudoGameState> State;
+	
 	UPROPERTY()
 	TScriptInterface<IGameEventsInterface> GameEventsInterface;
 
@@ -121,7 +102,7 @@ private:
 
 	bool CheckGameFinished() const;
 
-	void UpdateCurrentControllerState(bool bIsStartingTurn = true);
+	void UpdateCurrentControllerState(bool bIsStartingTurn = true) const;
 	
 	void OnPlayerReachedGoal(const uint8 Player, const uint8 InGoalTotal);
 
@@ -133,13 +114,13 @@ public:
 
 	void StartGame();
 
-	void AddPlayerThrow(FDieThrow Throw);
+	void AddPlayerThrow(const FDieThrow& Throw) const;
 
-	void PlayerPieceReachedGoal(TObjectPtr<APiece> Piece) const;
+	void PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece) const;
 
 	void NextTurn();
 
-	void EndGame();
+	void EndGame() const;
 
 	virtual void BeginPlay() override;
 };

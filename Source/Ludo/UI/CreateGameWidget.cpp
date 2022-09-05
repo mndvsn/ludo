@@ -33,10 +33,11 @@ void UCreateGameWidget::ButtonCreateGameReleased()
 	if (SliderPlayersCPU == nullptr) return;
 	const uint8 NumPlayersCPU = static_cast<uint8>(SliderPlayersCPU->GetValue());
 	const uint32 Seed = FCString::Atoi(*TextBoxSeed->GetText().ToString());
+	const char NumPlayers = NumPlayersCPU + 1;
 
-	if (const ULudoGameInstance* GameInstance = GetGameInstance<ULudoGameInstance>())
+	if (const TObjectPtr<ULudoGameInstance> GameInstance = GetGameInstance<ULudoGameInstance>())
 	{
-		GameInstance->CreateGameCPU(Seed, NumPlayersCPU + 1, NumPlayersCPU);
+		GameInstance->CreateGame(Seed, NumPlayers, NumPlayersCPU);
 	}
 }
 

@@ -6,16 +6,17 @@
 #include <EngineUtils.h>
 
 #include "LudoLog.h"
-#include "LudoGameState.h"
-#include "LudoPlayerController.h"
-#include "LudoAIController.h"
-#include "UI/GameHUD.h"
-#include "GamerState.h"
+#include "Game/LudoGameInstance.h"
+#include "Game/LudoGameState.h"
+#include "Game/LudoPlayerController.h"
+#include "Game/LudoAIController.h"
+#include "Game/GamerState.h"
 #include "Actors/Gamer.h"
 #include "Actors/PlayerSlot.h"
 #include "Actors/Board.h"
 #include "Actors/Yard.h"
 #include "Actors/Piece.h"
+#include "UI/GameHUD.h"
 
 
 ALudoGameModeBase::ALudoGameModeBase()
@@ -40,32 +41,32 @@ ALudoGameModeBase::ALudoGameModeBase()
 void ALudoGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-
-	// Override settings from URL
-	NumPlayers = UGameplayStatics::GetIntOption(Options, TEXT("Players"), NumPlayers);
-	NumPlayersCPU = UGameplayStatics::GetIntOption(Options, TEXT("CPU"), NumPlayersCPU);
-	RandomSeed = UGameplayStatics::GetIntOption(Options, TEXT("Seed"), FDateTime::UtcNow().ToUnixTimestamp());
-	bShouldSpawnCPU = NumPlayersCPU > 0;
 }
 
 void ALudoGameModeBase::InitGameState()
 {
 	Super::InitGameState();
 
-	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+	if (const TObjectPtr<ALudoGameState> LudoGameState = GetGameState<ALudoGameState>())
 	{
-		State->SetRandomSeed(RandomSeed);
-		State->SetPlayerCountForGame(NumPlayers);
-
-		GameEventsInterface = State;
+		State = LudoGameState;
+		GameEventsInterface = LudoGameState.Get();
 		if (GameEventsInterface)
 		{
 			PlayStateChangedHandle = GameEventsInterface->GetPlayStateChangedDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayStateChanged);
 			PlayerReachedGoalHandle = GameEventsInterface->GetPlayerReachedGoalDelegate().AddUObject(this, &ALudoGameModeBase::OnPlayerReachedGoal);
 		}
-	}
 
-	CreatePlayerSlots(NumPlayers);
+		// Initialize game settings from GI
+		if (const TObjectPtr<ULudoGameInstance> GameInstance = GetGameInstance<ULudoGameInstance>())
+		{
+			const FGameSettings& Settings = GameInstance->GetTempGameSettings();
+			bShouldSpawnCPU = Settings.NumPlayersCPU > 0;
+			State->SetGameSettings(Settings);
+			
+			CreatePlayerSlots(Settings.NumPlayers);
+		}
+	}
 }
 
 void ALudoGameModeBase::PostLogin(APlayerController* NewPlayer)
@@ -90,12 +91,12 @@ void ALudoGameModeBase::GenericPlayerInitialization(AController* C)
 bool ALudoGameModeBase::CheckGameReady() const
 {
 	// Check if all players are ready
-	bool bReady = false;	
-	
-	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+	bool bReady = false;
+
+	if (State)
 	{
 		// Game is ready if expected number of players is in
-		bReady = (State->GetNumPlayersReady() == State->GetPlayerCountForGame());
+		bReady = State->GetNumPlayersReady() == State->GetSettings().NumPlayers;
 	}
 
 	return bReady;
@@ -104,8 +105,8 @@ bool ALudoGameModeBase::CheckGameReady() const
 bool ALudoGameModeBase::CheckGameFinished() const
 {
 	bool bFinished = false;
-	
-	if (ALudoGameState* State = GetGameState<ALudoGameState>())
+
+	if (State)
 	{
 		bFinished = State->HasGameEnded();
 	}
@@ -121,22 +122,24 @@ void ALudoGameModeBase::StartGame()
 	NextTurn();
 }
 
-void ALudoGameModeBase::AddPlayerThrow(FDieThrow Throw)
+void ALudoGameModeBase::AddPlayerThrow(const FDieThrow& Throw) const
 {
+	if (!State) return;
+
 	// add throw to dice throws list
-	ALudoGameState* State = GetGameState<ALudoGameState>();
 	State->AddDieThrow(Throw);
 }
 
-void ALudoGameModeBase::PlayerPieceReachedGoal(TObjectPtr<APiece> Piece) const
+void ALudoGameModeBase::PlayerPieceReachedGoal(const TObjectPtr<APiece> Piece) const
 {
+	if (!Piece || !State) return;
+
 	const FPlayerCore& PlayerCore = Piece->GetPlayerCore();
 	UE_LOG(LogLudoGM, Verbose, TEXT("%s (%s) reached goal"), *Piece->GetName(), *PlayerCore.DisplayName);
 
 	Piece->SetInGoal(true);
 	Piece->SetActorHiddenInGame(true);
 
-	ALudoGameState* State = GetGameState<ALudoGameState>();
 	if (const TObjectPtr<APlayerSlot> PlayerSlot = State->GetPlayerSlot(PlayerCore))
 	{
 		const uint8 PlayerIndex = PlayerSlot->GetIndex();
@@ -146,8 +149,6 @@ void ALudoGameModeBase::PlayerPieceReachedGoal(TObjectPtr<APiece> Piece) const
 
 void ALudoGameModeBase::NextTurn()
 {
-	ALudoGameState* State = GetGameState<ALudoGameState>();
-
 	// If a players turn is ending
 	if (State->GetCurrentPlayerIndex() >= 0)
 	{
@@ -168,9 +169,9 @@ void ALudoGameModeBase::NextTurn()
 	UpdateCurrentControllerState(true);
 }
 
-void ALudoGameModeBase::EndGame()
+void ALudoGameModeBase::EndGame() const
 {
-	if (TObjectPtr<ALudoPlayerController> PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>())
+	if (const TObjectPtr<ALudoPlayerController> PlayerController = GetWorld()->GetFirstPlayerController<ALudoPlayerController>())
 	{
 		PlayerController->Server_ShowEndScreen();
 	}
@@ -181,7 +182,7 @@ void ALudoGameModeBase::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALudoGameModeBase::UpdateCurrentControllerState(bool bIsStartingTurn /*= true*/)
+void ALudoGameModeBase::UpdateCurrentControllerState(const bool bIsStartingTurn /*= true*/) const
 {
 	if (!ensure(PlayerInTurn)) return;
 
@@ -221,12 +222,12 @@ void ALudoGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController
 
 	if (const TObjectPtr<ALudoPlayerController> PC = Cast<ALudoPlayerController>(NewPlayer))
 	{
-		PC->SetGameEventsInterface(GetGameState<ALudoGameState>());
+		PC->SetGameEventsInterface(State.Get());
 
 		// Check if PlayerController is server controlled
 		if (bShouldSpawnCPU && NewPlayer->IsLocalPlayerController())
 		{
-			CreateCPUPlayers(NumPlayersCPU);
+			CreateCPUPlayers(State->GetSettings().NumPlayersCPU);
 		}
 	}
 }
@@ -273,9 +274,7 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	UE_LOG(LogLudoGM, Verbose, TEXT("ChoosePlayerStart: %s"), *Player->GetName());
 	APlayerSlot* Slot = nullptr;
 
-	const ALudoGameState* LudoGameState = GetGameState<ALudoGameState>();
-
-	if (TArray<APlayerSlot*> PlayerSlots = LudoGameState->GetPlayerSlots(); !PlayerSlots.IsEmpty())
+	if (TArray<APlayerSlot*> PlayerSlots = State->GetPlayerSlots(); !PlayerSlots.IsEmpty())
 	{
 		auto IsUnclaimed = [](const APlayerSlot* PlayerSlot)
 		{
@@ -293,28 +292,25 @@ AActor* ALudoGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return Slot;
 }
 
-void ALudoGameModeBase::CreatePlayerSlots(uint8 PlayerCount) const
+void ALudoGameModeBase::CreatePlayerSlots(const uint8 PlayerCount) const
 {
-	UWorld* World = GetWorld();
-	if (World == nullptr) return;
-
 	TArray<APlayerSlot*> PlayerSlots;
 	for (uint8 i=0; i < PlayerCount; i++)
 	{
 		const FRotator StartRotation = FRotator(0, i * (360.0f / 4), 0); // 4 sides of board, PlayerCount can be used but is bugged
 
-		APlayerSlot* Slot = World->SpawnActor<APlayerSlot>(FVector::ZeroVector, StartRotation);
+		const TObjectPtr<APlayerSlot> Slot = GetWorld()->SpawnActor<APlayerSlot>(FVector::ZeroVector, StartRotation);
 		Slot->SetIndex(i);
 		PlayerSlots.Add(Slot);
 	}
 
-	if (const TObjectPtr<ALudoGameState> LudoGameState = GetGameState<ALudoGameState>())
+	if (State)
 	{
-		LudoGameState->SetPlayerSlots(PlayerSlots);
+		State->SetPlayerSlots(PlayerSlots);
 	}
 }
 
-void ALudoGameModeBase::CreateCPUPlayers(uint8 NumCPUPlayers)
+void ALudoGameModeBase::CreateCPUPlayers(const uint8 NumCPUPlayers)
 {
 	UE_LOG(LogLudoGM, Verbose, TEXT("Create %d CPUs"), NumCPUPlayers);
 
@@ -361,10 +357,10 @@ void ALudoGameModeBase::SetBoard(TObjectPtr<ABoard> BoardActor)
 
 void ALudoGameModeBase::SetupBoard()
 {
-	if (!GetBoard()) return;
+	if (!GetBoard() || !State) return;
 
 	// Spawn player pieces
-	for (auto& PlayerState : GetGameState<ALudoGameState>()->PlayerArray)
+	for (auto& PlayerState : State->PlayerArray)
 	{
 		const TObjectPtr<AGamerState> GamerState = Cast<AGamerState>(PlayerState);
 		SpawnPiecesForPlayer(GamerState);
@@ -421,9 +417,9 @@ int32 ALudoGameModeBase::GetNumPlayersTotal() const
 	return PlayerCount;
 }
 
-void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, const EPlayState State)
+void ALudoGameModeBase::OnPlayStateChanged(AGamerState* GamerState, const EPlayState PlayState)
 {
-	if (State != EPlayState::Ready || !CheckGameReady()) return;
+	if (PlayState != EPlayState::Ready || !CheckGameReady()) return;
 
 	if (!GetBoard())
 	{

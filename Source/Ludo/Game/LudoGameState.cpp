@@ -16,8 +16,8 @@ void ALudoGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ALudoGameState, GameSettings);
 	DOREPLIFETIME(ALudoGameState, RandomStream);
-	DOREPLIFETIME(ALudoGameState, PlayerCountForGame);
 	DOREPLIFETIME(ALudoGameState, PlayerSlots);
 	DOREPLIFETIME(ALudoGameState, PlayerPiecesInGoal);
 	DOREPLIFETIME(ALudoGameState, CurrentPlayerIndex);
@@ -29,7 +29,7 @@ TObjectPtr<AGamerState> ALudoGameState::GetGamerStateForIndex(int8 PlayerIndex) 
 {
 	const TObjectPtr<APlayerState>* PlayerStatePtr = PlayerArray.FindByPredicate([PlayerIndex](const TObjectPtr<APlayerState>& PlayerState)
 	{
-		auto GamerState = Cast<AGamerState>(PlayerState);
+		const auto GamerState = Cast<AGamerState>(PlayerState);
 		return (GamerState->GetPlayerIndex() == PlayerIndex);
 	});
 
@@ -177,6 +177,14 @@ void ALudoGameState::OnRep_DieThrowList()
 {
 	const FDieThrow Throw = GetLastThrow();
 	OnDieThrowNative.Broadcast(Throw);
+}
+
+void ALudoGameState::SetGameSettings(const FGameSettings& NewSettings)
+{
+	UE_LOG(LogLudoGS, Verbose, TEXT("Setting game settings to game state"));
+	GameSettings = NewSettings;
+	
+	SetRandomSeed(GameSettings.Seed);
 }
 
 void ALudoGameState::SetRandomSeed(const int32 InSeed)

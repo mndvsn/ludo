@@ -246,7 +246,7 @@ void AGamer::Server_ThrowDie_Implementation()
 
 	UE_LOG(LogLudo, Verbose, TEXT("Player index %d throws a %d!"), Throw.PlayerIndex, Throw.Result);
 
-	ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode< ALudoGameModeBase>();
+	const ALudoGameModeBase* GameMode = GetWorld()->GetAuthGameMode< ALudoGameModeBase>();
 	GameMode->AddPlayerThrow(Throw);
 }
 
@@ -259,8 +259,7 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 {
 	// check if this Gamer is relevant for the throw
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
-	const bool bIsRelevant = PlayerIndex == Throw.PlayerIndex;
-	if (!bIsRelevant) return;
+	if (PlayerIndex != Throw.PlayerIndex) return;
 
 	// Display number
 	RunThrowUI(Throw);
@@ -286,7 +285,7 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 			PieceToMove = PieceInYard;
 
 			// Just move one step from Yard if high roll movement is disabled or result is low - "not high"
-			if (!GameMode->bMoveOnHighEntryRoll || !GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
+			if (!GameState->GetSettings().bMoveOnHighEntryRoll || !GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
 			{
 				Throw.Result = 1;
 			}
