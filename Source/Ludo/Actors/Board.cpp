@@ -271,7 +271,7 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 
 	// Check if target is occupied with other Pieces
 	TArray<APiece*> PiecesAtTarget;
-	if (GetPiecesAtSquare(TargetSquare, PiecesAtTarget))
+	if (TargetSquare != GoalSquare && GetPiecesAtSquare(TargetSquare, PiecesAtTarget))
 	{
 		FString NamesOfPieces;
 		TArray<TObjectPtr<APiece>> OpponentPieces;

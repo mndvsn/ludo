@@ -284,8 +284,8 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 			UE_LOG(LogLudo, Verbose, TEXT("Player %d can move a piece from their yard"), Throw.PlayerIndex);
 			PieceToMove = PieceInYard;
 
-			// Just move one step from Yard if high roll movement is disabled or result is low
-			if (!GameMode->bMoveOnHighEntryRoll && !GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
+			// Just move one step from Yard if high roll movement is disabled or result is low - "not high"
+			if (!GameMode->bMoveOnHighEntryRoll || !GameMode->GetEntryRolls(EEntryRollMask::ER_High).Contains(Throw.Result))
 			{
 				Throw.Result = 1;
 			}
