@@ -8,6 +8,7 @@
 #include "CreateGameWidget.generated.h"
 
 
+class UCheckBox;
 class UEditableTextBox;
 class UButton;
 class USlider;
@@ -33,6 +34,15 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category="Input", meta=(BindWidget))
 	UEditableTextBox* TextBoxSeed;
+
+	UPROPERTY(BlueprintReadOnly, Category="Input", meta=(BindWidget))
+	UCheckBox* CheckBoxKnock;
+
+	UPROPERTY(BlueprintReadOnly, Category="Input", meta=(BindWidget))
+	UCheckBox* CheckBoxKnockMultiple;
+
+	UPROPERTY(BlueprintReadOnly, Category="Input", meta=(BindWidget))
+	UCheckBox* CheckBoxMoveHighRoll;
 
 protected:
 	virtual void NativeOnInitialized() override;

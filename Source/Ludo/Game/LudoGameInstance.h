@@ -19,7 +19,7 @@ class LUDO_API ULudoGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 
-	void CreateGame(const uint32 InRandomSeed, const uint8 InPlayers = 4, const uint8 InCPU = 3);
+	void CreateGame(const uint32 InRandomSeed, const uint8 InPlayers = 4, const uint8 InCPU = 3, const bool InKnockPieces = true, const bool InKnockMultiple = true, const bool InMoveOnHighEntryRoll = true);
 
 	void EndGame();
 

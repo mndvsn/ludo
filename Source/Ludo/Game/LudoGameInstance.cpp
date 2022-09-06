@@ -14,7 +14,7 @@ void ULudoGameInstance::Init()
 	Engine->OnTravelFailure().AddUObject(this, &ULudoGameInstance::HandleTravelFailure);
 }
 
-void ULudoGameInstance::CreateGame(const uint32 InRandomSeed, const uint8 InPlayers, const uint8 InCPU)
+void ULudoGameInstance::CreateGame(const uint32 InRandomSeed, const uint8 InPlayers, const uint8 InCPU, const bool InKnockPieces, const bool InKnockMultiple, const bool InMoveOnHighEntryRoll)
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -22,6 +22,9 @@ void ULudoGameInstance::CreateGame(const uint32 InRandomSeed, const uint8 InPlay
 		Settings.Seed = InRandomSeed;
 		Settings.NumPlayers = InPlayers;
 		Settings.NumPlayersCPU = InCPU;
+		Settings.bKnockPieces = InKnockPieces;
+		Settings.bKnockMultiple = InKnockMultiple;
+		Settings.bMoveOnHighEntryRoll = InMoveOnHighEntryRoll;
 
 		StoreTempGameSettings(Settings);
 		
