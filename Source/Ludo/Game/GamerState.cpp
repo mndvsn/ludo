@@ -38,7 +38,7 @@ void AGamerState::UpdatePlayerName()
 
 void AGamerState::OnRep_PlayerName()
 {
-	if (AController* OwnerController = GetOwner<AController>())
+	if (const AController* OwnerController = GetOwner<AController>())
 	{
 		if (AGamer* Gamer = Cast<AGamer>(OwnerController->GetPawn()))
 		{
@@ -47,19 +47,19 @@ void AGamerState::OnRep_PlayerName()
 	}
 }
 
-void AGamerState::OnRep_PlayerIndex()
+void AGamerState::OnRep_PlayerIndex() const
 {
 	UE_LOG(LogLudoGS, Verbose, TEXT("OnRep_PlayerIndex: %d (Client)"), PlayerIndex);
 	GetWorld()->GetFirstPlayerController<ALudoPlayerController>()->CheckPlayerStates();
 }
 
-void AGamerState::SetPlayerIndex(int NewIndex)
+void AGamerState::SetPlayerIndex(const uint8 NewIndex)
 {
 	UE_LOG(LogLudoGS, Verbose, TEXT("SetPlayerIndex: %d (Auth)"), NewIndex);
 	PlayerIndex = NewIndex;
 }
 
-void AGamerState::SetPlayerSlot(TObjectPtr<APlayerSlot> NewSlot)
+void AGamerState::SetPlayerSlot(const TObjectPtr<APlayerSlot> NewSlot)
 {
 	UE_LOG(LogLudoGS, Verbose, TEXT("SetPlayerSlot: %s > %d"), *GetPlayerName(), *NewSlot->GetName());
 	PlayerSlot = NewSlot;
@@ -81,7 +81,7 @@ void AGamerState::OverrideWith(APlayerState* PlayerState)
 {
 	Super::OverrideWith(PlayerState);
 
-	if (AGamerState* GamerState = CastChecked<AGamerState>(PlayerState))
+	if (const AGamerState* GamerState = CastChecked<AGamerState>(PlayerState))
 	{
 		SetPlayerIndex(GamerState->PlayerIndex);
 		SetPlayState(GamerState->PlayState);

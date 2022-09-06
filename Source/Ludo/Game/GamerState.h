@@ -34,9 +34,9 @@ public:
 
 	void UpdatePlayerName();
 
-	void OnRep_PlayerName() override;
+	virtual void OnRep_PlayerName() override;
 	UFUNCTION()
-	void OnRep_PlayerIndex();
+	void OnRep_PlayerIndex() const;
 
 private:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerIndex)
@@ -50,13 +50,13 @@ private:
 
 public:
 	int8 GetPlayerIndex() const { return PlayerIndex; }
-	void SetPlayerIndex(int NewIndex);
+	void SetPlayerIndex(const uint8 NewIndex);
 
 	TObjectPtr<APlayerSlot> GetPlayerSlot() const { return PlayerSlot; }
-	void SetPlayerSlot(TObjectPtr<APlayerSlot> NewSlot);
+	void SetPlayerSlot(const TObjectPtr<APlayerSlot> NewSlot);
 
 	EPlayState GetPlayState() const { return PlayState; }
-	void SetPlayState(EPlayState State) { PlayState = State; };
+	void SetPlayState(const EPlayState State) { PlayState = State; }
 
 	//virtual FString GetPlayerNameCustom() const;
 
