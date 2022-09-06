@@ -242,7 +242,7 @@ void AGamer::Server_ThrowDie_Implementation()
 
 	FDieThrow Throw;
 	Throw.PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
-	Throw.Result = static_cast<uint8>(GameState->GetRandomStream().FRandRange(1, 6));
+	Throw.Result = static_cast<uint8>(GameState->GetRandomStream().RandRange(1, 6));
 
 	UE_LOG(LogLudo, Verbose, TEXT("Player index %d throws a %d!"), Throw.PlayerIndex, Throw.Result);
 
