@@ -111,12 +111,14 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_ThrowDie();
 
-	void OnDieThrow(FDieThrow Throw) const;
+	void OnDieThrow(FDieThrow Throw);
+
+	void EndAction() const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Client_ShowEndScreen(APlayerSlot* WinnerSlot) const;
 	
-	// //~=============================================================================
+	//~=============================================================================
 	// Visual
 
 	UFUNCTION(BlueprintNativeEvent)

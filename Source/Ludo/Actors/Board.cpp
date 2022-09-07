@@ -265,6 +265,8 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* StartSquare, const
 	const bool bKnock = GameState->GetSettings().bKnockPieces; // knock-out opponent pieces
 	const bool bKnockMultiple = GameState->GetSettings().bKnockMultiple; // multiple
 
+	bMovingPiece = true;
+	
 	RemovePieceFromBoardData(Piece);
 
 	if (TargetSquare == GoalSquare)
@@ -334,6 +336,8 @@ void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& P
 		{
 			Square->DistributePieces(this);
 		}
+		bMovingPiece = false;
+		OnBoardMovePiecesComplete.ExecuteIfBound();
 		Piece->GetAnimatePathFinishedDelegate().Unbind();
 	});
 

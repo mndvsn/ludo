@@ -255,7 +255,7 @@ bool AGamer::Server_ThrowDie_Validate()
 	return true;
 }
 
-void AGamer::OnDieThrow(FDieThrow Throw) const
+void AGamer::OnDieThrow(FDieThrow Throw)
 {
 	// check if this Gamer is relevant for the throw
 	const int8 PlayerIndex = GetPlayerState<AGamerState>()->GetPlayerIndex();
@@ -293,9 +293,10 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 	}
 
 	// Check if player can move a piece
+	bool bActionAvailable = false;
 	if (PieceToMove || GetPiecesOnBoard(TheBoard, false).Num() > 0)
 	{
-		bool bHasMoved = false;
+		bool bAttemptingMove = true;
 		short Attempt = 0;
 		
 		TArray<APiece*> MovablePieces;
@@ -309,7 +310,7 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 		}
 
 		// Try to move a piece
-		while (!bHasMoved)
+		while (bAttemptingMove)
 		{
 			if (MovablePieces.IsValidIndex(Attempt))
 			{
@@ -323,18 +324,35 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 				if (SquaresAhead.Num() == Throw.Result)
 				{
 					TheBoard->MovePiece(Piece, StartSquare, SquaresAhead);
-					bHasMoved = true;
+					bActionAvailable = true;
+					bAttemptingMove = false;
 				}
 				Attempt++;
 			}
 			else
 			{
 				// Ran out of possible moves
-				bHasMoved = true;
+				bAttemptingMove = false;
 			}
 		}
 	}
 
+	if (bActionAvailable)
+	{
+		TheBoard->OnBoardMovePiecesComplete.BindWeakLambda(this, [this, TheBoard]
+		{
+			EndAction();
+			TheBoard->OnBoardMovePiecesComplete.Unbind();
+		});
+	}
+	else
+	{
+		EndAction();
+	}
+}
+
+void AGamer::EndAction() const
+{
 	if (const TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
 	{
 		ControllerInterface->Server_RequestEndTurn();

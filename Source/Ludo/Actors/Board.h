@@ -10,6 +10,7 @@
 
 
 DECLARE_DELEGATE(FGE_OnBoardFoundYards);
+DECLARE_DELEGATE(FGE_OnBoardMovePiecesComplete);
 
 class AYard;
 class APlayerSquare;
@@ -52,9 +53,12 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void PerformMove(APiece* Piece, const TArray<ASquare*>& Path, const TArray<ASquare*>& PostAffectedSquares);
+
+	FGE_OnBoardMovePiecesComplete OnBoardMovePiecesComplete;
+	bool bMovingPiece = false;
 	
 	FGE_OnBoardFoundYards OnFoundYards;
-	bool bYardsFound;
+	bool bYardsFound = false;
 
 	// BoardData manipulation
 	bool AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare);
