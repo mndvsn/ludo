@@ -57,12 +57,12 @@ void APiece::AnimatePath_Implementation(const TArray<FVector>& Path, const bool 
 	MovesArray = Path;
 	if (bHandleFinished)
 	{
-		OnAnimatePathFinished.AddDynamic(this, &APiece::HandleAnimatePathFinished);
+		OnAnimatePathFinished.AddUniqueDynamic(this, &APiece::HandleAnimatePathFinished);
 	}
 }
 
 void APiece::HandleAnimatePathFinished()
 {
-	OnAnimatePathFinished.RemoveDynamic(this, &APiece::HandleAnimatePathFinished);
+	OnAnimatePathFinished.RemoveAll(this);
 	OnAnimatePathFinishedNative.ExecuteIfBound();
 }
