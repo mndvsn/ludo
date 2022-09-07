@@ -10,6 +10,10 @@
 
 
 class AGamer;
+class APiece;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAE_OnAnimatePathFinished);
+DECLARE_DELEGATE(FAE_OnAnimatePathFinishedNative);
 
 UCLASS(Abstract)
 class LUDO_API APiece : public AActor
@@ -28,6 +32,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Materials")
 	TObjectPtr<UMaterialInstanceDynamic> ColorMaterialInstance;
 
+	UPROPERTY(BlueprintCallable, Category=Events)
+	FAE_OnAnimatePathFinished OnAnimatePathFinished;
+
+private:
+	FAE_OnAnimatePathFinishedNative OnAnimatePathFinishedNative;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Piece", ReplicatedUsing=OnRep_PlayerCore)
 	FPlayerCore PlayerCore;
@@ -43,8 +53,11 @@ protected:
 	
 	FVector InitialLocation;
 
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FVector> MovesArray;
+	
 	virtual void BeginPlay() override;
-
+	
 public:
 	const FPlayerCore& GetPlayerCore() const { return PlayerCore; }
 	void SetPlayerCore(const FPlayerCore& InPlayerCore);
@@ -60,4 +73,12 @@ public:
 	
 	FVector GetInitialLocation() const { return InitialLocation; }
 	void SetInitialLocation(const FVector& InLocation) { InitialLocation = InLocation; }
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AnimatePath(const TArray<FVector>& Path, const bool bHandleFinished = false);
+
+	UFUNCTION()
+	void HandleAnimatePathFinished();
+
+	virtual FAE_OnAnimatePathFinishedNative& GetAnimatePathFinishedDelegate() { return OnAnimatePathFinishedNative; }
 };

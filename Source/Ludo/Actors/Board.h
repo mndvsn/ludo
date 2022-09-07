@@ -46,10 +46,13 @@ public:
 	TArray<TObjectPtr<ASquare>> GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const;
 
 	UFUNCTION(Server, Reliable)
-	void MovePiece(APiece* Piece, ASquare* TargetSquare);
+	void MovePiece(APiece* Piece, ASquare* StartSquare, const TArray<ASquare*>& SquaresAhead);
 	
 	void KnockPiece(const TObjectPtr<APiece> Piece);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void PerformMove(APiece* Piece, const TArray<ASquare*>& Path, const TArray<ASquare*>& PostAffectedSquares);
+	
 	FGE_OnBoardFoundYards OnFoundYards;
 	bool bYardsFound;
 

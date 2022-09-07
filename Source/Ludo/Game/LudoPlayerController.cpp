@@ -148,9 +148,10 @@ void ALudoPlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUD
 	// UI initialized callback for server controller
 	if (const TObjectPtr<AGameHUD> PlayerHUD = GetHUD<AGameHUD>())
 	{
-		PlayerHUD->OnGameHUDReady.BindLambda([this]()
+		PlayerHUD->OnGameHUDReady.BindWeakLambda(this, [this, PlayerHUD]
 		{
 			Server_NotifyOnReady(GetGamerState());
+			PlayerHUD->OnGameHUDReady.Unbind();
 		});
 	}
 }

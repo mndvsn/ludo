@@ -165,6 +165,7 @@ bool ABoard::GetPiecesAtSquare(const TObjectPtr<const ASquare> TargetSquare, TAr
 	bool bSuccess = false;
 	if (!TargetSquare) return bSuccess;
 
+	//TODO: Make code more readable
 	if (const auto FoundData = BoardData.FindByPredicate([TargetSquare](const FSquareData& Data)
 	{
 		return Data.Square == TargetSquare;
@@ -250,12 +251,12 @@ void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
 	}
 }
 
-void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
+void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* StartSquare, const TArray<ASquare*>& SquaresAhead)
 {
 	// Fail if null pointers or Piece is at target location already
-	if (!Piece || !TargetSquare) return;
-	const TObjectPtr<ASquare> StartSquare = LocationOfPiece(Piece);
-	if (!StartSquare || StartSquare == TargetSquare) return;
+	if (!Piece || !StartSquare || SquaresAhead.IsEmpty()) return;
+	const TObjectPtr<ASquare> TargetSquare = SquaresAhead.Last();
+	if (StartSquare == TargetSquare) return;
 
 	const TObjectPtr<ALudoGameModeBase> GameMode = GetWorld()->GetAuthGameMode<ALudoGameModeBase>();
 	
@@ -305,12 +306,39 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* TargetSquare)
 		{
 			Piece->SetInYard(false);
 		}
-		Piece->SetActorLocation(TargetSquare->GetActorLocation());
 
 		// Tidy up squares
-		StartSquare->DistributePieces(this);
-		TargetSquare->DistributePieces(this);
+		const TArray<ASquare*> SquaresToTidy = { StartSquare, TargetSquare };
+
+		// Make client move the Piece
+		PerformMove(Piece, SquaresAhead, SquaresToTidy);
 	}
+}
+
+void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& Path,
+	const TArray<ASquare*>& PostAffectedSquares)
+{
+	if (!Piece) return;
+	
+	// Make movement vectors
+	TArray<FVector> Moves;
+	for (auto& Square : Path)
+	{
+		Moves.Add(Square->GetActorLocation());
+	}
+	
+	// Post animation tidy of Pieces at square
+	Piece->GetAnimatePathFinishedDelegate().BindWeakLambda(this, [this, Piece, PostAffectedSquares]
+	{
+		for (auto& Square : PostAffectedSquares)
+		{
+			Square->DistributePieces(this);
+		}
+		Piece->GetAnimatePathFinishedDelegate().Unbind();
+	});
+
+	// Animate movement
+	Piece->AnimatePath(Moves, true);
 }
 
 bool ABoard::AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare)

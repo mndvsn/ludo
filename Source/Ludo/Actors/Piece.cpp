@@ -11,7 +11,7 @@
 
 APiece::APiece()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
 	Super::SetReplicateMovement(true);
@@ -50,4 +50,19 @@ void APiece::SetPlayerCore(const FPlayerCore& InPlayerCore)
 AGamer* APiece::GetGamer() const
 {
 	return GetInstigator<AGamer>();
+}
+
+void APiece::AnimatePath_Implementation(const TArray<FVector>& Path, const bool bHandleFinished)
+{
+	MovesArray = Path;
+	if (bHandleFinished)
+	{
+		OnAnimatePathFinished.AddDynamic(this, &APiece::HandleAnimatePathFinished);
+	}
+}
+
+void APiece::HandleAnimatePathFinished()
+{
+	OnAnimatePathFinished.RemoveDynamic(this, &APiece::HandleAnimatePathFinished);
+	OnAnimatePathFinishedNative.ExecuteIfBound();
 }

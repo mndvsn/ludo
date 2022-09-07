@@ -313,15 +313,16 @@ void AGamer::OnDieThrow(FDieThrow Throw) const
 		{
 			if (MovablePieces.IsValidIndex(Attempt))
 			{
-				APiece* Piece = MovablePieces[Attempt];
-				const uint8 StartIndex = TheBoard->IndexOfSquare(TheBoard->LocationOfPiece(Piece));
+				const TObjectPtr<APiece> Piece = MovablePieces[Attempt];
+				const TObjectPtr<ASquare> StartSquare = TheBoard->LocationOfPiece(Piece);
+				const uint8 StartIndex = TheBoard->IndexOfSquare(StartSquare);
 
 				TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
 
 				// If squares are fewer than throw it means we are moving a piece beyond goal, choose next piece
 				if (SquaresAhead.Num() == Throw.Result)
 				{
-					TheBoard->MovePiece(Piece, SquaresAhead.Last());
+					TheBoard->MovePiece(Piece, StartSquare, SquaresAhead);
 					bHasMoved = true;
 				}
 				Attempt++;

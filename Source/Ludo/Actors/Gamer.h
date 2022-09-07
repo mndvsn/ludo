@@ -49,7 +49,7 @@ private:
 	UPROPERTY(Replicated)
 	TObjectPtr<AYard> PlayerYard;
 
-	ALudoGameState* GameState;
+	TObjectPtr<ALudoGameState> GameState;
 
 public:
 	// Sets default values for this pawn's properties
