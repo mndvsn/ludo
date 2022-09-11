@@ -53,6 +53,7 @@ void UGameActionsWidget::OnButtonThrowDiceReleased_Implementation()
 		if (PC->IsInTurn())
 		{
 			PC->ThrowDie();
+			ButtonThrowDice->SetIsEnabled(false);
 		}
 	}
 }
