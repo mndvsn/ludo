@@ -44,6 +44,8 @@ void ASquare::DistributePieces(const ABoard* GameBoard) const
 		const float Slice = PI*2 / Items;
 		for (short i = 0; i < Pieces.Num(); i++)
 		{
+			if (!Pieces.IsValidIndex(i) || !Pieces[i]) continue;
+			
 			const TObjectPtr<APiece>& Piece = Pieces[i];
 			constexpr float SliceOffset = 45.f;
 

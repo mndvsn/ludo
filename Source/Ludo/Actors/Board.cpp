@@ -58,7 +58,10 @@ void ABoard::BeginPlay()
 				SquareData.Index = Square->Index;
 				SquareData.Square = Square;
 
-				BoardData.Add(SquareData);
+				if (HasAuthority())
+				{
+					BoardData.AddUnique(SquareData);
+				}
 
 				if (Square->Tags.Contains(TEXT("goal")))
 				{
@@ -234,21 +237,6 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 	return Reachable;
 }
 
-void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
-{
-	if (!HasAuthority()) return;
-	
-	// Reset Piece back to initial location in Yard
-	if (RemovePieceFromBoardData(Piece))
-	{
-		UE_LOG(LogLudo, Verbose, TEXT("KNOCK! %s (%s) moved back to yard"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
-		Piece->SetInYard(true);
-		const FVector InitialLocation = Piece->GetInitialLocation();
-		Piece->SetActorLocation(InitialLocation);
-		AddPieceToBoardData(Piece, Piece->GetOwner<ASquare>());
-	}
-}
-
 void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* StartSquare, const TArray<ASquare*>& SquaresAhead)
 {
 	// Fail if null pointers or Piece is at target location already
@@ -343,6 +331,29 @@ void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& P
 	Piece->AnimatePath(Moves, true);
 }
 
+void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
+{
+	if (!HasAuthority()) return;
+	
+	// Reset Piece back to initial location in Yard
+	if (RemovePieceFromBoardData(Piece))
+	{
+		UE_LOG(LogLudo, Verbose, TEXT("KNOCK! %s (%s) moved back to yard"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
+		Piece->SetInYard(true);
+		PerformKnock(Piece);
+		AddPieceToBoardData(Piece, Piece->GetOwner<AYard>());
+	}
+}
+
+void ABoard::PerformKnock_Implementation(APiece* Piece)
+{
+	// Make movement vector
+	const TArray MoveBackToInitial = { Piece->GetInitialLocation() };
+	
+	// Animate movement
+	Piece->AnimatePath(MoveBackToInitial);
+}
+
 bool ABoard::AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> TargetSquare)
 {
 	bool bSuccess = false;
@@ -357,7 +368,7 @@ bool ABoard::AddPieceToBoardData(TObjectPtr<APiece> Piece, TObjectPtr<ASquare> T
 
 	if (ArrayIndex > INDEX_NONE)
 	{
-		BoardData[ArrayIndex].Pieces.Add(Piece);
+		BoardData[ArrayIndex].Pieces.AddUnique(Piece);
 		bSuccess = true;
 	}
 
@@ -383,7 +394,3 @@ bool ABoard::RemovePieceFromBoardData(TObjectPtr<APiece> Piece)
 	return bSuccess;
 }
 
-void ABoard::OnRep_BoardData()
-{
-
-}

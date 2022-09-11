@@ -76,7 +76,6 @@ void AYard::SpawnPieces()
 				Piece->SetOwner(this);
 				Piece->SetPlayerCore(this->PlayerCore);
 				Piece->SetInYard(true);
-				Piece->SetInitialLocation(PieceTransform.GetLocation());
 
 				if (Gamer)
 				{

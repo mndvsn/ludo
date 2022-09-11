@@ -12,9 +12,10 @@
 APiece::APiece()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	bReplicates = true;
-	Super::SetReplicateMovement(true);
+	Super::SetReplicateMovement(false);
 
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Scene;
@@ -40,6 +41,8 @@ void APiece::OnRep_PlayerCore_Implementation()
 void APiece::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SetInitialLocation(GetActorLocation());
 }
 
 void APiece::SetPlayerCore(const FPlayerCore& InPlayerCore)
@@ -63,6 +66,6 @@ void APiece::AnimatePath_Implementation(const TArray<FVector>& Path, const bool 
 
 void APiece::HandleAnimatePathFinished()
 {
+	(void)OnAnimatePathFinishedNative.ExecuteIfBound();
 	OnAnimatePathFinished.RemoveAll(this);
-	OnAnimatePathFinishedNative.ExecuteIfBound();
 }

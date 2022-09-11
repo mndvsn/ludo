@@ -46,16 +46,21 @@ public:
 	
 	TArray<TObjectPtr<ASquare>> GetReachableSquares(const int StartIndex, const int StepLimit, const uint8 ForPlayerIndex) const;
 
+	// Move Piece to square
 	UFUNCTION(Server, Reliable)
 	void MovePiece(APiece* Piece, ASquare* StartSquare, const TArray<ASquare*>& SquaresAhead);
 	
-	void KnockPiece(const TObjectPtr<APiece> Piece);
-
 	UFUNCTION(NetMulticast, Reliable)
 	void PerformMove(APiece* Piece, const TArray<ASquare*>& Path, const TArray<ASquare*>& PostAffectedSquares);
 
 	FGE_OnBoardMovePiecesComplete OnBoardMovePiecesComplete;
 	bool bMovingPiece = false;
+
+	// Knock Piece from square
+	void KnockPiece(const TObjectPtr<APiece> Piece);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void PerformKnock(APiece* Piece);
 	
 	FGE_OnBoardFoundYards OnFoundYards;
 	bool bYardsFound = false;
@@ -77,9 +82,6 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<AYard>> Yards;
 
-	UPROPERTY(ReplicatedUsing=OnRep_BoardData)
+	UPROPERTY(Replicated)
 	TArray<FSquareData> BoardData;
-
-	UFUNCTION()
-	void OnRep_BoardData();
 };
