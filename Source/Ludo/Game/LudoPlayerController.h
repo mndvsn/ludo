@@ -85,7 +85,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsInTurn() const { return bInTurn; };
 
-	void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
+	virtual void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
 
 	void SetGameEventsInterface(TScriptInterface<IGameEventsInterface> Interface) { GameEventsInterface = Interface; };
 

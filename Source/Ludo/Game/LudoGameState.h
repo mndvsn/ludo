@@ -49,6 +49,8 @@ public:
 
 	void AdvanceTurn();
 
+	virtual void BeginPlay() override;
+
 private:
 	FGE_OnTurnChangedNative OnTurnChangedNative;
 	FGE_OnPlayerReachedGoalNative OnPlayerReachedGoalNative;

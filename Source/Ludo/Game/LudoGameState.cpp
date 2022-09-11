@@ -8,6 +8,7 @@
 #include "LudoLog.h"
 #include "Game/LudoGameModeBase.h"
 #include "Game/GamerState.h"
+#include "Game/LudoPlayerController.h"
 #include "Actors/PlayerSlot.h"
 #include "Actors/Piece.h"
 
@@ -92,6 +93,17 @@ void ALudoGameState::AdvanceTurn()
 		CurrentPlayerIndex = 0;
 	}
 	OnTurnChangedNative.Broadcast(CurrentPlayerIndex);
+}
+
+void ALudoGameState::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (!HasAuthority())
+	{
+		// Check if this client is fully replicated and ready
+		GetWorld()->GetFirstPlayerController<ALudoPlayerController>()->CheckPlayerStates();
+	}
 }
 
 void ALudoGameState::OnRep_CurrentPlayerIndex() const

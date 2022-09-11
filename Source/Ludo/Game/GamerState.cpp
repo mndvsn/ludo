@@ -50,6 +50,7 @@ void AGamerState::OnRep_PlayerName()
 void AGamerState::OnRep_PlayerIndex() const
 {
 	UE_LOG(LogLudoGS, Verbose, TEXT("OnRep_PlayerIndex: %d (Client)"), PlayerIndex);
+	// Check if this client is fully replicated and ready
 	GetWorld()->GetFirstPlayerController<ALudoPlayerController>()->CheckPlayerStates();
 }
 

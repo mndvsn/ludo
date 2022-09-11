@@ -68,7 +68,7 @@ void ALudoPlayerController::ThrowDie()
 
 void ALudoPlayerController::Server_NotifyOnReady_Implementation(APlayerState* PlayerStateReady)
 {
-	UE_LOG(LogLudo, Verbose, TEXT("Server_NotifyOnReady: %s"), *GetName());
+	UE_LOG(LogLudo, Verbose, TEXT("Server_NotifyOnReady: %s (%s)"), *GetName(), *PlayerStateReady->GetPlayerName());
 
 	const TObjectPtr<AGamerState> StateTyped = Cast<AGamerState>(PlayerStateReady);
 	StateTyped->SetPlayState(EPlayState::Ready);
@@ -90,11 +90,13 @@ void ALudoPlayerController::Server_ShowEndScreen_Implementation()
 
 void ALudoPlayerController::CheckPlayerStates()
 {
-	if (!PlayerState) return; // PlayerState not replicated yet, wait
+	// Don't proceed if PlayerState hasn't replicated or we are beyond loading/transition state
+	if (!PlayerState || Cast<AGamerState>(PlayerState)->GetPlayState() > EPlayState::Transitioning) return;
 
+	// Check that GameState is set
 	if (const ALudoGameState* GameState = GetWorld()->GetGameState<ALudoGameState>())
 	{
-		// Check if we have received an updated (+PlayerIndex) PlayerState for all (expected) other clients
+		// Check if we have received an updated (incl PlayerIndex) PlayerState for all (expected) clients
 		if (GameState->GetNumPlayersReplicated() == GameState->GetSettings().NumPlayers)
 		{
 			Server_NotifyOnReady(PlayerState);
@@ -109,7 +111,7 @@ TObjectPtr<AGamerState> ALudoPlayerController::GetGamerState()
 
 void ALudoPlayerController::OnRep_PlayerState()
 {
-	UE_LOG(LogLudo, Verbose, TEXT("OnRep_PlayerState: %s (%s)"), *GetName(), (HasAuthority() ? TEXT("Auth") : TEXT("Client")));
+	UE_LOG(LogLudo, Verbose, TEXT("OnRep_PlayerState: %s (%s: %s)"), *GetName(), (HasAuthority() ? TEXT("Auth") : TEXT("Client")), *PlayerState->GetPlayerName());
 	Super::OnRep_PlayerState();
 
 	if (!GameEventsInterface)
@@ -117,9 +119,7 @@ void ALudoPlayerController::OnRep_PlayerState()
 		GameEventsInterface = GetWorld()->GetGameState<ALudoGameState>();
 	}
 
-	// Don't proceed if we are beyond loading/transition
-	if (Cast<AGamerState>(PlayerState)->GetPlayState() > EPlayState::Transitioning) return;
-
+	// Check if this client is fully replicated and ready
 	CheckPlayerStates();
 }
 
