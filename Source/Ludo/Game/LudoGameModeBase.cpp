@@ -177,11 +177,6 @@ void ALudoGameModeBase::EndGame() const
 	}
 }
 
-void ALudoGameModeBase::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ALudoGameModeBase::UpdateCurrentControllerState(const bool bIsStartingTurn /*= true*/) const
 {
 	if (!ensure(PlayerInTurn)) return;
@@ -358,6 +353,7 @@ void ALudoGameModeBase::SetBoard(TObjectPtr<ABoard> BoardActor)
 void ALudoGameModeBase::SetupBoard()
 {
 	if (!GetBoard() || !State) return;
+	UE_LOG(LogLudoGM, Verbose, TEXT("SetupBoard: Ready to set up"));
 
 	// Spawn player pieces
 	for (auto& PlayerState : State->PlayerArray)

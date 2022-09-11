@@ -87,7 +87,7 @@ void ABoard::BeginPlay()
 		Algo::SortBy(Yards, &AYard::Index);
 
 		bYardsFound = true;
-		OnFoundYards.ExecuteIfBound();
+		(void)OnFoundYards.ExecuteIfBound();
 	}
 }
 
@@ -165,17 +165,15 @@ bool ABoard::GetPiecesAtSquare(const TObjectPtr<const ASquare> TargetSquare, TAr
 	bool bSuccess = false;
 	if (!TargetSquare) return bSuccess;
 
-	//TODO: Make code more readable
-	if (const auto FoundData = BoardData.FindByPredicate([TargetSquare](const FSquareData& Data)
+	auto MatchingSquare = [TargetSquare](const FSquareData& Data)
 	{
 		return Data.Square == TargetSquare;
-	}))
+	};
+	
+	if (const auto FoundData = BoardData.FindByPredicate(MatchingSquare); !FoundData->Pieces.IsEmpty())
 	{
-		if (!FoundData->Pieces.IsEmpty())
-		{
-			ResultArray.Append(FoundData->Pieces);
-			bSuccess = true;
-		}
+		ResultArray.Append(FoundData->Pieces);
+		bSuccess = true;
 	}
 	
 	return bSuccess;
@@ -337,7 +335,7 @@ void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& P
 			Square->DistributePieces(this);
 		}
 		bMovingPiece = false;
-		OnBoardMovePiecesComplete.ExecuteIfBound();
+		(void) OnBoardMovePiecesComplete.ExecuteIfBound();
 		Piece->GetAnimatePathFinishedDelegate().Unbind();
 	});
 
@@ -373,7 +371,7 @@ bool ABoard::RemovePieceFromBoardData(TObjectPtr<APiece> Piece)
 
 	const int32 ArrayIndex = BoardData.IndexOfByPredicate([Piece](const FSquareData& Data)
 	{
-		return (Data.Pieces.Contains(Piece));
+		return Data.Pieces.Contains(Piece);
 	});
 
 	if (ArrayIndex > INDEX_NONE)

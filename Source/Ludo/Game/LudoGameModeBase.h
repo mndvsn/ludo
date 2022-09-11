@@ -121,6 +121,4 @@ public:
 	void NextTurn();
 
 	void EndGame() const;
-
-	virtual void BeginPlay() override;
 };

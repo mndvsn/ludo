@@ -3,7 +3,6 @@
 
 #include "Actors/Square.h"
 
-#include "Yard.h"
 #include "Actors/Board.h" 
 #include "Actors/Piece.h"
 
