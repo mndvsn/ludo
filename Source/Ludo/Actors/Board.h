@@ -57,9 +57,8 @@ public:
 	bool bMovingPiece = false;
 
 	// Knock Piece from square
-	void KnockPiece(const TObjectPtr<APiece> Piece);
+	void KnockPiece(const TObjectPtr<APiece> Piece, const TObjectPtr<APiece> TargetPiece);
 
-	UFUNCTION(NetMulticast, Reliable)
 	void PerformKnock(APiece* Piece);
 	
 	FGE_OnBoardFoundYards OnFoundYards;

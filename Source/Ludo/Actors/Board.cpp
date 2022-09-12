@@ -283,7 +283,7 @@ void ABoard::MovePiece_Implementation(APiece* Piece, ASquare* StartSquare, const
 		{
 			for (const auto& OpponentPiece : OpponentPieces)
 			{
-				KnockPiece(OpponentPiece);
+				KnockPiece(Piece, OpponentPiece);
 			}
 		}
 	}
@@ -315,9 +315,20 @@ void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& P
 		Moves.Add(Square->GetActorLocation());
 	}
 	
-	// Post animation tidy of Pieces at square
+	// Post animation
 	Piece->GetAnimatePathFinishedDelegate().BindWeakLambda(this, [this, Piece, PostAffectedSquares]
 	{
+		// Check if this Piece hit opponent
+		if (Piece->GetKnockedPieces().Num() > 0)
+		{
+			for (APiece* KnockedPiece : Piece->GetKnockedPieces())
+			{
+				PerformKnock(KnockedPiece);
+			}
+			Piece->ResetKnockedPieces();
+		}
+
+		// Tidy up Pieces at start/stop square
 		for (auto& Square : PostAffectedSquares)
 		{
 			Square->DistributePieces(this);
@@ -331,21 +342,21 @@ void ABoard::PerformMove_Implementation(APiece* Piece, const TArray<ASquare*>& P
 	Piece->AnimatePath(Moves, true);
 }
 
-void ABoard::KnockPiece(const TObjectPtr<APiece> Piece)
+void ABoard::KnockPiece(const TObjectPtr<APiece> Piece, const TObjectPtr<APiece> TargetPiece)
 {
 	if (!HasAuthority()) return;
 	
 	// Reset Piece back to initial location in Yard
-	if (RemovePieceFromBoardData(Piece))
+	if (RemovePieceFromBoardData(TargetPiece))
 	{
-		UE_LOG(LogLudo, Verbose, TEXT("KNOCK! %s (%s) moved back to yard"), *Piece->GetName(), *Piece->GetPlayerCore().DisplayName);
-		Piece->SetInYard(true);
-		PerformKnock(Piece);
-		AddPieceToBoardData(Piece, Piece->GetOwner<AYard>());
+		UE_LOG(LogLudo, Verbose, TEXT("KNOCK! %s (%s) moved back to yard"), *TargetPiece->GetName(), *TargetPiece->GetPlayerCore().DisplayName);
+		Piece->AddKnockedPiece(TargetPiece);
+		TargetPiece->SetInYard(true);
+		AddPieceToBoardData(TargetPiece, TargetPiece->GetOwner<AYard>());
 	}
 }
 
-void ABoard::PerformKnock_Implementation(APiece* Piece)
+void ABoard::PerformKnock(APiece* Piece)
 {
 	// Make movement vector
 	const TArray MoveBackToInitial = { Piece->GetInitialLocation() };

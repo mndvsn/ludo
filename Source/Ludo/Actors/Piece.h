@@ -55,6 +55,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FVector> MovesArray;
+
+	TArray<TObjectPtr<APiece>> KnockedPieces;
 	
 	virtual void BeginPlay() override;
 	
@@ -63,11 +65,15 @@ public:
 	void SetPlayerCore(const FPlayerCore& InPlayerCore);
 
 	bool IsInYard() const { return bInYard; };
-	void SetInYard(bool bIn) { bInYard = bIn; };
+	void SetInYard(const bool bIn) { bInYard = bIn; };
 
 	bool IsInGoal() const { return bInGoal; };
-	void SetInGoal(bool bIn) { bInGoal = bIn; };
+	void SetInGoal(const bool bIn) { bInGoal = bIn; };
 
+	TArray<TObjectPtr<APiece>> GetKnockedPieces() const { return KnockedPieces; }
+	void AddKnockedPiece(const TObjectPtr<APiece> KnockedPiece) { KnockedPieces.Add(KnockedPiece); }
+	void ResetKnockedPieces() { KnockedPieces.Empty(); }
+	
 	UFUNCTION(BlueprintPure)
 	AGamer* GetGamer() const;
 	
