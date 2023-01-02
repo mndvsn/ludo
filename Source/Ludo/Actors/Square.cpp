@@ -42,7 +42,7 @@ void ASquare::DistributePieces(const ABoard* GameBoard) const
 		}
 
 		const float Slice = PI*2 / Items;
-		for (short i = 0; i < Pieces.Num(); i++)
+		for (int i = 0; i < Pieces.Num(); i++)
 		{
 			if (!Pieces.IsValidIndex(i) || !Pieces[i]) continue;
 			

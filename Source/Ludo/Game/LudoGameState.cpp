@@ -112,7 +112,7 @@ void ALudoGameState::OnRep_CurrentPlayerIndex() const
 }
 
 
-void ALudoGameState::SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots)
+void ALudoGameState::SetPlayerSlots(const TArray<APlayerSlot*>& InPlayerSlots)
 {
 	if (!HasAuthority()) return;
 
@@ -120,7 +120,7 @@ void ALudoGameState::SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots)
 	{
 		PlayerSlots = InPlayerSlots;
 
-		short SlotNum = PlayerSlots.Num();
+		int SlotNum = PlayerSlots.Num();
 		while (SlotNum--)
 		{
 			PlayerPiecesInGoal.Add(0);
@@ -128,7 +128,7 @@ void ALudoGameState::SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots)
 	}
 }
 
-APlayerSlot* ALudoGameState::GetPlayerSlot(uint8 PlayerIndex) const
+APlayerSlot* ALudoGameState::GetPlayerSlot(const int PlayerIndex) const
 {
 	if (!PlayerSlots.IsValidIndex(PlayerIndex)) return nullptr;
 

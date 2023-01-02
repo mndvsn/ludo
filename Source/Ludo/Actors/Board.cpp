@@ -196,7 +196,7 @@ TArray<TObjectPtr<ASquare>> ABoard::GetReachableSquares(const int StartIndex, co
 	const uint8 PlayerCoreId = GameState->GetPlayerSlot(ForPlayerIndex)->GetPlayerCore().Id;
 
 	TQueue<TObjectPtr<ASquare>> Near;
-	TMap<TObjectPtr<ASquare>, short> StepMap;
+	TMap<TObjectPtr<ASquare>, int> StepMap;
 	TObjectPtr<ASquare> Current = Squares[StartIndex];
 
 	Near.Enqueue(Current);

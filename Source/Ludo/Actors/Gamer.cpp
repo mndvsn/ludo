@@ -148,7 +148,7 @@ void AGamer::PushCameraUp(float AxisValue)
 
 void AGamer::PushCameraRight(float AxisValue)
 {
-	//TODO: PushCamerRight
+	//TODO: PushCameraRight
 }
 
 void AGamer::TurnCamera(float AxisValue)
@@ -297,7 +297,7 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 	if (PieceToMove || GetPiecesOnBoard(TheBoard, false).Num() > 0)
 	{
 		bool bAttemptingMove = true;
-		short Attempt = 0;
+		int Attempt = 0;
 		
 		TArray<APiece*> MovablePieces;
 		if (PieceToMove)
@@ -316,7 +316,7 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 			{
 				const TObjectPtr<APiece> Piece = MovablePieces[Attempt];
 				const TObjectPtr<ASquare> StartSquare = TheBoard->LocationOfPiece(Piece);
-				const uint8 StartIndex = TheBoard->IndexOfSquare(StartSquare);
+				const int StartIndex = TheBoard->IndexOfSquare(StartSquare);
 
 				TArray<TObjectPtr<ASquare>> SquaresAhead = TheBoard->GetReachableSquares(StartIndex, Throw.Result, Throw.PlayerIndex);
 

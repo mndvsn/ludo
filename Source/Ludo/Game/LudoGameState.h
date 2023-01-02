@@ -94,9 +94,9 @@ public:
 	void SetRandomSeed(const int32 InSeed);
 	
 	TArray<APlayerSlot*> GetPlayerSlots() const { return PlayerSlots; };
-	void SetPlayerSlots(TArray<APlayerSlot*> InPlayerSlots);
+	void SetPlayerSlots(const TArray<APlayerSlot*>& InPlayerSlots);
 
-	APlayerSlot* GetPlayerSlot(uint8 PlayerIndex) const;
+	APlayerSlot* GetPlayerSlot(const int PlayerIndex) const;
 	APlayerSlot* GetPlayerSlot(const FPlayerCore& PlayerCore) const;
 
 	int8 GetCurrentPlayerIndex() const { return CurrentPlayerIndex; };
