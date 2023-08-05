@@ -353,7 +353,7 @@ void AGamer::OnDieThrow(FDieThrow Throw)
 
 void AGamer::EndAction() const
 {
-	if (const TObjectPtr<ILudoControllerInterface> ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
+	if (ILudoControllerInterface* ControllerInterface = Cast<ILudoControllerInterface>(GetController()))
 	{
 		ControllerInterface->Server_RequestEndTurn();
 	}

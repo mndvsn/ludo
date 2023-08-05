@@ -43,8 +43,6 @@ void AMenuHUD::ShowMenu()
 	if (PlayerController == nullptr) return;
 	if (!IsValid(Menu)) return;
 
-	Menu->bIsFocusable = true;
-
 	FInputModeUIOnly InputModeData;
 	InputModeData.SetWidgetToFocus(Menu->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
@@ -63,7 +61,7 @@ void AMenuHUD::HideMenu()
 
 	if (APlayerController* PlayerController = GetOwner<APlayerController>())
 	{
-		FInputModeGameOnly InputModeData;
+		const FInputModeGameOnly InputModeData;
 		PlayerController->SetInputMode(InputModeData);
 		PlayerController->SetShowMouseCursor(false);
 	}
